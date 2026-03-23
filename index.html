@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>RubyBrandDesign 電子名片</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    .glass-card { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 10px 40px rgba(0,0,0,0.05); }
+    .fade-enter-active, .fade-leave-active { transition: opacity 0.5s ease; }
+    .fade-enter-from, .fade-leave-to { opacity: 0; }
+  </style>
+</head>
+<body>
+  <div id="app" class="min-h-screen flex flex-col items-center py-10 px-4 transition-colors duration-500" :style="{ backgroundColor: profile.背景主題顏色 || '#FDF2F8' }">
+    
+    <div v-if="isLoading" class="flex flex-col items-center justify-center mt-32">
+      <i class="ph ph-spinner animate-spin text-5xl text-pink-500 mb-4"></i>
+      <p class="text-gray-500 font-bold">資料準備中...</p>
+    </div>
+
+    <div v-else-if="errorMessage" class="flex flex-col items-center justify-center mt-20 bg-white p-6 rounded-2xl shadow-lg">
+      <i class="ph-fill ph-warning-circle text-4xl text-red-500 mb-2"></i>
+      <p class="text-gray-800 font-bold">{{ errorMessage }}</p>
+    </div>
+
+    <transition name="fade">
+      <div v-if="!isLoading && !errorMessage && isAutoShare" class="w-full flex flex-col items-center justify-center mt-32 text-center">
+        <div class="w-20 h-20 bg-white rounded-full shadow-lg flex items-center justify-center mb-6">
+           <i class="ph-fill ph-paper-plane-tilt text-4xl text-[#06C755] animate-pulse"></i>
+        </div>
+        <h2 class="text-xl font-black text-gray-900 mb-2">正在開啟好友列表</h2>
+        <p class="text-sm text-gray-500 font-bold mb-8">請在彈出的視窗中選擇要發送的對象</p>
+        <button @click="closeLiff" class="text-gray-400 text-sm font-bold underline">取消並關閉視窗</button>
+      </div>
+    </transition>
+
+    <transition name="fade">
+      <div v-if="!isLoading && !errorMessage && !isAutoShare" class="w-full max-w-md glass-card rounded-3xl p-8 flex flex-col items-center relative overflow-hidden">
+        
+        <div class="w-28 h-28 rounded-full border-4 border-white shadow-lg overflow-hidden mb-5 bg-gray-100">
+          <img v-if="profile.大頭貼圖片URL" :src="profile.大頭貼圖片URL" class="w-full h-full object-cover">
+        </div>
+        
+        <h1 class="text-2xl font-black text-gray-900 mb-2">{{ profile.顯示名稱 }}</h1>
+        <p class="text-sm text-gray-600 text-center whitespace-pre-wrap leading-relaxed mb-8 w-full">{{ profile.個人簡介文字 }}</p>
+
+        <button @click="shareMyCard" class="w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-4 rounded-2xl mb-6 shadow-md transition flex items-center justify-center gap-2 transform hover:scale-[1.02]">
+          <i class="ph-fill ph-chat-circle-text text-xl"></i> {{ shareButtonText }}
+        </button>
+
+        <div class="w-full space-y-3">
+          <a v-for="btn in buttons" :key="btn.按鈕ID" :href="btn.跳轉連結" target="_blank" 
+             class="w-full flex items-center gap-3 p-3 rounded-2xl border border-white/50 shadow-sm transition transform hover:-translate-y-1 hover:shadow-md"
+             :style="{ backgroundColor: btn.按鈕顏色 || '#ffffff' }">
+            <div class="w-10 h-10 rounded-xl bg-white/60 flex items-center justify-center overflow-hidden shrink-0">
+              <img v-if="btn.Icon圖片URL" :src="btn.Icon圖片URL" class="w-full h-full object-cover">
+              <i v-else class="ph ph-link text-gray-700"></i>
+            </div>
+            <div class="flex-1 font-bold text-gray-800 text-center pr-10">{{ btn.按鈕文字 }}</div>
+          </a>
+        </div>
+        
+      </div>
+    </transition>
+    <p v-if="!isLoading && !errorMessage && !isAutoShare" class="mt-8 text-xs font-bold text-gray-400">Powered by Ruby.Brand.Design</p>
+  </div>
+
+  <script>
+    const { createApp, ref, onMounted } = Vue;
+
+    // ⚠️ 務必確認這是你的最新 GAS URL
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzVcMLPTZ41rZebfLtjBXNuTdxPyZDkatjSHILCVk2GtYXPNbLxMBqDI1hhTROuECDEPw/exec";
+    const LIFF_ID = "2009561347-VUhbtrEC";
+
+    createApp({
+      setup() {
+        const profile = ref({});
+        const buttons = ref([]);
+        const flexMsg = ref(null);
+        
+        const isLoading = ref(true);
+        const errorMessage = ref('');
+        const isAutoShare = ref(false); // 控制是否為「隱形轉發模式」
+        
+        const shareButtonText = ref("傳送E-LINE-CARD");
+
+        const closeLiff = () => {
+            if (liff.isLoggedIn()) liff.closeWindow();
+        };
+
+        const shareMyCard = async () => {
+          try {
+            if (!liff.isLoggedIn()) {
+              liff.login({ redirectUri: window.location.href });
+              return; 
+            }
+
+            if (!flexMsg.value) {
+              alert("名片資料尚未準備好，請稍候再試。");
+              if(isAutoShare.value) closeLiff();
+              return;
+            }
+
+            if (liff.isApiAvailable('shareTargetPicker')) {
+              const res = await liff.shareTargetPicker([{
+                "type": "flex",
+                "altText": `這是 ${profile.value.顯示名稱 || '我'} 的電子名片，請查收！`, 
+                "contents": flexMsg.value
+              }]);
+              
+              if (res) {
+                // ✨ 傳送成功：如果是「隱形模式」，傳完立刻秒關閉視窗！
+                if (isAutoShare.value) {
+                    closeLiff();
+                } else {
+                    alert("✨ 名片已成功發送到聊天室！");
+                }
+              } else {
+                // 使用者按了取消 (右上角叉叉)：一樣自動關閉視窗
+                if (isAutoShare.value) closeLiff();
+              }
+            } else {
+              alert("目前無法使用分享功能。請確認 LINE Developers Console 中是否已開啟「Share Target Picker」權限。");
+            }
+          } catch (err) {
+            console.error("分享失敗，原因:", err);
+            // 發生未知錯誤時也自動關閉，避免卡在白畫面
+            if (isAutoShare.value) closeLiff();
+          }
+        };
+
+        onMounted(async () => {
+          try {
+            await liff.init({ liffId: LIFF_ID });
+          } catch (err) {
+            console.error("LIFF 初始化失敗", err);
+          }
+
+          const urlParams = new URLSearchParams(window.location.search);
+          const memberId = urlParams.get('id');
+          
+          // 判斷網址是否帶有 autoShare=true 參數
+          isAutoShare.value = urlParams.get('autoShare') === 'true';
+
+          if (!memberId) {
+            errorMessage.value = '網址錯誤：缺少專屬會員 ID';
+            isLoading.value = false;
+            return;
+          }
+
+          try {
+            const response = await fetch(`${GAS_API_URL}?id=${memberId}`);
+            const data = await response.json();
+
+            if (data.status === 'success') {
+              profile.value = data.profile;
+              buttons.value = data.buttons;
+              flexMsg.value = data.flexMsg;
+              document.title = isAutoShare.value ? '發送名片中...' : `${data.profile.顯示名稱} 的數位名片`;
+
+              // 🌟 核心邏輯：如果是轉發模式，不顯示介面，直接觸發轉發
+              if (isAutoShare.value) {
+                  setTimeout(() => {
+                      shareMyCard();
+                  }, 500); // 只給 0.5 秒讓動畫跑一下，隨即彈出選擇框
+              }
+
+            } else {
+              errorMessage.value = data.message || '無法載入名片資料';
+            }
+          } catch (error) {
+            errorMessage.value = '網路連線異常，請稍後再試。';
+          } finally {
+            isLoading.value = false;
+          }
+        });
+
+        return { profile, buttons, isLoading, errorMessage, isAutoShare, shareButtonText, shareMyCard, closeLiff };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
