@@ -161,7 +161,7 @@
               profile.value = data.profile;
               buttons.value = data.buttons;
               flexMsg.value = data.flexMsg;
-              document.title = isAutoShare.value ? '發送名片中...' : `${data.profile.顯示名稱} 的數位名片`;
+              document.title = isAutoShare.value ? '發送名片中...' : `${data.profile.顯示名稱} 的電子名片`;
 
               // 🌟 核心邏輯：如果是轉發模式，不顯示介面，直接觸發轉發
               if (isAutoShare.value) {
