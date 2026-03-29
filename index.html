@@ -95,7 +95,6 @@
         
         const shareButtonText = ref("傳送E-LINE-CARD");
 
-        // 【終極防呆參數解析器】：完美解決 LINE liff.state 多重編碼問題
         const getSafeParam = (paramName) => {
             const urlParams = new URLSearchParams(window.location.search);
             let val = urlParams.get(paramName);
@@ -105,7 +104,6 @@
             if (liffState) {
                 try {
                     let decodedState = liffState;
-                    // 防禦多次編碼的情況
                     while(decodedState !== decodeURIComponent(decodedState)) {
                         decodedState = decodeURIComponent(decodedState);
                     }
@@ -118,7 +116,6 @@
                 }
             }
 
-            // 終極正則暴力解析 (處理跳轉過程中的奇葩編碼)
             const regex = new RegExp(`(?:${paramName}=|${paramName}%3D)([^&]+)`);
             const match = window.location.href.match(regex);
             if (match) return decodeURIComponent(match[1]);
@@ -137,8 +134,6 @@
         const buildTrackedUrl = (btn, index) => {
             const targetUrl = btn['跳轉連結'] || btn.url;
             const itemId = btn[Object.keys(btn)[0]]; 
-            
-            // 使用全新的防呆解析器
             let memberId = getSafeParam('id');
 
             if (!memberId || !targetUrl) return targetUrl || '#';
@@ -150,56 +145,35 @@
             return `${GAS_API_URL}?action=trackClick&memberId=${memberId}&type=button&itemId=${itemId}&btnIdx=${index + 1}&url=${encodeURIComponent(targetUrl)}`;
         };
 
+        // 【修正核心】全面解放好友選擇器，網頁與手機一律喚醒！
         const shareMyCard = async () => {
           try {
-            if (isAutoShare.value) {
-                if (!flexMsg.value) {
-                    alert("名片資料尚未準備好，請稍候再試。");
-                    closeLiff();
-                    return;
-                }
+            if (!flexMsg.value) {
+                alert("名片資料尚未準備好，請稍候再試。");
+                if (isAutoShare.value) closeLiff();
+                return;
+            }
 
-                if (typeof liff !== 'undefined' && liff.isApiAvailable('shareTargetPicker')) {
-                    if (!liff.isLoggedIn()) {
-                        liff.login({ redirectUri: window.location.href });
-                        return; 
-                    }
-                    const res = await liff.shareTargetPicker([{
+            if (typeof liff !== 'undefined') {
+                // 如果未登入，強制導向 LINE 登入畫面
+                if (!liff.isLoggedIn()) {
+                    liff.login({ redirectUri: window.location.href });
+                    return; 
+                }
+                
+                // 確認功能有開啟後，直接喚醒好友選擇器發送 Flex Message
+                if (liff.isApiAvailable('shareTargetPicker')) {
+                    await liff.shareTargetPicker([{
                         "type": "flex",
                         "altText": `這是 ${profile.value.顯示名稱 || '我'} 的電子名片，請查收！`, 
                         "contents": flexMsg.value
                     }]);
-                    closeLiff(); 
+                    
+                    // 發送成功後，只有在 AutoShare (自動輪播) 模式才自動關閉視窗
+                    if (isAutoShare.value) closeLiff(); 
                 } else {
-                    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                    // 使用全新的防呆解析器
-                    let mId = getSafeParam('id');
-
-                    if (isMobile) {
-                        window.location.href = `https://liff.line.me/${LIFF_ID}?id=${mId}&autoShare=true`;
-                    } else {
-                        alert("⚠️ 系統提示\n\n為確保格式完美，發送「精美輪播名片」必須在手機版 LINE 中進行。\n請使用手機開啟此網址操作喔！");
-                        closeLiff();
-                    }
-                }
-            } else {
-                const currentUrl = new URL(window.location.href);
-                currentUrl.searchParams.delete('autoShare'); 
-                const shareUrl = currentUrl.toString();
-                
-                const shareText = `哈囉！這是 ${profile.value.顯示名稱 || '我'} 的電子名片，請點擊連結查看：\n${shareUrl}`;
-                
-                try {
-                    await navigator.clipboard.writeText(shareText);
-                    alert('✨ 已為您複製名片資訊！\n您可以直接貼到 LINE 聊天室或群組中。');
-                } catch(err) {
-                    const input = document.createElement('textarea');
-                    input.value = shareText;
-                    document.body.appendChild(input);
-                    input.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(input);
-                    alert('✨ 已為您複製名片資訊！\n您可以直接貼到 LINE 聊天室或群組中。');
+                    alert("⚠️ 系統提示：\n請確認 LINE Developers 後台的「Share Target Picker」功能已開啟。");
+                    if (isAutoShare.value) closeLiff();
                 }
             }
           } catch (err) {
@@ -209,7 +183,6 @@
         };
 
         onMounted(() => {
-          // 使用全新的防呆解析器全面接管 URL 參數解析
           let memberId = getSafeParam('id');
           let autoShareParam = getSafeParam('autoShare');
           
@@ -221,7 +194,6 @@
             return;
           }
 
-          // 任務 A：拉取 GAS 資料
           fetch(`${GAS_API_URL}?id=${memberId}`)
             .then(res => res.json())
             .then(data => {
@@ -241,7 +213,6 @@
                 isLoading.value = false; 
             });
 
-          // 任務 B：背景初始化 LIFF
           if (typeof liff !== 'undefined') {
               liff.init({ liffId: LIFF_ID }).then(() => {
                   if (isAutoShare.value) {
