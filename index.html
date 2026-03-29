@@ -13,10 +13,12 @@
     .glass-card { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 10px 40px rgba(0,0,0,0.05); }
     .fade-enter-active, .fade-leave-active { transition: opacity 0.5s ease; }
     .fade-enter-from, .fade-leave-to { opacity: 0; }
+    /* 【優化】加入 v-cloak 防閃爍樣式，確保社群軟體爬蟲與預覽時，不會顯示未編譯的 Vue 標籤 */
+    [v-cloak] { display: none !important; }
   </style>
 </head>
 <body>
-  <div id="app" class="min-h-screen flex flex-col items-center py-10 px-4 transition-colors duration-500" :style="{ backgroundColor: profile.背景主題顏色 || '#FDF2F8' }">
+  <div id="app" v-cloak class="min-h-screen flex flex-col items-center py-10 px-4 transition-colors duration-500" :style="{ backgroundColor: profile.背景主題顏色 || '#FDF2F8' }">
     
     <div v-if="isLoading" class="flex flex-col items-center justify-center mt-32">
       <i class="ph ph-spinner animate-spin text-5xl text-pink-500 mb-4"></i>
@@ -85,47 +87,81 @@
         
         const isLoading = ref(true);
         const errorMessage = ref('');
-        const isAutoShare = ref(false); // 控制是否為「隱形轉發模式」
+        const isAutoShare = ref(false); 
         
         const shareButtonText = ref("傳送E-LINE-CARD");
 
+        // 【優化】支援一般瀏覽器的關閉視窗邏輯
         const closeLiff = () => {
-            if (liff.isLoggedIn()) liff.closeWindow();
+            if (typeof liff !== 'undefined' && liff.isInClient()) {
+                liff.closeWindow();
+            } else {
+                window.close(); // 外部瀏覽器嘗試關閉分頁
+            }
         };
 
         const shareMyCard = async () => {
           try {
-            if (!liff.isLoggedIn()) {
-              liff.login({ redirectUri: window.location.href });
-              return; 
-            }
-
-            if (!flexMsg.value) {
-              alert("名片資料尚未準備好，請稍候再試。");
-              if(isAutoShare.value) closeLiff();
-              return;
-            }
-
-            if (liff.isApiAvailable('shareTargetPicker')) {
-              const res = await liff.shareTargetPicker([{
-                "type": "flex",
-                "altText": `這是 ${profile.value.顯示名稱 || '我'} 的電子名片，請查收！`, 
-                "contents": flexMsg.value
-              }]);
-              
-              if (res) {
-                // ✨ 傳送成功：如果是「隱形模式」，傳完立刻秒關閉視窗！
-                if (isAutoShare.value) {
-                    closeLiff();
-                } else {
-                    alert("✨ 名片已成功發送到聊天室！");
+            // 【跨平台優化 1】：偵測是否在 LINE App 內建瀏覽器環境
+            if (typeof liff !== 'undefined' && liff.isInClient()) {
+                // 原本的 LINE 內部轉發邏輯
+                if (!liff.isLoggedIn()) {
+                  liff.login({ redirectUri: window.location.href });
+                  return; 
                 }
-              } else {
-                // 使用者按了取消 (右上角叉叉)：一樣自動關閉視窗
-                if (isAutoShare.value) closeLiff();
-              }
+
+                if (!flexMsg.value) {
+                  alert("名片資料尚未準備好，請稍候再試。");
+                  if(isAutoShare.value) closeLiff();
+                  return;
+                }
+
+                if (liff.isApiAvailable('shareTargetPicker')) {
+                  const res = await liff.shareTargetPicker([{
+                    "type": "flex",
+                    "altText": `這是 ${profile.value.顯示名稱 || '我'} 的電子名片，請查收！`, 
+                    "contents": flexMsg.value
+                  }]);
+                  
+                  if (res) {
+                    if (isAutoShare.value) {
+                        closeLiff();
+                    } else {
+                        alert("✨ 名片已成功發送到聊天室！");
+                    }
+                  } else {
+                    if (isAutoShare.value) closeLiff();
+                  }
+                } else {
+                  alert("目前無法使用分享功能。請確認 LINE Developers Console 中是否已開啟「Share Target Picker」權限。");
+                }
+
             } else {
-              alert("目前無法使用分享功能。請確認 LINE Developers Console 中是否已開啟「Share Target Picker」權限。");
+                // 【跨平台優化 2】：一般瀏覽器 (電腦版、Safari 等) 的降級處理
+                
+                // 取得當前真實網址 (確保是您的 Github Pages 直連網址，而非 liff.line.me)
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.delete('autoShare'); // 移除自動分享參數避免死迴圈
+                const shareUrl = currentUrl.toString();
+                
+                const shareText = `哈囉！這是 ${profile.value.顯示名稱 || '我'} 的電子名片，請點擊連結查看：\n${shareUrl}`;
+                
+                try {
+                    // 嘗試將名片網址與文案複製到使用者的剪貼簿
+                    await navigator.clipboard.writeText(shareText);
+                    if (!isAutoShare.value) {
+                        alert('✨ 已為您複製名片資訊！即將喚醒 LINE 準備分享...');
+                    }
+                } catch(err) {
+                    console.log('剪貼簿無權限寫入，跳過複製步驟');
+                }
+
+                // 透過 LINE 的 URL Scheme 強制喚醒手機/電腦裡的 LINE 應用程式，帶入已編碼的訊息！
+                window.open(`https://line.me/R/msg/text/?${encodeURIComponent(shareText)}`, '_blank');
+                
+                if (isAutoShare.value) {
+                    setTimeout(() => { closeLiff(); }, 1500); // 如果是自動轉發，發送後自動關閉分頁
+                }
             }
           } catch (err) {
             console.error("分享失敗，原因:", err);
@@ -167,7 +203,7 @@
               if (isAutoShare.value) {
                   setTimeout(() => {
                       shareMyCard();
-                  }, 500); // 只給 0.5 秒讓動畫跑一下，隨即彈出選擇框
+                  }, 500); // 給 0.5 秒讓畫面的動畫跑一下，隨即彈出選擇框/轉跳
               }
 
             } else {
