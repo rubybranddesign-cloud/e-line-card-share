@@ -7,7 +7,6 @@
   
   <meta property="og:title" content="RubyBrandDesign 專屬電子名片">
   <meta property="og:description" content="點擊連結，查看我的專屬電子名片與最新資訊！">
-  <meta property="og:url" content="https://liff.line.me/2009561347-VUhbtrEC">
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://drive.google.com/thumbnail?id=1qS2jY3DkOoxbjd5hI6F7rl6pYbBRDbfs&sz=w1000">
 
@@ -111,58 +110,50 @@
             const memberId = urlParams.get('id');
             
             if (!memberId || !targetUrl) return targetUrl || '#';
-            
             return `${GAS_API_URL}?action=trackClick&memberId=${memberId}&type=button&itemId=${itemId}&btnIdx=${index + 1}&url=${encodeURIComponent(targetUrl)}`;
         };
 
+        // 【核心修正】：拔除純文字網址轉發，強制導向 LIFF 發送輪播
         const shareMyCard = async () => {
           try {
-            if (typeof liff !== 'undefined' && liff.isInClient()) {
+            if (!flexMsg.value) {
+              alert("名片資料尚未準備好，請稍候再試。");
+              if(isAutoShare.value) closeLiff();
+              return;
+            }
+
+            // 判斷 1：是否在 LIFF 授權環境內 (這代表 ShareTargetPicker 必定可以用)
+            if (typeof liff !== 'undefined' && liff.isApiAvailable('shareTargetPicker')) {
                 if (!liff.isLoggedIn()) {
                   liff.login({ redirectUri: window.location.href });
                   return; 
                 }
 
-                if (!flexMsg.value) {
-                  alert("名片資料尚未準備好，請稍候再試。");
-                  if(isAutoShare.value) closeLiff();
-                  return;
-                }
-
-                if (liff.isApiAvailable('shareTargetPicker')) {
-                  const res = await liff.shareTargetPicker([{
-                    "type": "flex",
-                    "altText": `這是 ${profile.value.顯示名稱 || '我'} 的電子名片，請查收！`, 
-                    "contents": flexMsg.value
-                  }]);
-                  
-                  if (res) {
-                    if (isAutoShare.value) closeLiff();
-                    else alert("✨ 名片已成功發送到聊天室！");
-                  } else {
-                    if (isAutoShare.value) closeLiff();
-                  }
+                const res = await liff.shareTargetPicker([{
+                  "type": "flex",
+                  "altText": `這是 ${profile.value.顯示名稱 || '我'} 的電子名片，請查收！`, 
+                  "contents": flexMsg.value
+                }]);
+                
+                if (res) {
+                  if (isAutoShare.value) closeLiff();
+                  else alert("✨ 名片已成功發送到聊天室！");
                 } else {
-                  alert("目前無法使用分享功能。請確認 LINE Developers Console 中是否已開啟「Share Target Picker」權限。");
+                  if (isAutoShare.value) closeLiff();
                 }
-
             } else {
-                const currentUrl = new URL(window.location.href);
-                currentUrl.searchParams.delete('autoShare'); 
-                const shareUrl = currentUrl.toString();
+                // 判斷 2：不在 LIFF 環境中 (可能是一般瀏覽器，或是 github 網址直接打開)
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                const memberId = new URLSearchParams(window.location.search).get('id');
                 
-                const shareText = `哈囉！這是 ${profile.value.顯示名稱 || '我'} 的電子名片，請點擊連結查看：\n${shareUrl}`;
-                
-                try {
-                    await navigator.clipboard.writeText(shareText);
-                    if (!isAutoShare.value) alert('✨ 已為您複製名片資訊！即將喚醒 LINE 準備分享...');
-                } catch(err) {
-                    console.log('剪貼簿無權限寫入，跳過複製步驟');
+                if (isMobile) {
+                    // 若為手機，瞬間轉導到 liff 專屬網址，LINE 會自動喚醒並賦予正確權限！
+                    window.location.href = `https://liff.line.me/${LIFF_ID}?id=${memberId}&autoShare=true`;
+                } else {
+                    // 若為電腦，給予友善提示，因為電腦版無法送出輪播名片
+                    alert("⚠️ 系統提示\n\n為確保格式完美，發送「精美輪播名片」必須在手機版 LINE 中進行。\n請使用手機開啟此網址操作喔！");
+                    if (isAutoShare.value) closeLiff();
                 }
-
-                window.open(`https://line.me/R/msg/text/?${encodeURIComponent(shareText)}`, '_blank');
-                
-                if (isAutoShare.value) setTimeout(() => { closeLiff(); }, 1500);
             }
           } catch (err) {
             console.error("分享失敗，原因:", err);
