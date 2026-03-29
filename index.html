@@ -4,6 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>RubyBrandDesign 電子名片</title>
+  
+  <meta property="og:title" content="RubyBrandDesign 專屬電子名片">
+  <meta property="og:description" content="點擊連結，查看我的專屬電子名片與最新資訊！">
+  <meta property="og:url" content="https://liff.line.me/2009561347-VUhbtrEC">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://drive.google.com/thumbnail?id=1qS2jY3DkOoxbjd5hI6F7rl6pYbBRDbfs&sz=w1000">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -13,7 +20,6 @@
     .glass-card { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 10px 40px rgba(0,0,0,0.05); }
     .fade-enter-active, .fade-leave-active { transition: opacity 0.5s ease; }
     .fade-enter-from, .fade-leave-to { opacity: 0; }
-    /* 【優化】加入 v-cloak 防閃爍樣式，確保社群軟體爬蟲與預覽時，不會顯示未編譯的 Vue 標籤 */
     [v-cloak] { display: none !important; }
   </style>
 </head>
@@ -22,12 +28,12 @@
     
     <div v-if="isLoading" class="flex flex-col items-center justify-center mt-32">
       <i class="ph ph-spinner animate-spin text-5xl text-pink-500 mb-4"></i>
-      <p class="text-gray-500 font-bold">資料準備中...</p>
+      <p class="text-gray-500 font-bold" v-text="'資料準備中...'"></p>
     </div>
 
     <div v-else-if="errorMessage" class="flex flex-col items-center justify-center mt-20 bg-white p-6 rounded-2xl shadow-lg">
       <i class="ph-fill ph-warning-circle text-4xl text-red-500 mb-2"></i>
-      <p class="text-gray-800 font-bold">{{ errorMessage }}</p>
+      <p class="text-gray-800 font-bold" v-text="errorMessage"></p>
     </div>
 
     <transition name="fade">
@@ -35,9 +41,9 @@
         <div class="w-20 h-20 bg-white rounded-full shadow-lg flex items-center justify-center mb-6">
            <i class="ph-fill ph-paper-plane-tilt text-4xl text-[#06C755] animate-pulse"></i>
         </div>
-        <h2 class="text-xl font-black text-gray-900 mb-2">正在開啟好友列表</h2>
-        <p class="text-sm text-gray-500 font-bold mb-8">請在彈出的視窗中選擇要發送的對象</p>
-        <button @click="closeLiff" class="text-gray-400 text-sm font-bold underline">取消並關閉視窗</button>
+        <h2 class="text-xl font-black text-gray-900 mb-2" v-text="'正在開啟好友列表'"></h2>
+        <p class="text-sm text-gray-500 font-bold mb-8" v-text="'請在彈出的視窗中選擇要發送的對象'"></p>
+        <button @click="closeLiff" class="text-gray-400 text-sm font-bold underline" v-text="'取消並關閉視窗'"></button>
       </div>
     </transition>
 
@@ -48,11 +54,11 @@
           <img v-if="profile.大頭貼圖片URL" :src="profile.大頭貼圖片URL" class="w-full h-full object-cover">
         </div>
         
-        <h1 class="text-2xl font-black text-gray-900 mb-2">{{ profile.顯示名稱 }}</h1>
-        <p class="text-sm text-gray-600 text-center whitespace-pre-wrap leading-relaxed mb-8 w-full">{{ profile.個人簡介文字 }}</p>
+        <h1 class="text-2xl font-black text-gray-900 mb-2" v-text="profile.顯示名稱"></h1>
+        <p class="text-sm text-gray-600 text-center whitespace-pre-wrap leading-relaxed mb-8 w-full" v-text="profile.個人簡介文字"></p>
 
         <button @click="shareMyCard" class="w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-4 rounded-2xl mb-6 shadow-md transition flex items-center justify-center gap-2 transform hover:scale-[1.02]">
-          <i class="ph-fill ph-chat-circle-text text-xl"></i> {{ shareButtonText }}
+          <i class="ph-fill ph-chat-circle-text text-xl"></i> <span v-text="shareButtonText"></span>
         </button>
 
         <div class="w-full space-y-3">
@@ -63,13 +69,13 @@
               <img v-if="btn.Icon圖片URL" :src="btn.Icon圖片URL" class="w-full h-full object-cover">
               <i v-else class="ph ph-link text-gray-700"></i>
             </div>
-            <div class="flex-1 font-bold text-gray-800 text-center pr-10">{{ btn.按鈕文字 }}</div>
+            <div class="flex-1 font-bold text-gray-800 text-center pr-10" v-text="btn.按鈕文字"></div>
           </a>
         </div>
         
       </div>
     </transition>
-    <p v-if="!isLoading && !errorMessage && !isAutoShare" class="mt-8 text-xs font-bold text-gray-400">Powered by Ruby.Brand.Design</p>
+    <p v-if="!isLoading && !errorMessage && !isAutoShare" class="mt-8 text-xs font-bold text-gray-400" v-text="'Powered by Ruby.Brand.Design'"></p>
   </div>
 
   <script>
@@ -98,10 +104,8 @@
             }
         };
 
-        // 【新增】產生追蹤網址，將網頁上的點擊也傳送回 GAS
         const buildTrackedUrl = (btn, index) => {
             const targetUrl = btn['跳轉連結'] || btn.url;
-            // 透過 Object.keys 獲取資料表第一欄的 ID (不論 Header 名稱是 ID 還是 按鈕ID)
             const itemId = btn[Object.keys(btn)[0]]; 
             const urlParams = new URLSearchParams(window.location.search);
             const memberId = urlParams.get('id');
@@ -207,7 +211,6 @@
           }
         });
 
-        // 記得回傳 buildTrackedUrl
         return { profile, buttons, isLoading, errorMessage, isAutoShare, shareButtonText, shareMyCard, closeLiff, buildTrackedUrl };
       }
     }).mount('#app');
