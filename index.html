@@ -95,6 +95,37 @@
         
         const shareButtonText = ref("傳送E-LINE-CARD");
 
+        // 【終極防呆參數解析器】：完美解決 LINE liff.state 多重編碼問題
+        const getSafeParam = (paramName) => {
+            const urlParams = new URLSearchParams(window.location.search);
+            let val = urlParams.get(paramName);
+            if (val) return val;
+
+            const liffState = urlParams.get('liff.state');
+            if (liffState) {
+                try {
+                    let decodedState = liffState;
+                    // 防禦多次編碼的情況
+                    while(decodedState !== decodeURIComponent(decodedState)) {
+                        decodedState = decodeURIComponent(decodedState);
+                    }
+                    const stateQuery = decodedState.includes('?') ? decodedState.substring(decodedState.indexOf('?') + 1) : decodedState;
+                    const stateParams = new URLSearchParams(stateQuery);
+                    val = stateParams.get(paramName);
+                    if (val) return val;
+                } catch (e) {
+                    console.error("LIFF State 解析異常", e);
+                }
+            }
+
+            // 終極正則暴力解析 (處理跳轉過程中的奇葩編碼)
+            const regex = new RegExp(`(?:${paramName}=|${paramName}%3D)([^&]+)`);
+            const match = window.location.href.match(regex);
+            if (match) return decodeURIComponent(match[1]);
+
+            return null;
+        };
+
         const closeLiff = () => {
             if (typeof liff !== 'undefined' && liff.isInClient()) {
                 liff.closeWindow();
@@ -106,16 +137,9 @@
         const buildTrackedUrl = (btn, index) => {
             const targetUrl = btn['跳轉連結'] || btn.url;
             const itemId = btn[Object.keys(btn)[0]]; 
-            let memberId = new URLSearchParams(window.location.search).get('id');
             
-            // 防呆補齊 liff.state 中的 memberId
-            if (!memberId) {
-                const liffState = new URLSearchParams(window.location.search).get('liff.state');
-                if (liffState) {
-                    const decoded = decodeURIComponent(liffState);
-                    memberId = new URLSearchParams(decoded.startsWith('?') ? decoded.substring(1) : decoded).get('id');
-                }
-            }
+            // 使用全新的防呆解析器
+            let memberId = getSafeParam('id');
 
             if (!memberId || !targetUrl) return targetUrl || '#';
 
@@ -128,7 +152,6 @@
 
         const shareMyCard = async () => {
           try {
-            // 【優化邏輯】：如果是 autoShare 模式，代表是要轉發輪播，強制走 LIFF 喚醒邏輯
             if (isAutoShare.value) {
                 if (!flexMsg.value) {
                     alert("名片資料尚未準備好，請稍候再試。");
@@ -149,15 +172,8 @@
                     closeLiff(); 
                 } else {
                     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                    // 重新解析出 memberId
-                    let mId = new URLSearchParams(window.location.search).get('id');
-                    if (!mId) {
-                        const liffState = new URLSearchParams(window.location.search).get('liff.state');
-                        if (liffState) {
-                            const d = decodeURIComponent(liffState);
-                            mId = new URLSearchParams(d.startsWith('?') ? d.substring(1) : d).get('id');
-                        }
-                    }
+                    // 使用全新的防呆解析器
+                    let mId = getSafeParam('id');
 
                     if (isMobile) {
                         window.location.href = `https://liff.line.me/${LIFF_ID}?id=${mId}&autoShare=true`;
@@ -167,7 +183,6 @@
                     }
                 }
             } else {
-                // 【優化邏輯】：如果是一般個人介紹頁模式，點擊按鈕「純複製網址文字」，絕對不彈窗
                 const currentUrl = new URL(window.location.href);
                 currentUrl.searchParams.delete('autoShare'); 
                 const shareUrl = currentUrl.toString();
@@ -194,19 +209,9 @@
         };
 
         onMounted(() => {
-          let urlParams = new URLSearchParams(window.location.search);
-          let memberId = urlParams.get('id');
-          let autoShareParam = urlParams.get('autoShare');
-
-          // 【核心修復】LINE LIFF 轉址參數解碼器
-          const liffState = urlParams.get('liff.state');
-          if (liffState) {
-              const decodedState = decodeURIComponent(liffState);
-              const stateQuery = decodedState.startsWith('?') ? decodedState.substring(1) : decodedState;
-              const stateParams = new URLSearchParams(stateQuery);
-              if (!memberId) memberId = stateParams.get('id');
-              if (!autoShareParam) autoShareParam = stateParams.get('autoShare');
-          }
+          // 使用全新的防呆解析器全面接管 URL 參數解析
+          let memberId = getSafeParam('id');
+          let autoShareParam = getSafeParam('autoShare');
           
           isAutoShare.value = autoShareParam === 'true';
 
@@ -216,7 +221,7 @@
             return;
           }
 
-          // 任務 A：拉取 GAS 資料 (移除 finally 確保舊手機相容性)
+          // 任務 A：拉取 GAS 資料
           fetch(`${GAS_API_URL}?id=${memberId}`)
             .then(res => res.json())
             .then(data => {
@@ -228,20 +233,20 @@
                 } else {
                   errorMessage.value = data.message || '無法載入名片資料';
                 }
-                isLoading.value = false; // 成功時關閉 Loading
+                isLoading.value = false; 
             })
             .catch(error => {
                 console.error(error);
                 errorMessage.value = '網路連線異常，請稍後再試。';
-                isLoading.value = false; // 失敗時關閉 Loading
+                isLoading.value = false; 
             });
 
-          // 任務 B：背景初始化 LIFF (與拉資料雙軌並行，避免互相卡死)
+          // 任務 B：背景初始化 LIFF
           if (typeof liff !== 'undefined') {
               liff.init({ liffId: LIFF_ID }).then(() => {
                   if (isAutoShare.value) {
                       const checkInterval = setInterval(() => {
-                          if (!isLoading.value) { // 確定資料拉完後才觸發分享
+                          if (!isLoading.value) { 
                               clearInterval(checkInterval);
                               if (flexMsg.value) shareMyCard();
                           }
