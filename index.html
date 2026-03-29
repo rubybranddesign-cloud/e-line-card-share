@@ -113,7 +113,6 @@
             return `${GAS_API_URL}?action=trackClick&memberId=${memberId}&type=button&itemId=${itemId}&btnIdx=${index + 1}&url=${encodeURIComponent(targetUrl)}`;
         };
 
-        // 【核心修正】：拔除純文字網址轉發，強制導向 LIFF 發送輪播
         const shareMyCard = async () => {
           try {
             if (!flexMsg.value) {
@@ -122,7 +121,6 @@
               return;
             }
 
-            // 判斷 1：是否在 LIFF 授權環境內 (這代表 ShareTargetPicker 必定可以用)
             if (typeof liff !== 'undefined' && liff.isApiAvailable('shareTargetPicker')) {
                 if (!liff.isLoggedIn()) {
                   liff.login({ redirectUri: window.location.href });
@@ -142,15 +140,12 @@
                   if (isAutoShare.value) closeLiff();
                 }
             } else {
-                // 判斷 2：不在 LIFF 環境中 (可能是一般瀏覽器，或是 github 網址直接打開)
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                 const memberId = new URLSearchParams(window.location.search).get('id');
                 
                 if (isMobile) {
-                    // 若為手機，瞬間轉導到 liff 專屬網址，LINE 會自動喚醒並賦予正確權限！
                     window.location.href = `https://liff.line.me/${LIFF_ID}?id=${memberId}&autoShare=true`;
                 } else {
-                    // 若為電腦，給予友善提示，因為電腦版無法送出輪播名片
                     alert("⚠️ 系統提示\n\n為確保格式完美，發送「精美輪播名片」必須在手機版 LINE 中進行。\n請使用手機開啟此網址操作喔！");
                     if (isAutoShare.value) closeLiff();
                 }
@@ -161,13 +156,8 @@
           }
         };
 
-        onMounted(async () => {
-          try {
-            await liff.init({ liffId: LIFF_ID });
-          } catch (err) {
-            console.error("LIFF 初始化失敗", err);
-          }
-
+        // 【極致防呆優化】：分離資料載入與 LIFF 初始化，避免彼此卡死！
+        onMounted(() => {
           const urlParams = new URLSearchParams(window.location.search);
           const memberId = urlParams.get('id');
           
@@ -179,26 +169,43 @@
             return;
           }
 
-          try {
-            const response = await fetch(`${GAS_API_URL}?id=${memberId}`);
-            const data = await response.json();
+          // 任務 A：先去 GAS 拿資料，拿完立刻關閉 Loading 畫面，絕對不卡死
+          fetch(`${GAS_API_URL}?id=${memberId}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                  profile.value = data.profile;
+                  buttons.value = data.buttons;
+                  flexMsg.value = data.flexMsg;
+                  document.title = isAutoShare.value ? '發送名片中...' : `${data.profile.顯示名稱} 的電子名片`;
+                } else {
+                  errorMessage.value = data.message || '無法載入名片資料';
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                errorMessage.value = '網路連線異常，請稍後再試。';
+            })
+            .finally(() => {
+                isLoading.value = false; // 確保動畫一定會消失
+            });
 
-            if (data.status === 'success') {
-              profile.value = data.profile;
-              buttons.value = data.buttons;
-              flexMsg.value = data.flexMsg;
-              document.title = isAutoShare.value ? '發送名片中...' : `${data.profile.顯示名稱} 的電子名片`;
-
-              if (isAutoShare.value) {
-                  setTimeout(() => { shareMyCard(); }, 500); 
-              }
-            } else {
-              errorMessage.value = data.message || '無法載入名片資料';
-            }
-          } catch (error) {
-            errorMessage.value = '網路連線異常，請稍後再試。';
-          } finally {
-            isLoading.value = false;
+          // 任務 B：背景初始化 LIFF
+          if (typeof liff !== 'undefined') {
+              liff.init({ liffId: LIFF_ID }).then(() => {
+                  // 初始化成功後，如果是自動分享模式，每 0.2 秒檢查一次資料是否拿到了
+                  if (isAutoShare.value) {
+                      const checkInterval = setInterval(() => {
+                          if (!isLoading.value) {
+                              clearInterval(checkInterval);
+                              if (flexMsg.value) shareMyCard();
+                          }
+                      }, 200);
+                  }
+              }).catch(err => {
+                  console.error("LIFF 初始化失敗", err);
+                  if (isAutoShare.value) setTimeout(() => { closeLiff(); }, 2000);
+              });
           }
         });
 
