@@ -107,6 +107,7 @@
         const buildTrackedUrl = (btn, index) => {
             const targetUrl = btn['跳轉連結'] || btn.url;
             const itemId = btn[Object.keys(btn)[0]]; 
+            const btnText = btn['按鈕文字'] || '未知按鈕'; // ✅ 獲取按鈕文字
             const urlParams = new URLSearchParams(window.location.search);
             const memberId = urlParams.get('id');
             
@@ -117,7 +118,8 @@
                 return targetUrl;
             }
             
-            return `${GAS_API_URL}?action=trackClick&memberId=${memberId}&type=button&itemId=${itemId}&btnIdx=${index + 1}&url=${encodeURIComponent(targetUrl)}`;
+            // ✅ 升級：將 btnText 加入參數傳給 GAS 閘道
+            return `${GAS_API_URL}?action=trackClick&memberId=${memberId}&type=button&itemId=${itemId}&btnIdx=${index + 1}&btnText=${encodeURIComponent(btnText)}&url=${encodeURIComponent(targetUrl)}`;
         };
 
         const shareMyCard = async () => {
