@@ -62,7 +62,8 @@
         </button>
 
         <div class="w-full space-y-3">
-          <a v-for="(btn, index) in buttons" :key="index" :href="buildTrackedUrl(btn, index)" target="_blank" 
+          <a v-for="(btn, index) in buttons" :key="index" :href="btn['跳轉連結'] || btn.url" target="_blank" 
+             @click="trackClickAsync(btn, index)"
              class="w-full flex items-center gap-3 p-3 rounded-2xl border border-white/50 shadow-sm transition transform hover:-translate-y-1 hover:shadow-md"
              :style="{ backgroundColor: btn.按鈕顏色 || '#ffffff' }">
             <div class="w-10 h-10 rounded-xl bg-white/60 flex items-center justify-center overflow-hidden shrink-0">
@@ -104,22 +105,19 @@
             }
         };
 
-        const buildTrackedUrl = (btn, index) => {
+        // ✅ 全新的背景非同步追蹤函數，不影響超連結運作
+        const trackClickAsync = (btn, index) => {
             const targetUrl = btn['跳轉連結'] || btn.url;
             const itemId = btn[Object.keys(btn)[0]]; 
-            const btnText = btn['按鈕文字'] || '未知按鈕'; // ✅ 獲取按鈕文字
+            const btnText = btn['按鈕文字'] || '未知按鈕';
             const urlParams = new URLSearchParams(window.location.search);
             const memberId = urlParams.get('id');
             
-            if (!memberId || !targetUrl) return targetUrl || '#';
+            if (!memberId || !targetUrl) return;
 
-            // ⚠️ 排除電話、信箱、以及 LIFF 轉發網址，讓這些功能直連，避免被瀏覽器或 LINE 擋下
-            if (targetUrl.startsWith('tel:') || targetUrl.startsWith('mailto:') || targetUrl.includes('liff.line.me')) {
-                return targetUrl;
-            }
-            
-            // ✅ 升級：將 btnText 加入參數傳給 GAS 閘道
-            return `${GAS_API_URL}?action=trackClick&memberId=${memberId}&type=button&itemId=${itemId}&btnIdx=${index + 1}&btnText=${encodeURIComponent(btnText)}&url=${encodeURIComponent(targetUrl)}`;
+            // 使用 no-cors 模式發送 fetch，瀏覽器會在背景偷偷請求 GAS 寫入數據，不會卡住網頁
+            const trackUrl = `${GAS_API_URL}?action=trackClick&memberId=${memberId}&type=button&itemId=${itemId}&btnIdx=${index + 1}&btnText=${encodeURIComponent(btnText)}&url=${encodeURIComponent(targetUrl)}`;
+            fetch(trackUrl, { mode: 'no-cors' }).catch(e => console.log('背景追蹤發送失敗', e));
         };
 
         const shareMyCard = async () => {
@@ -218,7 +216,7 @@
           }
         });
 
-        return { profile, buttons, isLoading, errorMessage, isAutoShare, shareButtonText, shareMyCard, closeLiff, buildTrackedUrl };
+        return { profile, buttons, isLoading, errorMessage, isAutoShare, shareButtonText, shareMyCard, closeLiff, trackClickAsync };
       }
     }).mount('#app');
   </script>
