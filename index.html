@@ -210,7 +210,7 @@
               }
               document.body.style.backgroundColor = safeBgColor.value;
 
-              // 🚀 核心修復：喚醒 LINE 好友分享列表
+              // 🚀 核心修復：正確封裝 Flex Message 並喚醒 LINE 好友分享列表
               if (isAutoShare.value && flexMsg.value) {
                   if (!liff.isLoggedIn()) {
                       liff.login({ redirectUri: window.location.href });
@@ -218,10 +218,18 @@
                   }
                   
                   if (liff.isApiAvailable('shareTargetPicker')) {
-                      // 使用 500ms 延遲，確保「發送中」的綠色動畫順暢顯示後，再彈出原生視窗，完美無縫感
+                      // ⚠️ 關鍵修復點：將後端傳來的 carousel 外層包上 type: "flex"
+                      const messageToSend = {
+                          type: "flex",
+                          altText: `${profile.value['顯示名稱'] || '專屬'} 的電子名片`,
+                          contents: flexMsg.value
+                      };
+
+                      // 使用 500ms 延遲，確保畫面過場流暢
                       setTimeout(async () => {
                           try {
-                              const res = await liff.shareTargetPicker([flexMsg.value]);
+                              // 將包裝好的 messageToSend 放入陣列發送
+                              const res = await liff.shareTargetPicker([messageToSend]);
                               if (res) {
                                   // 分享成功，直接關閉視窗
                                   liff.closeWindow();
