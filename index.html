@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>RubyBrandDesign 電子名片</title>
   
   <meta property="og:title" content="RubyBrandDesign 專屬電子名片">
@@ -16,7 +16,7 @@
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
-    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; background-color: #f9fafb; }
     .fade-enter-active, .fade-leave-active { transition: opacity 0.5s ease; }
     .fade-enter-from, .fade-leave-to { opacity: 0; }
     [v-cloak] { display: none !important; }
@@ -24,33 +24,33 @@
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="bg-gray-50 flex justify-center">
+<body class="flex justify-center">
   <div id="app" v-cloak class="w-full max-w-md min-h-screen flex flex-col items-center relative overflow-y-auto no-scrollbar shadow-2xl transition-all duration-500" 
        :style="{ backgroundColor: profile['背景主題顏色'] || '#ffffff' }">
     
-    <div v-if="isLoading" class="flex flex-col items-center justify-center mt-32 z-50 absolute inset-0 bg-white/80 backdrop-blur-sm">
+    <div v-if="isLoading" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
       <i class="ph ph-spinner animate-spin text-5xl text-pink-500 mb-4"></i>
-      <p class="text-gray-500 font-bold" v-text="'資料準備中...'"></p>
+      <p class="text-gray-500 font-bold">資料準備中...</p>
     </div>
 
-    <div v-else-if="errorMessage" class="flex flex-col items-center justify-center mt-32 bg-white p-6 rounded-2xl shadow-lg z-50">
+    <div v-else-if="errorMessage" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/90 p-6">
       <i class="ph-fill ph-warning-circle text-4xl text-red-500 mb-2"></i>
-      <p class="text-gray-800 font-bold" v-text="errorMessage"></p>
+      <p class="text-gray-800 font-bold text-center">{{ errorMessage }}</p>
     </div>
 
     <transition name="fade">
-      <div v-if="!isLoading && !errorMessage && isAutoShare" class="w-full h-screen flex flex-col items-center justify-center text-center absolute z-50 bg-white/90 backdrop-blur-md">
+      <div v-if="!isLoading && !errorMessage && isAutoShare" class="absolute inset-0 z-50 bg-white/90 backdrop-blur-md flex flex-col items-center justify-center text-center h-screen">
         <div class="w-20 h-20 bg-white rounded-full shadow-lg flex items-center justify-center mb-6">
            <i class="ph-fill ph-paper-plane-tilt text-4xl text-[#06C755] animate-pulse"></i>
         </div>
-        <h2 class="text-xl font-black text-gray-900 mb-2" v-text="'正在開啟好友列表'"></h2>
-        <p class="text-sm text-gray-500 font-bold mb-8" v-text="'請在彈出的視窗中選擇要發送的對象'"></p>
-        <button @click="closeLiff" class="text-gray-400 text-sm font-bold underline" v-text="'取消並關閉視窗'"></button>
+        <h2 class="text-xl font-black text-gray-900 mb-2">正在開啟好友列表</h2>
+        <p class="text-sm text-gray-500 font-bold mb-8">請在彈出的視窗中選擇要發送的對象</p>
+        <button @click="closeLiff" class="text-gray-400 text-sm font-bold underline">取消並關閉視窗</button>
       </div>
     </transition>
 
     <transition name="fade">
-      <div v-if="!isLoading && !errorMessage && !isAutoShare" class="w-full flex flex-col items-center pb-12 relative">
+      <div v-if="!isLoading && !errorMessage && !isAutoShare" class="w-full flex flex-col items-center pb-12 relative min-h-full">
         
         <div v-if="profile['背景圖片URL']" class="relative w-full aspect-[4/5] shrink-0 bg-cover bg-center flex flex-col justify-end items-center pb-[2px]" :style="{ backgroundImage: `url(${profile['背景圖片URL']})` }">
             <div class="absolute bottom-0 left-0 w-full h-1/2" :style="{ background: `linear-gradient(to top, ${profile['背景主題顏色'] || '#ffffff'} 0%, transparent 100%)` }"></div>
@@ -58,7 +58,6 @@
                 <img :src="profile['大頭貼圖片URL'] || 'https://via.placeholder.com/150'" class="w-[110px] h-[110px] rounded-full object-cover border-2 border-white/50 shadow-md bg-gray-100">
             </div>
         </div>
-
         <div v-else class="relative z-10 w-full flex flex-col items-center mt-[80px] shrink-0">
             <div class="relative mb-3">
                 <img :src="profile['大頭貼圖片URL'] || 'https://via.placeholder.com/150'" class="w-[110px] h-[110px] rounded-full object-cover border-2 border-white/50 shadow-md bg-gray-100">
@@ -70,7 +69,7 @@
             <div class="text-[13px] text-center whitespace-pre-wrap leading-relaxed w-full break-words opacity-90 mb-5" :style="{ color: profile['全域文字顏色'] || '#1a1a1a' }">{{ profile['個人簡介文字'] }}</div>
 
             <button @click="shareMyCard" class="w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-4 rounded-2xl mb-5 shadow-md transition flex items-center justify-center gap-2 transform hover:-translate-y-0.5">
-              <i class="ph-fill ph-chat-circle-text text-xl"></i> <span v-text="shareButtonText"></span>
+              <i class="ph-fill ph-chat-circle-text text-xl"></i> <span>{{ shareButtonText }}</span>
             </button>
 
             <div v-if="profile['FB連結'] || profile['IG連結'] || profile['LINE連結'] || profile['TikTok連結'] || profile['WeChat連結']" class="flex gap-4 mb-4 justify-center items-center">
@@ -93,7 +92,7 @@
                  class="w-full flex items-center justify-center font-bold px-4 py-[14px] transition cursor-pointer relative overflow-hidden group shadow-sm rounded-[2px] transform hover:-translate-y-0.5 hover:shadow-md"
                  :style="{ backgroundColor: btn['按鈕顏色'] || '#ffffff', color: btn['按鈕文字顏色'] || '#000000' }">
                 <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <span class="tracking-widest text-[13px]" v-text="btn['按鈕文字']"></span>
+                <span class="tracking-widest text-[13px]">{{ btn['按鈕文字'] || btn.title }}</span>
               </a>
             </div>
             
@@ -133,10 +132,9 @@
             if (type === 'tel') return value.startsWith('tel:') ? value : 'tel:' + value;
             if (type === 'email') return value.startsWith('mailto:') ? value : 'mailto:' + value;
             if (type === 'share' || String(value).includes('social-plugins.line.me') || String(value).includes('line.me/R/msg')) {
-                // 如果是分享類型，一律導入 LINE 官方的 social plugin
                 let shareText = '';
                 if (String(value).includes('text=')) shareText = decodeURIComponent(value.split('text=')[1]);
-                else shareText = `哈囉！這是「${profile.value['顯示名稱']}」的電子名片，請點擊連結查看：\nhttps://liff.line.me/${LIFF_ID}?id=${profile.value['會員ID']}`;
+                else shareText = `哈囉！這是「${profile.value['顯示名稱'] || '我'}」的電子名片，請點擊連結查看：\nhttps://liff.line.me/${LIFF_ID}?id=${profile.value['會員ID']}`;
                 return `https://social-plugins.line.me/lineit/share?text=${encodeURIComponent(shareText)}`;
             }
             if (type === 'line') {
@@ -168,7 +166,6 @@
             fetch(trackUrl, { mode: 'no-cors' }).catch(e => console.log('背景追蹤發送失敗', e));
         };
 
-        // 🔥 客製化文案與無縫跨平台分享引擎
         const shareMyCard = async () => {
           try {
             const shareText = `哈囉！這是「${profile.value['顯示名稱'] || '我'}」的電子名片，請點擊連結查看：\nhttps://liff.line.me/${LIFF_ID}?id=${profile.value['會員ID']}`;
@@ -203,7 +200,6 @@
                 }
 
             } else {
-                // 若在電腦瀏覽器或非 LINE App 內，喚醒官方社交外掛，讓電腦也能無縫選取好友轉發！
                 try {
                     await navigator.clipboard.writeText(shareText);
                     if (!isAutoShare.value) alert('✨ 已為您複製名片資訊！即將喚醒 LINE 準備分享...');
@@ -212,7 +208,6 @@
                 }
                 
                 window.open(`https://social-plugins.line.me/lineit/share?text=${encodeURIComponent(shareText)}`, '_blank');
-                
                 if (isAutoShare.value) setTimeout(() => { closeLiff(); }, 1500);
             }
           } catch (err) {
@@ -230,7 +225,6 @@
 
           const urlParams = new URLSearchParams(window.location.search);
           const memberId = urlParams.get('id');
-          
           isAutoShare.value = urlParams.get('autoShare') === 'true';
 
           if (!memberId) {
@@ -245,8 +239,7 @@
 
             if (data.status === 'success') {
               profile.value = data.profile;
-              // 將會員 ID 掛載到 profile 方便後續使用
-              profile.value['會員ID'] = memberId;
+              profile.value['會員ID'] = memberId; 
               buttons.value = data.buttons;
               flexMsg.value = data.flexMsg;
               document.title = isAutoShare.value ? '發送名片中...' : `${data.profile['顯示名稱']} 的電子名片`;
