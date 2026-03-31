@@ -20,8 +20,7 @@
     body { 
         font-family: 'Helvetica Neue', Helvetica, Arial, 'PingFang TC', '微軟正黑體', sans-serif; 
         -webkit-tap-highlight-color: transparent; 
-        /* 這裡的底色是給桌機版網頁兩側外框的底色，名片本體顏色由下方的 #app 控制 */
-        background-color: #333333; 
+        transition: background-color 0.5s ease; /* 讓底色切換時有柔和過渡 */
     }
     .fade-enter-active, .fade-leave-active { transition: opacity 0.5s ease; }
     .fade-enter-from, .fade-leave-to { opacity: 0; }
@@ -35,14 +34,25 @@
        :style="{ backgroundColor: profile['背景主題顏色'] || '#fefce8' }">
     
     <div v-if="isLoading" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
-      <i class="ph ph-spinner animate-spin text-5xl text-pink-500 mb-4"></i>
-      <p class="text-gray-500 font-bold">資料準備中...</p>
+      <i class="ph ph-spinner animate-spin text-[51px] text-pink-500 mb-4"></i>
+      <p class="text-[19px] text-gray-500 font-bold">資料準備中...</p>
     </div>
 
     <div v-else-if="errorMessage" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/90 p-6">
-      <i class="ph-fill ph-warning-circle text-4xl text-red-500 mb-2"></i>
-      <p class="text-gray-800 font-bold text-center">{{ errorMessage }}</p>
+      <i class="ph-fill ph-warning-circle text-[39px] text-red-500 mb-2"></i>
+      <p class="text-[19px] text-gray-800 font-bold text-center">{{ errorMessage }}</p>
     </div>
+
+    <transition name="fade">
+      <div v-if="!isLoading && !errorMessage && isAutoShare" class="absolute inset-0 z-50 bg-white/90 backdrop-blur-md flex flex-col items-center justify-center text-center h-screen">
+        <div class="w-20 h-20 bg-white rounded-full shadow-lg flex items-center justify-center mb-6">
+           <i class="ph-fill ph-paper-plane-tilt text-[39px] text-[#06C755] animate-pulse"></i>
+        </div>
+        <h2 class="text-[23px] font-black text-gray-900 mb-2">正在開啟好友列表</h2>
+        <p class="text-[17px] text-gray-500 font-bold mb-8">請在彈出的視窗中選擇要發送的對象</p>
+        <button @click="closeLiff" class="text-gray-400 text-[17px] font-bold underline">取消並關閉視窗</button>
+      </div>
+    </transition>
 
     <transition name="fade">
       <div v-if="!isLoading && !errorMessage && !isAutoShare" class="w-full flex flex-col items-center pb-16 relative min-h-full">
@@ -59,39 +69,39 @@
         </div>
 
         <div class="relative z-10 w-full flex flex-col items-center px-8">
-            <h1 class="text-2xl font-black text-center mb-5 tracking-[0.15em]" :style="{ color: profile['全域文字顏色'] || '#1a1a1a' }">
+            <h1 class="text-[27px] font-black text-center mb-5 tracking-[0.15em]" :style="{ color: profile['全域文字顏色'] || '#1a1a1a' }">
                 {{ profile['顯示名稱'] }}
             </h1>
             
-            <p class="text-[13px] text-center whitespace-pre-wrap leading-[2.5] tracking-widest w-full break-words opacity-90 mb-8 font-medium" :style="{ color: profile['全域文字顏色'] || '#1a1a1a' }">
+            <p class="text-[16px] text-center whitespace-pre-wrap leading-[2.5] tracking-widest w-full break-words opacity-90 mb-8 font-medium" :style="{ color: profile['全域文字顏色'] || '#1a1a1a' }">
                 {{ profile['個人簡介文字'] }}
             </p>
 
             <div v-if="profile['FB連結'] || profile['IG連結'] || profile['LINE連結'] || profile['TikTok連結'] || profile['Wechat'] || profile['WeChat連結']" class="flex gap-5 mb-8 justify-center items-center">
-                <a v-if="profile['FB連結']" :href="profile['FB連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-facebook-logo text-[34px]"></i></a>
-                <a v-if="profile['IG連結']" :href="profile['IG連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-instagram-logo text-[34px]"></i></a>
+                <a v-if="profile['FB連結']" :href="profile['FB連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-facebook-logo text-[37px]"></i></a>
+                <a v-if="profile['IG連結']" :href="profile['IG連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-instagram-logo text-[37px]"></i></a>
                 <a v-if="profile['LINE連結']" :href="profile['LINE連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }">
-                    <svg viewBox="0 0 24 24" fill="currentColor" class="w-[34px] h-[34px]" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M24 12c0 6.627-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0s12 5.373 12 12zm-12-7.5c-4.606 0-8.25 3.03-8.25 6.75 0 3.35 2.5 6.17 6.13 6.68.25.05.58.15.65.37.06.2.04.5.02.7l-.1.65c-.03.2-.15.75.65.4 1-.45 5.5-2.3 7.4-4.25 1.25-1.25 1.75-2.7 1.75-4.3C20.25 7.53 16.606 4.5 12 4.5z" /></svg>
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="w-[37px] h-[37px]" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M24 12c0 6.627-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0s12 5.373 12 12zm-12-7.5c-4.606 0-8.25 3.03-8.25 6.75 0 3.35 2.5 6.17 6.13 6.68.25.05.58.15.65.37.06.2.04.5.02.7l-.1.65c-.03.2-.15.75.65.4 1-.45 5.5-2.3 7.4-4.25 1.25-1.25 1.75-2.7 1.75-4.3C20.25 7.53 16.606 4.5 12 4.5z" /></svg>
                 </a>
-                <a v-if="profile['Wechat'] || profile['WeChat連結']" :href="profile['Wechat'] || profile['WeChat連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-wechat-logo text-[34px]"></i></a>
-                <a v-if="profile['TikTok連結']" :href="profile['TikTok連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-tiktok-logo text-[34px]"></i></a>
+                <a v-if="profile['Wechat'] || profile['WeChat連結']" :href="profile['Wechat'] || profile['WeChat連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-wechat-logo text-[37px]"></i></a>
+                <a v-if="profile['TikTok連結']" :href="profile['TikTok連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-tiktok-logo text-[37px]"></i></a>
             </div>
 
-            <div v-if="profile['YouTube影音連結'] && getYoutubeEmbedUrl(profile['YouTube影音連結'])" class="w-full mb-8 rounded-[20px] overflow-hidden shadow-sm aspect-video bg-black shrink-0">
+            <div v-if="profile['YouTube影音連結'] && getYoutubeEmbedUrl(profile['YouTube影音連結'])" class="w-full mb-8 rounded-[13px] overflow-hidden shadow-sm aspect-video bg-black shrink-0">
                 <iframe :src="`https://www.youtube.com/embed/${getYoutubeEmbedUrl(profile['YouTube影音連結'])}`" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
 
             <div class="w-full space-y-4 pb-6">
               <a v-for="(btn, index) in buttons" :key="index" :href="buildFinalLink(btn.type || 'url', btn['跳轉連結'] || btn.url)" target="_blank" 
                  @click="trackClickAsync(btn, index)"
-                 class="w-full flex items-center justify-center font-bold px-4 py-[16px] transition cursor-pointer relative overflow-hidden group shadow-sm rounded-[20px] transform hover:opacity-90"
+                 class="w-full flex items-center justify-center font-bold px-4 py-[16px] transition cursor-pointer relative overflow-hidden group shadow-sm rounded-[13px] transform hover:opacity-90"
                  :style="{ backgroundColor: btn['按鈕背景顏色'] || '#D2B992', color: btn['按鈕文字顏色'] || '#000000' }">
                 <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <span class="tracking-[0.1em] text-[14px]">{{ btn['按鈕文字'] || btn.title }}</span>
+                <span class="tracking-[0.1em] text-[17px]">{{ btn['按鈕文字'] || btn.title }}</span>
               </a>
             </div>
             
-            <p class="mt-4 pb-8 text-[11px] font-medium tracking-wider text-gray-400 opacity-60">Powered by Ruby.Brand.Design</p>
+            <p class="mt-4 pb-8 text-[14px] font-medium tracking-wider text-gray-400 opacity-60">Powered by Ruby.Brand.Design</p>
         </div>
       </div>
     </transition>
@@ -186,6 +196,11 @@
               buttons.value = data.buttons;
               flexMsg.value = data.flexMsg;
               document.title = isAutoShare.value ? '發送名片中...' : `${data.profile['顯示名稱']} 的電子名片`;
+
+              // 🔥 終極殺手鐧：直接用 JS 強制把整個網頁的最底層(包含手機邊界)漆成你設定的顏色！
+              if(profile.value['背景主題顏色']) {
+                  document.body.style.backgroundColor = profile.value['背景主題顏色'];
+              }
 
             } else {
               errorMessage.value = data.message || '無法載入名片資料';
