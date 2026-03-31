@@ -20,7 +20,8 @@
     body { 
         font-family: 'Helvetica Neue', Helvetica, Arial, 'PingFang TC', '微軟正黑體', sans-serif; 
         -webkit-tap-highlight-color: transparent; 
-        background-color: #f9fafb; /* 載入前的預設底色 */
+        /* 這裡的底色是給桌機版網頁兩側外框的底色，名片本體顏色由下方的 #app 控制 */
+        background-color: #333333; 
     }
     .fade-enter-active, .fade-leave-active { transition: opacity 0.5s ease; }
     .fade-enter-from, .fade-leave-to { opacity: 0; }
@@ -31,7 +32,7 @@
 </head>
 <body class="flex justify-center">
   <div id="app" v-cloak class="w-full max-w-md min-h-screen flex flex-col items-center relative overflow-y-auto no-scrollbar shadow-2xl transition-all duration-500" 
-       :style="{ backgroundColor: profile['背景主題顏色'] || '#E3E1DE' }">
+       :style="{ backgroundColor: profile['背景主題顏色'] || '#fefce8' }">
     
     <div v-if="isLoading" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
       <i class="ph ph-spinner animate-spin text-5xl text-pink-500 mb-4"></i>
@@ -47,14 +48,14 @@
       <div v-if="!isLoading && !errorMessage && !isAutoShare" class="w-full flex flex-col items-center pb-16 relative min-h-full">
         
         <div v-if="profile['背景圖片URL']" class="relative w-full aspect-[4/5] shrink-0 bg-cover bg-center flex flex-col justify-end items-center" :style="{ backgroundImage: `url(${profile['背景圖片URL']})` }">
-            <div class="absolute bottom-0 left-0 w-full h-[45%]" :style="{ background: `linear-gradient(to top, ${profile['背景主題顏色'] || '#E3E1DE'} 0%, transparent 100%)` }"></div>
+            <div class="absolute bottom-0 left-0 w-full h-[50%]" :style="{ backgroundImage: `linear-gradient(to top, ${profile['背景主題顏色'] || '#fefce8'} 0%, transparent 100%)` }"></div>
         </div>
         <div v-else class="relative w-full h-[150px] shrink-0"></div>
 
         <div class="relative z-10 -mt-[60px] mb-4 flex justify-center w-full">
             <img :src="profile['大頭貼圖片URL'] || 'https://via.placeholder.com/150'" 
-                 class="w-[100px] h-[100px] rounded-full object-cover shadow-sm border-[3px]" 
-                 :style="{ borderColor: profile['背景主題顏色'] || '#E3E1DE' }">
+                 class="w-[100px] h-[100px] rounded-full object-cover shadow-sm border-[4px]" 
+                 :style="{ borderColor: profile['背景主題顏色'] || '#fefce8' }">
         </div>
 
         <div class="relative z-10 w-full flex flex-col items-center px-8">
@@ -76,14 +77,14 @@
                 <a v-if="profile['TikTok連結']" :href="profile['TikTok連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-tiktok-logo text-[34px]"></i></a>
             </div>
 
-            <div v-if="profile['YouTube影音連結'] && getYoutubeEmbedUrl(profile['YouTube影音連結'])" class="w-full mb-8 rounded-[5px] overflow-hidden shadow-sm aspect-video bg-black shrink-0">
+            <div v-if="profile['YouTube影音連結'] && getYoutubeEmbedUrl(profile['YouTube影音連結'])" class="w-full mb-8 rounded-[20px] overflow-hidden shadow-sm aspect-video bg-black shrink-0">
                 <iframe :src="`https://www.youtube.com/embed/${getYoutubeEmbedUrl(profile['YouTube影音連結'])}`" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
 
             <div class="w-full space-y-4 pb-6">
               <a v-for="(btn, index) in buttons" :key="index" :href="buildFinalLink(btn.type || 'url', btn['跳轉連結'] || btn.url)" target="_blank" 
                  @click="trackClickAsync(btn, index)"
-                 class="w-full flex items-center justify-center font-bold px-4 py-[16px] transition cursor-pointer relative overflow-hidden group shadow-sm rounded-[5px] transform hover:opacity-90"
+                 class="w-full flex items-center justify-center font-bold px-4 py-[16px] transition cursor-pointer relative overflow-hidden group shadow-sm rounded-[20px] transform hover:opacity-90"
                  :style="{ backgroundColor: btn['按鈕背景顏色'] || '#D2B992', color: btn['按鈕文字顏色'] || '#000000' }">
                 <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <span class="tracking-[0.1em] text-[14px]">{{ btn['按鈕文字'] || btn.title }}</span>
