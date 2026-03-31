@@ -17,27 +17,29 @@
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
     body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-    .glass-card { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 10px 40px rgba(0,0,0,0.05); }
     .fade-enter-active, .fade-leave-active { transition: opacity 0.5s ease; }
     .fade-enter-from, .fade-leave-to { opacity: 0; }
     [v-cloak] { display: none !important; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body>
-  <div id="app" v-cloak class="min-h-screen flex flex-col items-center py-10 px-4 transition-colors duration-500" :style="{ backgroundColor: profile.背景主題顏色 || '#FDF2F8' }">
+<body class="bg-gray-50 flex justify-center">
+  <div id="app" v-cloak class="w-full max-w-md min-h-screen flex flex-col items-center relative overflow-y-auto no-scrollbar shadow-2xl transition-all duration-500" 
+       :style="{ backgroundColor: profile['背景主題顏色'] || '#ffffff' }">
     
-    <div v-if="isLoading" class="flex flex-col items-center justify-center mt-32">
+    <div v-if="isLoading" class="flex flex-col items-center justify-center mt-32 z-50 absolute inset-0 bg-white/80 backdrop-blur-sm">
       <i class="ph ph-spinner animate-spin text-5xl text-pink-500 mb-4"></i>
       <p class="text-gray-500 font-bold" v-text="'資料準備中...'"></p>
     </div>
 
-    <div v-else-if="errorMessage" class="flex flex-col items-center justify-center mt-20 bg-white p-6 rounded-2xl shadow-lg">
+    <div v-else-if="errorMessage" class="flex flex-col items-center justify-center mt-32 bg-white p-6 rounded-2xl shadow-lg z-50">
       <i class="ph-fill ph-warning-circle text-4xl text-red-500 mb-2"></i>
       <p class="text-gray-800 font-bold" v-text="errorMessage"></p>
     </div>
 
     <transition name="fade">
-      <div v-if="!isLoading && !errorMessage && isAutoShare" class="w-full flex flex-col items-center justify-center mt-32 text-center">
+      <div v-if="!isLoading && !errorMessage && isAutoShare" class="w-full h-screen flex flex-col items-center justify-center text-center absolute z-50 bg-white/90 backdrop-blur-md">
         <div class="w-20 h-20 bg-white rounded-full shadow-lg flex items-center justify-center mb-6">
            <i class="ph-fill ph-paper-plane-tilt text-4xl text-[#06C755] animate-pulse"></i>
         </div>
@@ -48,35 +50,57 @@
     </transition>
 
     <transition name="fade">
-      <div v-if="!isLoading && !errorMessage && !isAutoShare" class="w-full max-w-md glass-card rounded-3xl p-8 flex flex-col items-center relative overflow-hidden">
+      <div v-if="!isLoading && !errorMessage && !isAutoShare" class="w-full flex flex-col items-center pb-12 relative">
         
-        <div class="w-28 h-28 rounded-full border-4 border-white shadow-lg overflow-hidden mb-5 bg-gray-100">
-          <img v-if="profile.大頭貼圖片URL" :src="profile.大頭貼圖片URL" class="w-full h-full object-cover">
-        </div>
-        
-        <h1 class="text-2xl font-black text-gray-900 mb-2" v-text="profile.顯示名稱"></h1>
-        <p class="text-sm text-gray-600 text-center whitespace-pre-wrap leading-relaxed mb-8 w-full" v-text="profile.個人簡介文字"></p>
-
-        <button @click="shareMyCard" class="w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-4 rounded-2xl mb-6 shadow-md transition flex items-center justify-center gap-2 transform hover:scale-[1.02]">
-          <i class="ph-fill ph-chat-circle-text text-xl"></i> <span v-text="shareButtonText"></span>
-        </button>
-
-        <div class="w-full space-y-3">
-          <a v-for="(btn, index) in buttons" :key="index" :href="btn['跳轉連結'] || btn.url" target="_blank" 
-             @click="trackClickAsync(btn, index)"
-             class="w-full flex items-center gap-3 p-3 rounded-2xl border border-white/50 shadow-sm transition transform hover:-translate-y-1 hover:shadow-md"
-             :style="{ backgroundColor: btn.按鈕顏色 || '#ffffff' }">
-            <div class="w-10 h-10 rounded-xl bg-white/60 flex items-center justify-center overflow-hidden shrink-0">
-              <img v-if="btn.Icon圖片URL" :src="btn.Icon圖片URL" class="w-full h-full object-cover">
-              <i v-else class="ph ph-link text-gray-700"></i>
+        <div v-if="profile['背景圖片URL']" class="relative w-full aspect-[4/5] shrink-0 bg-cover bg-center flex flex-col justify-end items-center pb-[2px]" :style="{ backgroundImage: `url(${profile['背景圖片URL']})` }">
+            <div class="absolute bottom-0 left-0 w-full h-1/2" :style="{ background: `linear-gradient(to top, ${profile['背景主題顏色'] || '#ffffff'} 0%, transparent 100%)` }"></div>
+            <div class="relative z-10 mb-3">
+                <img :src="profile['大頭貼圖片URL'] || 'https://via.placeholder.com/150'" class="w-[110px] h-[110px] rounded-full object-cover border-2 border-white/50 shadow-md bg-gray-100">
             </div>
-            <div class="flex-1 font-bold text-gray-800 text-center pr-10" v-text="btn.按鈕文字"></div>
-          </a>
         </div>
-        
+
+        <div v-else class="relative z-10 w-full flex flex-col items-center mt-[80px] shrink-0">
+            <div class="relative mb-3">
+                <img :src="profile['大頭貼圖片URL'] || 'https://via.placeholder.com/150'" class="w-[110px] h-[110px] rounded-full object-cover border-2 border-white/50 shadow-md bg-gray-100">
+            </div>
+        </div>
+
+        <div class="relative z-10 w-full flex flex-col items-center px-6">
+            <div class="text-2xl font-black text-center mb-1 tracking-wider" :style="{ color: profile['全域文字顏色'] || '#1a1a1a' }">{{ profile['顯示名稱'] }}</div>
+            <div class="text-[13px] text-center whitespace-pre-wrap leading-relaxed w-full break-words opacity-90 mb-5" :style="{ color: profile['全域文字顏色'] || '#1a1a1a' }">{{ profile['個人簡介文字'] }}</div>
+
+            <button @click="shareMyCard" class="w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-4 rounded-2xl mb-5 shadow-md transition flex items-center justify-center gap-2 transform hover:-translate-y-0.5">
+              <i class="ph-fill ph-chat-circle-text text-xl"></i> <span v-text="shareButtonText"></span>
+            </button>
+
+            <div v-if="profile['FB連結'] || profile['IG連結'] || profile['LINE連結'] || profile['TikTok連結'] || profile['WeChat連結']" class="flex gap-4 mb-4 justify-center items-center">
+                <a v-if="profile['FB連結']" :href="profile['FB連結']" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-facebook-logo text-[28px]"></i></a>
+                <a v-if="profile['IG連結']" :href="profile['IG連結']" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-instagram-logo text-[28px]"></i></a>
+                <a v-if="profile['LINE連結']" :href="profile['LINE連結']" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }">
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="w-[28px] h-[28px]" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M24 12c0 6.627-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0s12 5.373 12 12zm-12-7.5c-4.606 0-8.25 3.03-8.25 6.75 0 3.35 2.5 6.17 6.13 6.68.25.05.58.15.65.37.06.2.04.5.02.7l-.1.65c-.03.2-.15.75.65.4 1-.45 5.5-2.3 7.4-4.25 1.25-1.25 1.75-2.7 1.75-4.3C20.25 7.53 16.606 4.5 12 4.5z" /></svg>
+                </a>
+                <a v-if="profile['WeChat連結']" :href="profile['WeChat連結']" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-wechat-logo text-[28px]"></i></a>
+                <a v-if="profile['TikTok連結']" :href="profile['TikTok連結']" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-tiktok-logo text-[28px]"></i></a>
+            </div>
+
+            <div v-if="profile['YouTube影音連結'] && getYoutubeEmbedUrl(profile['YouTube影音連結'])" class="w-full mt-2 mb-4 rounded-xl overflow-hidden shadow-lg aspect-video bg-black shrink-0 border border-white/20">
+                <iframe :src="`https://www.youtube.com/embed/${getYoutubeEmbedUrl(profile['YouTube影音連結'])}`" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+
+            <div class="w-full space-y-3 pb-6">
+              <a v-for="(btn, index) in buttons" :key="index" :href="buildFinalLink(btn.type || 'url', btn['跳轉連結'] || btn.url)" target="_blank" 
+                 @click="trackClickAsync(btn, index)"
+                 class="w-full flex items-center justify-center font-bold px-4 py-[14px] transition cursor-pointer relative overflow-hidden group shadow-sm rounded-[2px] transform hover:-translate-y-0.5 hover:shadow-md"
+                 :style="{ backgroundColor: btn['按鈕顏色'] || '#ffffff', color: btn['按鈕文字顏色'] || '#000000' }">
+                <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <span class="tracking-widest text-[13px]" v-text="btn['按鈕文字']"></span>
+              </a>
+            </div>
+            
+            <p class="mt-4 pb-8 text-xs font-bold text-gray-400 opacity-70">Powered by Ruby.Brand.Design</p>
+        </div>
       </div>
     </transition>
-    <p v-if="!isLoading && !errorMessage && !isAutoShare" class="mt-8 text-xs font-bold text-gray-400" v-text="'Powered by Ruby.Brand.Design'"></p>
   </div>
 
   <script>
@@ -97,6 +121,32 @@
         
         const shareButtonText = ref("傳送E-LINE-CARD");
 
+        const getYoutubeEmbedUrl = (url) => {
+            if (!url) return null;
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        };
+
+        const buildFinalLink = (type, value) => {
+            if (!value) return '#';
+            if (type === 'tel') return value.startsWith('tel:') ? value : 'tel:' + value;
+            if (type === 'email') return value.startsWith('mailto:') ? value : 'mailto:' + value;
+            if (type === 'share' || String(value).includes('social-plugins.line.me') || String(value).includes('line.me/R/msg')) {
+                // 如果是分享類型，一律導入 LINE 官方的 social plugin
+                let shareText = '';
+                if (String(value).includes('text=')) shareText = decodeURIComponent(value.split('text=')[1]);
+                else shareText = `哈囉！這是「${profile.value['顯示名稱']}」的電子名片，請點擊連結查看：\nhttps://liff.line.me/${LIFF_ID}?id=${profile.value['會員ID']}`;
+                return `https://social-plugins.line.me/lineit/share?text=${encodeURIComponent(shareText)}`;
+            }
+            if (type === 'line') {
+                if (value.startsWith('http')) return value;
+                return 'https://line.me/ti/p/~' + value.replace('@', '%40'); 
+            }
+            if (!value.startsWith('http') && !value.startsWith('mailto:') && !value.startsWith('tel:')) return 'https://' + value;
+            return value;
+        };
+
         const closeLiff = () => {
             if (typeof liff !== 'undefined' && liff.isInClient()) {
                 liff.closeWindow();
@@ -105,23 +155,24 @@
             }
         };
 
-        // ✅ 全新的背景非同步追蹤函數，不影響超連結運作
         const trackClickAsync = (btn, index) => {
             const targetUrl = btn['跳轉連結'] || btn.url;
-            const itemId = btn[Object.keys(btn)[0]]; 
+            const itemId = btn['按鈕ID'] || btn[Object.keys(btn)[0]]; 
             const btnText = btn['按鈕文字'] || '未知按鈕';
             const urlParams = new URLSearchParams(window.location.search);
             const memberId = urlParams.get('id');
             
             if (!memberId || !targetUrl) return;
 
-            // 使用 no-cors 模式發送 fetch，瀏覽器會在背景偷偷請求 GAS 寫入數據，不會卡住網頁
             const trackUrl = `${GAS_API_URL}?action=trackClick&memberId=${memberId}&type=button&itemId=${itemId}&btnIdx=${index + 1}&btnText=${encodeURIComponent(btnText)}&url=${encodeURIComponent(targetUrl)}`;
             fetch(trackUrl, { mode: 'no-cors' }).catch(e => console.log('背景追蹤發送失敗', e));
         };
 
+        // 🔥 客製化文案與無縫跨平台分享引擎
         const shareMyCard = async () => {
           try {
+            const shareText = `哈囉！這是「${profile.value['顯示名稱'] || '我'}」的電子名片，請點擊連結查看：\nhttps://liff.line.me/${LIFF_ID}?id=${profile.value['會員ID']}`;
+
             if (typeof liff !== 'undefined' && liff.isInClient()) {
                 if (!liff.isLoggedIn()) {
                   liff.login({ redirectUri: window.location.href });
@@ -137,7 +188,7 @@
                 if (liff.isApiAvailable('shareTargetPicker')) {
                   const res = await liff.shareTargetPicker([{
                     "type": "flex",
-                    "altText": `這是 ${profile.value.顯示名稱 || '我'} 的電子名片，請查收！`, 
+                    "altText": `這是 ${profile.value['顯示名稱']} 的電子名片，請查收！`, 
                     "contents": flexMsg.value
                   }]);
                   
@@ -148,24 +199,19 @@
                     if (isAutoShare.value) closeLiff();
                   }
                 } else {
-                  alert("目前無法使用分享功能。請確認 LINE Developers Console 中是否已開啟「Share Target Picker」權限。");
+                  alert("目前無法使用分享功能。請確認 LINE Developers 權限。");
                 }
 
             } else {
-                const currentUrl = new URL(window.location.href);
-                currentUrl.searchParams.delete('autoShare'); 
-                const shareUrl = currentUrl.toString();
-                
-                const shareText = `哈囉！這是 ${profile.value.顯示名稱 || '我'} 的電子名片，請點擊連結查看：\n${shareUrl}`;
-                
+                // 若在電腦瀏覽器或非 LINE App 內，喚醒官方社交外掛，讓電腦也能無縫選取好友轉發！
                 try {
                     await navigator.clipboard.writeText(shareText);
                     if (!isAutoShare.value) alert('✨ 已為您複製名片資訊！即將喚醒 LINE 準備分享...');
                 } catch(err) {
                     console.log('剪貼簿無權限寫入，跳過複製步驟');
                 }
-
-                window.open(`https://line.me/R/msg/text/?${encodeURIComponent(shareText)}`, '_blank');
+                
+                window.open(`https://social-plugins.line.me/lineit/share?text=${encodeURIComponent(shareText)}`, '_blank');
                 
                 if (isAutoShare.value) setTimeout(() => { closeLiff(); }, 1500);
             }
@@ -199,9 +245,11 @@
 
             if (data.status === 'success') {
               profile.value = data.profile;
+              // 將會員 ID 掛載到 profile 方便後續使用
+              profile.value['會員ID'] = memberId;
               buttons.value = data.buttons;
               flexMsg.value = data.flexMsg;
-              document.title = isAutoShare.value ? '發送名片中...' : `${data.profile.顯示名稱} 的電子名片`;
+              document.title = isAutoShare.value ? '發送名片中...' : `${data.profile['顯示名稱']} 的電子名片`;
 
               if (isAutoShare.value) {
                   setTimeout(() => { shareMyCard(); }, 500); 
@@ -216,7 +264,7 @@
           }
         });
 
-        return { profile, buttons, isLoading, errorMessage, isAutoShare, shareButtonText, shareMyCard, closeLiff, trackClickAsync };
+        return { profile, buttons, isLoading, errorMessage, isAutoShare, shareButtonText, shareMyCard, closeLiff, trackClickAsync, getYoutubeEmbedUrl, buildFinalLink };
       }
     }).mount('#app');
   </script>
