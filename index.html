@@ -68,17 +68,13 @@
             <div class="text-2xl font-black text-center mb-1 tracking-wider" :style="{ color: profile['全域文字顏色'] || '#1a1a1a' }">{{ profile['顯示名稱'] }}</div>
             <div class="text-[13px] text-center whitespace-pre-wrap leading-relaxed w-full break-words opacity-90 mb-5" :style="{ color: profile['全域文字顏色'] || '#1a1a1a' }">{{ profile['個人簡介文字'] }}</div>
 
-            <button @click="shareMyCard" class="w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-4 rounded-2xl mb-5 shadow-md transition flex items-center justify-center gap-2 transform hover:-translate-y-0.5">
-              <i class="ph-fill ph-chat-circle-text text-xl"></i> <span>{{ shareButtonText }}</span>
-            </button>
-
-            <div v-if="profile['FB連結'] || profile['IG連結'] || profile['LINE連結'] || profile['TikTok連結'] || profile['WeChat連結']" class="flex gap-4 mb-4 justify-center items-center">
+            <div v-if="profile['FB連結'] || profile['IG連結'] || profile['LINE連結'] || profile['TikTok連結'] || profile['Wechat'] || profile['WeChat連結']" class="flex gap-4 mb-4 justify-center items-center">
                 <a v-if="profile['FB連結']" :href="profile['FB連結']" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-facebook-logo text-[28px]"></i></a>
                 <a v-if="profile['IG連結']" :href="profile['IG連結']" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-instagram-logo text-[28px]"></i></a>
                 <a v-if="profile['LINE連結']" :href="profile['LINE連結']" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }">
                     <svg viewBox="0 0 24 24" fill="currentColor" class="w-[28px] h-[28px]" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M24 12c0 6.627-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0s12 5.373 12 12zm-12-7.5c-4.606 0-8.25 3.03-8.25 6.75 0 3.35 2.5 6.17 6.13 6.68.25.05.58.15.65.37.06.2.04.5.02.7l-.1.65c-.03.2-.15.75.65.4 1-.45 5.5-2.3 7.4-4.25 1.25-1.25 1.75-2.7 1.75-4.3C20.25 7.53 16.606 4.5 12 4.5z" /></svg>
                 </a>
-                <a v-if="profile['WeChat連結']" :href="profile['WeChat連結']" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-wechat-logo text-[28px]"></i></a>
+                <a v-if="profile['Wechat'] || profile['WeChat連結']" :href="profile['Wechat'] || profile['WeChat連結']" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-wechat-logo text-[28px]"></i></a>
                 <a v-if="profile['TikTok連結']" :href="profile['TikTok連結']" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-tiktok-logo text-[28px]"></i></a>
             </div>
 
@@ -90,7 +86,7 @@
               <a v-for="(btn, index) in buttons" :key="index" :href="buildFinalLink(btn.type || 'url', btn['跳轉連結'] || btn.url)" target="_blank" 
                  @click="trackClickAsync(btn, index)"
                  class="w-full flex items-center justify-center font-bold px-4 py-[14px] transition cursor-pointer relative overflow-hidden group shadow-sm rounded-[2px] transform hover:-translate-y-0.5 hover:shadow-md"
-                 :style="{ backgroundColor: btn['按鈕顏色'] || '#ffffff', color: btn['按鈕文字顏色'] || '#000000' }">
+                 :style="{ backgroundColor: btn['按鈕背景顏色'] || '#ffffff', color: btn['按鈕文字顏色'] || '#000000' }">
                 <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <span class="tracking-widest text-[13px]">{{ btn['按鈕文字'] || btn.title }}</span>
               </a>
@@ -118,8 +114,6 @@
         const errorMessage = ref('');
         const isAutoShare = ref(false); 
         
-        const shareButtonText = ref("傳送E-LINE-CARD");
-
         const getYoutubeEmbedUrl = (url) => {
             if (!url) return null;
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
@@ -257,7 +251,7 @@
           }
         });
 
-        return { profile, buttons, isLoading, errorMessage, isAutoShare, shareButtonText, shareMyCard, closeLiff, trackClickAsync, getYoutubeEmbedUrl, buildFinalLink };
+        return { profile, buttons, isLoading, errorMessage, isAutoShare, shareMyCard, closeLiff, trackClickAsync, getYoutubeEmbedUrl, buildFinalLink };
       }
     }).mount('#app');
   </script>
