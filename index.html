@@ -122,7 +122,7 @@
         const errorMessage = ref('');
         const isAutoShare = ref(false); 
         
-        // 🔥 定義安全的底色變數 (預設給你想要的米黃底色)
+        // 🔥 定義安全的底色變數
         const safeBgColor = ref('#fefce8'); 
         
         const getYoutubeEmbedUrl = (url) => {
@@ -199,7 +199,7 @@
               flexMsg.value = data.flexMsg;
               document.title = isAutoShare.value ? '發送名片中...' : `${data.profile['顯示名稱']} 的電子名片`;
 
-              // 🔥 色碼防呆處理：自動過濾空白鍵、自動補齊 # 號
+              // 🔥 色碼防呆處理
               let rawColor = profile.value['背景主題顏色'];
               let cleanColor = rawColor ? String(rawColor).trim() : '';
               if (cleanColor !== '') {
@@ -208,9 +208,38 @@
                   }
                   safeBgColor.value = cleanColor;
               }
-              
-              // 強制將整個網頁底層塗滿該顏色，斷絕白邊或深灰底的可能
               document.body.style.backgroundColor = safeBgColor.value;
+
+              // 🚀 核心修復：喚醒 LINE 好友分享列表
+              if (isAutoShare.value && flexMsg.value) {
+                  if (!liff.isLoggedIn()) {
+                      liff.login({ redirectUri: window.location.href });
+                      return;
+                  }
+                  
+                  if (liff.isApiAvailable('shareTargetPicker')) {
+                      // 使用 500ms 延遲，確保「發送中」的綠色動畫順暢顯示後，再彈出原生視窗，完美無縫感
+                      setTimeout(async () => {
+                          try {
+                              const res = await liff.shareTargetPicker([flexMsg.value]);
+                              if (res) {
+                                  // 分享成功，直接關閉視窗
+                                  liff.closeWindow();
+                              } else {
+                                  // 使用者按了取消，關閉自動分享畫面，退回主畫面
+                                  isAutoShare.value = false;
+                              }
+                          } catch (error) {
+                              console.error("Share API 錯誤", error);
+                              errorMessage.value = '名片發送失敗，請確認 LINE App 狀態。';
+                              isAutoShare.value = false;
+                          }
+                      }, 500);
+                  } else {
+                      errorMessage.value = '您當前的 LINE 版本不支援分享功能，請更新 App。';
+                      isAutoShare.value = false;
+                  }
+              }
 
             } else {
               errorMessage.value = data.message || '無法載入名片資料';
