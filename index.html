@@ -189,7 +189,8 @@
           }
 
           try {
-            const response = await fetch(`${GAS_API_URL}?id=${memberId}`);
+            // ✅ 核心修改處：加上 action=getData，告訴 GAS 這是 Vue 在要 JSON 資料
+            const response = await fetch(`${GAS_API_URL}?action=getData&id=${memberId}`);
             const data = await response.json();
 
             if (data.status === 'success') {
