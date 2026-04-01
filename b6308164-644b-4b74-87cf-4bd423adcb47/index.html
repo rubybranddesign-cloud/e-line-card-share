@@ -3,18 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>專屬電子名片 - 專屬電子名片</title>
-  <meta name="description" content="...">
-  <meta property="og:title" content="專屬電子名片 - 專屬電子名片">
-  <meta property="og:description" content="...">
-  <meta property="og:image" content="https://via.placeholder.com/150">
+  <title>林東岳 TroyLin - 專屬電子名片</title>
+  <meta name="description" content="微型企業的AI賦能師
+「擺脫窮忙，生意永續」...">
+  <meta property="og:title" content="林東岳 TroyLin - 專屬電子名片">
+  <meta property="og:description" content="微型企業的AI賦能師
+「擺脫窮忙，生意永續」...">
+  <meta property="og:image" content="https://drive.google.com/thumbnail?id=1nBXWqTaGBSsCsIgSQ-phGYZgecUVF4FR&sz=w1000">
   <meta property="og:type" content="website">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
-    body { font-family: 'Helvetica Neue', Helvetica, Arial, 'PingFang TC', '微軟正黑體', sans-serif; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s ease; }
+    body { font-family: "Helvetica Neue", Helvetica, Arial, "PingFang TC", "微軟正黑體", sans-serif; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s ease; }
     .fade-enter-active, .fade-leave-active { transition: opacity 0.5s ease; }
     .fade-enter-from, .fade-leave-to { opacity: 0; }
     [v-cloak] { display: none !important; }
@@ -83,13 +85,13 @@
     const LIFF_ID = "2009561347-VUhbtrEC";
     createApp({
       setup() {
-        const profile = ref({"顯示名稱":"","個人簡介文字":"","大頭貼圖片URL":"https://via.placeholder.com/150","背景圖片URL":"","背景主題顏色":"#fefce8","全域文字顏色":"#1a1a1a","社群Icon顏色":"#000000","FB連結":"","IG連結":"","LINE連結":"","WeChat連結":"","TikTok連結":"","YouTube影音連結":"","會員ID":"b6308164-644b-4b74-87cf-4bd423adcb47"});
-        const buttons = ref([{"type":"url"},{"type":"url"},{"type":"url"},{"type":"url"}]);
+        const profile = ref({"顯示名稱":"林東岳 TroyLin","個人簡介文字":"微型企業的AI賦能師\n「擺脫窮忙，生意永續」","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1nBXWqTaGBSsCsIgSQ-phGYZgecUVF4FR&sz=w1000","背景圖片URL":"https://drive.google.com/thumbnail?id=1zHVQlNzcI2xIkFveApb-SjUrPNaxUaPm&sz=w1000","背景主題顏色":"#fefce8","全域文字顏色":"#333333","社群Icon顏色":"#333333","FB連結":"https://www.facebook.com/profile.php?id=61578553414359","IG連結":"https://www.instagram.com/troy.growthx.ai/?hl=zh-tw","LINE連結":"@movingbetter","WeChat連結":"","TikTok連結":"@movingbetter","YouTube影音連結":"https://www.youtube.com/watch?v=RrSDcliE6G4&pp=ygUW6Kqe6I-TIOaWsOiBnua3seWRvOWQuA%3D%3D","會員ID":"b6308164-644b-4b74-87cf-4bd423adcb47"});
+        const buttons = ref([{"按鈕ID":"btn_mnev1kve_6p1amaco","按鈕文字":"傳送電子名片","跳轉連結":"https://liff.line.me/2009561347-VUhbtrEC?id=b6308164-644b-4b74-87cf-4bd423adcb47&autoShare=true","按鈕背景顏色":"#fde047","按鈕文字顏色":"#000000","type":"url"},{"按鈕ID":1774973632029,"按鈕文字":"官方網站","跳轉連結":"https://vocus.cc/salon/bizgrowthxai","按鈕背景顏色":"#fde047","按鈕文字顏色":"#000000","type":"url"},{"按鈕ID":1774973586646,"按鈕文字":"電話連繫Troy","跳轉連結":"tel:0905566525","按鈕背景顏色":"#fde047","按鈕文字顏色":"#000000","type":"url"},{"按鈕ID":"btn_mneuki7x_m4buqs4r","按鈕文字":"發送Email","跳轉連結":"mailto:dongyue0814@gmail.com","按鈕背景顏色":"#fde047","按鈕文字顏色":"#000000","type":"url"}]);
         const flexMsg = ref(null);
         const isLoading = ref(true);
-        const errorMessage = ref('');
-        const isAutoShare = ref(false); 
-        const safeBgColor = ref('#fefce8'); 
+        const errorMessage = ref("");
+        const isAutoShare = ref(false);
+        const safeBgColor = ref("#fefce8");
         
         const getYoutubeEmbedUrl = (url) => {
             if (!url) return null;
@@ -97,87 +99,81 @@
             const match = url.match(regExp);
             return (match && match[2].length === 11) ? match[2] : null;
         };
-
         const buildFinalLink = (type, value) => {
-            if (!value) return '#';
-            if (type === 'tel') return value.startsWith('tel:') ? value : 'tel:' + value;
-            if (type === 'email') return value.startsWith('mailto:') ? value : 'mailto:' + value;
-            if (type === 'share' || String(value).includes('social-plugins.line.me') || String(value).includes('line.me/R/msg')) {
-                let shareText = '';
-                if (String(value).includes('text=')) shareText = decodeURIComponent(value.split('text=')[1]);
-                else shareText = '哈囉！這是「' + (profile.value['顯示名稱'] || '我') + '」的電子名片，請點擊連結查看：\nhttps://liff.line.me/' + LIFF_ID + '?id=' + profile.value['會員ID'];
-                return 'https://social-plugins.line.me/lineit/share?text=' + encodeURIComponent(shareText);
+            if (!value) return "#";
+            if (type === "tel") return value.startsWith("tel:") ? value : "tel:" + value;
+            if (type === "email") return value.startsWith("mailto:") ? value : "mailto:" + value;
+            if (type === "share" || String(value).includes("social-plugins.line.me") || String(value).includes("line.me/R/msg")) {
+                let shareText = "";
+                if (String(value).includes("text=")) shareText = decodeURIComponent(value.split("text=")[1]);
+                else shareText = "哈囉！這是「" + (profile.value['顯示名稱'] || "我") + "」的電子名片，請點擊連結查看：\nhttps://liff.line.me/" + LIFF_ID + "?id=" + profile.value['會員ID'];
+                return "https://social-plugins.line.me/lineit/share?text=" + encodeURIComponent(shareText);
             }
-            if (type === 'line') {
-                if (value.startsWith('http')) return value;
-                return 'https://line.me/ti/p/~' + value.replace('@', '%40'); 
+            if (type === "line") {
+                if (value.startsWith("http")) return value;
+                return "https://line.me/ti/p/~" + value.replace("@", "%40");
             }
-            if (!value.startsWith('http') && !value.startsWith('mailto:') && !value.startsWith('tel:')) return 'https://' + value;
+            if (!value.startsWith("http") && !value.startsWith("mailto:") && !value.startsWith("tel:")) return "https://" + value;
             return value;
         };
-
         const closeLiff = () => {
-            if (typeof liff !== 'undefined' && liff.isInClient()) liff.closeWindow();
-            else window.close(); 
+            if (typeof liff !== "undefined" && liff.isInClient()) liff.closeWindow();
+            else window.close();
         };
-
         const trackClickAsync = (btn, index) => {
             const targetUrl = btn['跳轉連結'] || btn.url;
-            const itemId = btn['按鈕ID']; 
-            const btnText = btn['按鈕文字'] || '未知按鈕';
+            const itemId = btn['按鈕ID'];
+            const btnText = btn['按鈕文字'] || "未知按鈕";
             const memberId = profile.value['會員ID'];
             if (!memberId || !targetUrl) return;
-            const trackUrl = GAS_API_URL + '?action=trackClick&memberId=' + memberId + '&type=button&itemId=' + itemId + '&btnIdx=' + (index + 1) + '&btnText=' + encodeURIComponent(btnText) + '&url=' + encodeURIComponent(targetUrl);
-            fetch(trackUrl, { mode: 'no-cors' }).catch(e => console.log('背景追蹤發送失敗', e));
+            const trackUrl = GAS_API_URL + "?action=trackClick&memberId=" + memberId + "&type=button&itemId=" + itemId + "&btnIdx=" + (index + 1) + "&btnText=" + encodeURIComponent(btnText) + "&url=" + encodeURIComponent(targetUrl);
+            fetch(trackUrl, { mode: "no-cors" }).catch(e => console.log("背景追蹤發送失敗", e));
         };
-
         onMounted(async () => {
           try { await liff.init({ liffId: LIFF_ID }); } catch (err) { console.error("LIFF 初始化失敗", err); }
           const urlParams = new URLSearchParams(window.location.search);
-          isAutoShare.value = urlParams.get('autoShare') === 'true';
-
+          isAutoShare.value = urlParams.get("autoShare") === "true";
           let rawColor = profile.value['背景主題顏色'];
-          let cleanColor = rawColor ? String(rawColor).trim() : '';
-          if (cleanColor !== '') {
-              if (!cleanColor.startsWith('#') && (cleanColor.length === 6 || cleanColor.length === 3)) cleanColor = '#' + cleanColor;
+          let cleanColor = rawColor ? String(rawColor).trim() : "";
+          if (cleanColor !== "") {
+              if (!cleanColor.startsWith("#") && (cleanColor.length === 6 || cleanColor.length === 3)) cleanColor = "#" + cleanColor;
               safeBgColor.value = cleanColor;
           }
           document.body.style.backgroundColor = safeBgColor.value;
           isLoading.value = false;
-
           if (isAutoShare.value) {
               if (!liff.isLoggedIn()) {
                   liff.login({ redirectUri: window.location.href });
                   return;
               }
               try {
-                  const response = await fetch(GAS_API_URL + '?action=getData&id=' + profile.value['會員ID']);
+                  const response = await fetch(GAS_API_URL + "?action=getData&id=" + profile.value['會員ID']);
                   const data = await response.json();
-                  if (data.status === 'success' && data.flexMsg) {
+                  if (data.status === "success" && data.flexMsg) {
                       flexMsg.value = data.flexMsg;
-                      if (liff.isApiAvailable('shareTargetPicker')) {
-                          const messageToSend = { type: "flex", altText: profile.value['顯示名稱'] + ' 的電子名片', contents: flexMsg.value };
+                      if (liff.isApiAvailable("shareTargetPicker")) {
+                          const messageToSend = { type: "flex", altText: profile.value['顯示名稱'] + " 的電子名片", contents: flexMsg.value };
                           setTimeout(async () => {
                               try {
                                   const res = await liff.shareTargetPicker([messageToSend]);
                                   if (res) liff.closeWindow();
                                   else isAutoShare.value = false;
                               } catch (error) {
-                                  errorMessage.value = '名片發送失敗，請確認 LINE App 狀態。';
+                                  errorMessage.value = "名片發送失敗，請確認 LINE App 狀態。";
                                   isAutoShare.value = false;
                               }
                           }, 500);
                       } else {
-                          errorMessage.value = '您當前的 LINE 版本不支援分享功能，請更新 App。';
+                          errorMessage.value = "您當前的 LINE 版本不支援分享功能，請更新 App。";
                           isAutoShare.value = false;
                       }
                   }
-              } catch (e) { errorMessage.value = '轉發資料載入失敗。'; }
+              } catch (e) { errorMessage.value = "轉發資料載入失敗。"; }
           }
         });
         return { profile, buttons, isLoading, errorMessage, isAutoShare, safeBgColor, closeLiff, trackClickAsync, getYoutubeEmbedUrl, buildFinalLink };
       }
-    }).mount('#app');
+    }).mount("#app");
   </script>
 </body>
 </html>
