@@ -4,11 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>林東岳 TroyLin - 專屬電子名片</title>
-  <meta name="description" content="微型企業的AI賦能師
-「擺脫窮忙，生意永續」...">
+  <meta name="description" content="微型企業的AI賦能師 「擺脫窮忙，生意永續」...">
   <meta property="og:title" content="林東岳 TroyLin - 專屬電子名片">
-  <meta property="og:description" content="微型企業的AI賦能師
-「擺脫窮忙，生意永續」...">
+  <meta property="og:description" content="微型企業的AI賦能師 「擺脫窮忙，生意永續」...">
   <meta property="og:image" content="https://drive.google.com/thumbnail?id=1nBXWqTaGBSsCsIgSQ-phGYZgecUVF4FR&sz=w1000">
   <meta property="og:type" content="website">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -85,14 +83,13 @@
     const LIFF_ID = "2009561347-VUhbtrEC";
     createApp({
       setup() {
-        const profile = ref({"顯示名稱":"林東岳 TroyLin","個人簡介文字":"微型企業的AI賦能師\n「擺脫窮忙，生意永續」","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1nBXWqTaGBSsCsIgSQ-phGYZgecUVF4FR&sz=w1000","背景圖片URL":"https://drive.google.com/thumbnail?id=1zHVQlNzcI2xIkFveApb-SjUrPNaxUaPm&sz=w1000","背景主題顏色":"#fefce8","全域文字顏色":"#333333","社群Icon顏色":"#333333","FB連結":"https://www.facebook.com/profile.php?id=61578553414359","IG連結":"https://www.instagram.com/troy.growthx.ai/?hl=zh-tw","LINE連結":"@movingbetter","WeChat連結":"","TikTok連結":"@movingbetter","YouTube影音連結":"https://www.youtube.com/watch?v=RrSDcliE6G4&pp=ygUW6Kqe6I-TIOaWsOiBnua3seWRvOWQuA%3D%3D","會員ID":"b6308164-644b-4b74-87cf-4bd423adcb47"});
+        const profile = ref({"顯示名稱":"林東岳 TroyLin","個人簡介文字":"微型企業的AI賦能師\n「擺脫窮忙，生意永續」","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1nBXWqTaGBSsCsIgSQ-phGYZgecUVF4FR&sz=w1000","背景圖片URL":"https://drive.google.com/thumbnail?id=1zHVQlNzcI2xIkFveApb-SjUrPNaxUaPm&sz=w1000","背景主題顏色":"#fefce8","全域文字顏色":"#333333","社群Icon顏色":"#333333","FB連結":"https://www.facebook.com/profile.php?id=61578553414359","IG連結":"https://www.instagram.com/troy.growthx.ai/?hl=zh-tw","LINE連結":"@movingbetter","WeChat連結":"@movingbetter","Wechat":"@movingbetter","TikTok連結":"@movingbetter","YouTube影音連結":"https://www.youtube.com/watch?v=RrSDcliE6G4&pp=ygUW6Kqe6I-TIOaWsOiBnua3seWRvOWQuA%3D%3D","會員ID":"b6308164-644b-4b74-87cf-4bd423adcb47"});
         const buttons = ref([{"按鈕ID":"btn_mnev1kve_6p1amaco","按鈕文字":"傳送電子名片","跳轉連結":"https://liff.line.me/2009561347-VUhbtrEC?id=b6308164-644b-4b74-87cf-4bd423adcb47&autoShare=true","按鈕背景顏色":"#fde047","按鈕文字顏色":"#000000","type":"url"},{"按鈕ID":1774973632029,"按鈕文字":"官方網站","跳轉連結":"https://vocus.cc/salon/bizgrowthxai","按鈕背景顏色":"#fde047","按鈕文字顏色":"#000000","type":"url"},{"按鈕ID":1774973586646,"按鈕文字":"電話連繫Troy","跳轉連結":"tel:0905566525","按鈕背景顏色":"#fde047","按鈕文字顏色":"#000000","type":"url"},{"按鈕ID":"btn_mneuki7x_m4buqs4r","按鈕文字":"發送Email","跳轉連結":"mailto:dongyue0814@gmail.com","按鈕背景顏色":"#fde047","按鈕文字顏色":"#000000","type":"url"}]);
         const flexMsg = ref(null);
         const isLoading = ref(true);
         const errorMessage = ref("");
         const isAutoShare = ref(false);
         const safeBgColor = ref("#fefce8");
-        
         const getYoutubeEmbedUrl = (url) => {
             if (!url) return null;
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
