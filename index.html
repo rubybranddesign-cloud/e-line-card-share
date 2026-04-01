@@ -380,7 +380,7 @@
 
           try {
 
-            const response = await fetch(`${GAS_API_URL}?id=${memberId}`);
+            const response = await fetch(`${GAS_API_URL}?action=getData&id=${memberId}`);
 
             const data = await response.json();
 
