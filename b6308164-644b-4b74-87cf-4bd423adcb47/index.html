@@ -63,8 +63,8 @@
                 <a v-if="profile['Wechat'] || profile['WeChat連結']" :href="profile['Wechat'] || profile['WeChat連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-wechat-logo" style="font-size: 37px;"></i></a>
                 <a v-if="profile['TikTok連結']" :href="profile['TikTok連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-tiktok-logo" style="font-size: 37px;"></i></a>
             </div>
-            <div v-if="profile['YouTube影音連結'] && getYoutubeEmbedUrl(profile['YouTube影音連結'])" class="w-full mb-8 overflow-hidden shadow-sm aspect-video bg-black shrink-0" style="border-radius: 13px;">
-                <iframe :src="'https://www.youtube.com/embed/' + getYoutubeEmbedUrl(profile['YouTube影音連結'])" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <div v-if="profile['YouTube影音連結'] && getVideoData(profile['YouTube影音連結'])" class="w-full mb-8 overflow-hidden shadow-sm aspect-video bg-black shrink-0" style="border-radius: 13px;">
+                <iframe :src="getVideoData(profile['YouTube影音連結']).embedUrl" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
             <div class="w-full space-y-4 pb-6">
               <a v-for="(btn, index) in buttons" :key="index" :href="buildFinalLink(btn.type || 'url', btn['跳轉連結'] || btn.url)" target="_blank" @click="trackClickAsync(btn, index)" class="w-full flex items-center justify-center font-bold px-4 py-[16px] transition cursor-pointer relative overflow-hidden group shadow-sm transform hover:opacity-90" :style="{ backgroundColor: btn['按鈕背景顏色'] || '#D2B992', color: btn['按鈕文字顏色'] || '#000000', borderRadius: '13px', textDecoration: 'none' }">
@@ -99,11 +99,11 @@
   </div>
   <script>
     const { createApp, ref, onMounted } = Vue;
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwKN7tVF5tnRIIHDGyQ3KElB_BNstGbrWOikDG69EVB-pflciYpVCyVjLStZxpUMQvs/exec";
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxgW5KERInNvhpPTww6sUlaRGUYNXV8uOi7dORSBDQqudK5YsT6CwRf3cq2sen_Yec/exec";
     const LIFF_ID = "2009561347-VUhbtrEC";
     createApp({
       setup() {
-        const profile = ref({"顯示名稱":"林東岳 TroyLin","個人簡介文字":"微型企業的AI賦能師\n「擺脫窮忙，生意永續」","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1nBXWqTaGBSsCsIgSQ-phGYZgecUVF4FR&sz=w1000","背景圖片URL":"https://drive.google.com/thumbnail?id=1zHVQlNzcI2xIkFveApb-SjUrPNaxUaPm&sz=w1000","背景主題顏色":"#fefce8","全域文字顏色":"#333333","社群Icon顏色":"#333333","FB連結":"https://www.facebook.com/profile.php?id=61578553414359","IG連結":"https://www.instagram.com/troy.growthx.ai/?hl=zh-tw","LINE連結":"@movingbetter","WeChat連結":"@movingbetter","TikTok連結":"@movingbetter","YouTube影音連結":"https://www.youtube.com/watch?v=RrSDcliE6G4&pp=ygUW6Kqe6I-TIOaWsOiBnua3seWRvOWQuA%3D%3D","會員ID":"b6308164-644b-4b74-87cf-4bd423adcb47"});
+        const profile = ref({"顯示名稱":"林東岳 TroyLin","個人簡介文字":"微型企業的AI賦能師\n「擺脫窮忙，生意永續」","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1nBXWqTaGBSsCsIgSQ-phGYZgecUVF4FR&sz=w1000","背景圖片URL":"https://drive.google.com/thumbnail?id=1zHVQlNzcI2xIkFveApb-SjUrPNaxUaPm&sz=w1000","背景主題顏色":"#fefce8","全域文字顏色":"#333333","社群Icon顏色":"#333333","FB連結":"https://www.facebook.com/profile.php?id=61578553414359","IG連結":"https://www.instagram.com/troy.growthx.ai/?hl=zh-tw","LINE連結":"@movingbetter","WeChat連結":"@movingbetter","TikTok連結":"@movingbetter","YouTube影音連結":"https://vimeo.com/1179651758?share=copy","會員ID":"b6308164-644b-4b74-87cf-4bd423adcb47"});
         const buttons = ref([{"按鈕ID":"btn_mnev1kve_6p1amaco","按鈕文字":"傳送電子名片","跳轉連結":"https://liff.line.me/2009561347-VUhbtrEC?id=b6308164-644b-4b74-87cf-4bd423adcb47&autoShare=true","按鈕背景顏色":"#fde047","按鈕文字顏色":"#000000","type":"url"},{"按鈕ID":1774973632029,"按鈕文字":"官方網站","跳轉連結":"https://vocus.cc/salon/bizgrowthxai","按鈕背景顏色":"#fde047","按鈕文字顏色":"#000000","type":"url"},{"按鈕ID":1774973586646,"按鈕文字":"電話連繫Troy","跳轉連結":"tel:0905566525","按鈕背景顏色":"#fde047","按鈕文字顏色":"#000000","type":"url"},{"按鈕ID":"btn_mneuki7x_m4buqs4r","按鈕文字":"發送Email","跳轉連結":"mailto:dongyue0814@gmail.com","按鈕背景顏色":"#fde047","按鈕文字顏色":"#000000","type":"url"}]);
         const slides = ref([{"id":"sld_mneuv6is_4c7vz31d","sort":1,"imageUrl":"https://drive.google.com/thumbnail?id=15ETuL3oN68MW5SmWp9WC_Qf1qz_OJW5M&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"title":"官方LINE","color":"#6C0B22","type":"line","linkValue":"https://line.me/ti/p/~%40movingbetter"}]},{"id":"sld_mneuvamg_1tmwcz07","sort":2,"imageUrl":"https://drive.google.com/thumbnail?id=1rZF1Sh08dh9k1yKBX6_sXqlZGblzphCr&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"title":"有點想睡","color":"#6C0B22","type":"share","linkValue":"https://liff.line.me/2009561347-VUhbtrEC?id=b6308164-644b-4b74-87cf-4bd423adcb47&autoShare=true"}]}]);
         const flexMsg = ref(null);
@@ -111,11 +111,13 @@
         const errorMessage = ref("");
         const isAutoShare = ref(false);
         const safeBgColor = ref("#fefce8");
-        const getYoutubeEmbedUrl = (url) => {
+        const getVideoData = (url) => {
             if (!url) return null;
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
+            const ytMatch = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/);
+            if (ytMatch && ytMatch[2].length === 11) return { embedUrl: "https://www.youtube.com/embed/" + ytMatch[2] };
+            const vimeoMatch = url.match(/(?:vimeo\.com\/|player\.vimeo\.com\/video\/)([0-9]+)/);
+            if (vimeoMatch && vimeoMatch[1]) return { embedUrl: "https://player.vimeo.com/video/" + vimeoMatch[1] + "?title=0&byline=0&portrait=0" };
+            return null;
         };
         const getFontFamily = (fontName) => {
             const map = { "預設字體": "sans-serif", "黑體": "\"Noto Sans TC\", sans-serif", "明體": "\"Noto Serif TC\", serif", "圓體": "\"Zen Maru Gothic\", sans-serif" };
@@ -194,7 +196,7 @@
               } catch (e) { errorMessage.value = "轉發資料載入失敗。"; }
           }
         });
-        return { profile, buttons, slides, isLoading, errorMessage, isAutoShare, safeBgColor, closeLiff, trackClickAsync, getYoutubeEmbedUrl, buildFinalLink, getFontFamily };
+        return { profile, buttons, slides, isLoading, errorMessage, isAutoShare, safeBgColor, closeLiff, trackClickAsync, getVideoData, buildFinalLink, getFontFamily };
       }
     }).mount("#app");
   </script>
