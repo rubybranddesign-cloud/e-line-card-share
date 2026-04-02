@@ -79,13 +79,13 @@
                     <div class="h-[1px] flex-1 bg-black/10" :style="{ backgroundColor: profile['全域文字顏色'] || '#1a1a1a', opacity: 0.15 }"></div>
                 </div>
                 <div class="flex gap-4 overflow-x-auto no-scrollbar px-2 pb-6 snap-x snap-mandatory items-stretch">
-                    <div v-for="slide in slides" :key="slide.id" class="snap-center shrink-0 w-[260px] rounded-[24px] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20 flex flex-col relative transform transition hover:-translate-y-1" :style="{ backgroundColor: slide.bgColor || '#ffffff' }">
-                        <div class="w-full aspect-[4/5] relative overflow-hidden bg-gray-100 border-b border-gray-100/50">
+                    <div v-for="slide in slides" :key="slide.id" class="snap-center shrink-0 w-[245px] rounded-[24px] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20 flex flex-col relative transform transition hover:-translate-y-1" :style="{ backgroundColor: slide.bgColor || '#ffffff' }">
+                        <div class="w-full aspect-[1080/1680] relative overflow-hidden bg-gray-100 border-b border-gray-100/50">
                             <img v-if="slide.imageUrl" :src="slide.imageUrl" class="absolute inset-0 w-full h-full object-cover">
                             <div v-else class="absolute inset-0 flex items-center justify-center text-gray-300 bg-gray-50"><i class="ph-fill ph-image text-4xl"></i></div>
                         </div>
-                        <div v-if="slide.buttons && slide.buttons.length > 0" class="p-4 flex flex-col gap-2 w-full relative z-10 flex-1 justify-end">
-                            <a v-for="(sBtn, bIdx) in slide.buttons" :key="bIdx" :href="buildFinalLink(sBtn.type, sBtn.linkValue)" target="_blank" @click="trackClickAsync({ '跳轉連結': sBtn.linkValue, '按鈕ID': slide.id, '按鈕文字': sBtn.title }, bIdx)" class="w-full text-center py-3 rounded-xl text-[14px] font-bold shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200" :style="{ backgroundColor: sBtn.color || '#6C0B22', color: slide.buttonTextColor || '#ffffff', fontFamily: getFontFamily(slide.buttonFont) }">
+                        <div v-if="slide.buttons && slide.buttons.length > 0" class="pt-[13px] pb-[12px] px-[8px] flex flex-col gap-[10px] w-full relative z-10 flex-1 justify-end">
+                            <a v-for="(sBtn, bIdx) in slide.buttons" :key="bIdx" :href="buildFinalLink(sBtn.type, sBtn.linkValue)" target="_blank" @click="trackClickAsync({ '跳轉連結': sBtn.linkValue, '按鈕ID': slide.id, '按鈕文字': sBtn.title }, bIdx, 'slide')" class="w-full text-center py-[10px] rounded-lg text-[14px] font-bold shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200" :style="{ backgroundColor: sBtn.color || '#6C0B22', color: slide.buttonTextColor || '#ffffff', fontFamily: getFontFamily(slide.buttonFont) }">
                                 {{ sBtn.title || '按鈕文字' }}
                             </a>
                         </div>
@@ -103,7 +103,7 @@
     const LIFF_ID = "2009561347-VUhbtrEC";
     createApp({
       setup() {
-        const profile = ref({"顯示名稱":"林東岳 TroyLin","個人簡介文字":"微型企業的AI賦能師\n「擺脫窮忙，生意永續」","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1nBXWqTaGBSsCsIgSQ-phGYZgecUVF4FR&sz=w1000","背景圖片URL":"https://drive.google.com/thumbnail?id=1zHVQlNzcI2xIkFveApb-SjUrPNaxUaPm&sz=w1000","背景主題顏色":"#fefce8","全域文字顏色":"#333333","社群Icon顏色":"#333333","FB連結":"https://www.facebook.com/profile.php?id=61578553414359","IG連結":"https://www.instagram.com/troy.growthx.ai/?hl=zh-tw","LINE連結":"@movingbetter","WeChat連結":"@movingbetter","Wechat":"@movingbetter","TikTok連結":"@movingbetter","YouTube影音連結":"https://www.youtube.com/watch?v=RrSDcliE6G4&pp=ygUW6Kqe6I-TIOaWsOiBnua3seWRvOWQuA%3D%3D","會員ID":"b6308164-644b-4b74-87cf-4bd423adcb47"});
+        const profile = ref({"顯示名稱":"林東岳 TroyLin","個人簡介文字":"微型企業的AI賦能師\n「擺脫窮忙，生意永續」","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1nBXWqTaGBSsCsIgSQ-phGYZgecUVF4FR&sz=w1000","背景圖片URL":"https://drive.google.com/thumbnail?id=1zHVQlNzcI2xIkFveApb-SjUrPNaxUaPm&sz=w1000","背景主題顏色":"#fefce8","全域文字顏色":"#333333","社群Icon顏色":"#333333","FB連結":"https://www.facebook.com/profile.php?id=61578553414359","IG連結":"https://www.instagram.com/troy.growthx.ai/?hl=zh-tw","LINE連結":"@movingbetter","WeChat連結":"@movingbetter","TikTok連結":"@movingbetter","YouTube影音連結":"https://www.youtube.com/watch?v=RrSDcliE6G4&pp=ygUW6Kqe6I-TIOaWsOiBnua3seWRvOWQuA%3D%3D","會員ID":"b6308164-644b-4b74-87cf-4bd423adcb47"});
         const buttons = ref([{"按鈕ID":"btn_mnev1kve_6p1amaco","按鈕文字":"傳送電子名片","跳轉連結":"https://liff.line.me/2009561347-VUhbtrEC?id=b6308164-644b-4b74-87cf-4bd423adcb47&autoShare=true","按鈕背景顏色":"#fde047","按鈕文字顏色":"#000000","type":"url"},{"按鈕ID":1774973632029,"按鈕文字":"官方網站","跳轉連結":"https://vocus.cc/salon/bizgrowthxai","按鈕背景顏色":"#fde047","按鈕文字顏色":"#000000","type":"url"},{"按鈕ID":1774973586646,"按鈕文字":"電話連繫Troy","跳轉連結":"tel:0905566525","按鈕背景顏色":"#fde047","按鈕文字顏色":"#000000","type":"url"},{"按鈕ID":"btn_mneuki7x_m4buqs4r","按鈕文字":"發送Email","跳轉連結":"mailto:dongyue0814@gmail.com","按鈕背景顏色":"#fde047","按鈕文字顏色":"#000000","type":"url"}]);
         const slides = ref([{"id":"sld_mneuv6is_4c7vz31d","sort":1,"imageUrl":"https://drive.google.com/thumbnail?id=15ETuL3oN68MW5SmWp9WC_Qf1qz_OJW5M&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"title":"官方LINE","color":"#6C0B22","type":"line","linkValue":"https://line.me/ti/p/~%40movingbetter"}]},{"id":"sld_mneuvamg_1tmwcz07","sort":2,"imageUrl":"https://drive.google.com/thumbnail?id=1rZF1Sh08dh9k1yKBX6_sXqlZGblzphCr&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"title":"有點想睡","color":"#6C0B22","type":"share","linkValue":"https://liff.line.me/2009561347-VUhbtrEC?id=b6308164-644b-4b74-87cf-4bd423adcb47&autoShare=true"}]}]);
         const flexMsg = ref(null);
@@ -142,13 +142,14 @@
             if (typeof liff !== "undefined" && liff.isInClient()) liff.closeWindow();
             else window.close();
         };
-        const trackClickAsync = (btn, index) => {
+        const trackClickAsync = (btn, index, specificType) => {
             const targetUrl = btn['跳轉連結'] || btn.url;
             const itemId = btn['按鈕ID'];
             const btnText = btn['按鈕文字'] || "未知按鈕";
             const memberId = profile.value['會員ID'];
             if (!memberId || !targetUrl) return;
-            const trackUrl = GAS_API_URL + "?action=trackClick&memberId=" + memberId + "&type=button&itemId=" + itemId + "&btnIdx=" + (index + 1) + "&btnText=" + encodeURIComponent(btnText) + "&url=" + encodeURIComponent(targetUrl);
+            const reqType = specificType || "button";
+            const trackUrl = GAS_API_URL + "?action=trackClick&memberId=" + memberId + "&type=" + reqType + "&itemId=" + itemId + "&btnIdx=" + (index + 1) + "&btnText=" + encodeURIComponent(btnText) + "&url=" + encodeURIComponent(targetUrl);
             fetch(trackUrl, { mode: "no-cors" }).catch(e => console.log("背景追蹤發送失敗", e));
         };
         onMounted(async () => {
