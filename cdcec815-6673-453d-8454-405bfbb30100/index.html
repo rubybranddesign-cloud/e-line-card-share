@@ -127,7 +127,8 @@
             if (!value) return "#";
             if (type === "tel") return value.startsWith("tel:") ? value : "tel:" + value;
             if (type === "email") return value.startsWith("mailto:") ? value : "mailto:" + value;
-            if (type === "share" || String(value).includes("social-plugins.line.me") || String(value).includes("line.me/R/msg")) {
+            if (type === "share" || String(value).includes("social-plugins.line.me") || String(value).includes("line.me/R/msg") || String(value).includes("liff.line.me")) {
+                if (String(value).includes("liff.line.me")) return value;
                 let shareText = "";
                 if (String(value).includes("text=")) shareText = decodeURIComponent(value.split("text=")[1]);
                 else shareText = "哈囉！這是「" + (profile.value['顯示名稱'] || "我") + "」的電子名片，請點擊連結查看：\nhttps://liff.line.me/" + LIFF_ID + "?id=" + profile.value['會員ID'];
