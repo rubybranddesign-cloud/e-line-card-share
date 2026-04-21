@@ -138,7 +138,7 @@
                 else shareText = "哈囉！這是「" + (profile.value['顯示名稱'] || "我") + "」的電子名片，請點擊連結查看：\nhttps://liff.line.me/" + LIFF_ID + "?id=" + profile.value['會員ID'];
                 return "https://social-plugins.line.me/lineit/share?text=" + encodeURIComponent(shareText);
             }
-            if (type === "line") {
+            if (type === "line" || type === "line_personal") {
                 if (value.startsWith("http")) return value;
                 return "https://line.me/ti/p/~" + value.replace("@", "%40");
             }
