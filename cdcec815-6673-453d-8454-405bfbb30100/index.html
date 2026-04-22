@@ -21,7 +21,7 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
-</head>
+  </head>
 <body class="flex justify-center">
   <div id="app" v-cloak class="w-full max-w-md min-h-screen flex flex-col items-center relative overflow-y-auto no-scrollbar shadow-2xl transition-all duration-500" :style="{ backgroundColor: safeBgColor }">
     <div v-if="isLoading" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
@@ -63,7 +63,7 @@
                 <a v-if="profile['Wechat'] || profile['WeChat連結']" :href="profile['Wechat'] || profile['WeChat連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-wechat-logo" style="font-size: 37px;"></i></a>
                 <a v-if="profile['TikTok連結']" :href="profile['TikTok連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-tiktok-logo" style="font-size: 37px;"></i></a>
             </div>
-                <div v-if="profile['YouTube影音連結'] && getVideoData(profile['YouTube影音連結'])" class="relative w-full mb-8 overflow-hidden shadow-sm aspect-video bg-black shrink-0" style="border-radius: 13px;">
+            <div v-if="profile['YouTube影音連結'] && getVideoData(profile['YouTube影音連結'])" class="relative w-full mb-8 overflow-hidden shadow-sm aspect-video bg-black shrink-0" style="border-radius: 13px;">
                 <iframe v-if="getVideoData(profile['YouTube影音連結']).type !== 'html5'" :src="getVideoData(profile['YouTube影音連結']).embedUrl" class="absolute inset-0 w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 <video v-if="getVideoData(profile['YouTube影音連結']).type === 'html5'" :src="getVideoData(profile['YouTube影音連結']).embedUrl" class="absolute inset-0 w-full h-full" controls playsinline controlslist="nodownload"></video>
             </div>
@@ -112,7 +112,7 @@
         const errorMessage = ref("");
         const isAutoShare = ref(false);
         const safeBgColor = ref("#fefce8");
-              const getVideoData = (url) => {
+        const getVideoData = (url) => {
             if (!url) return null;
             const ytMatch = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/);
             if (ytMatch && ytMatch[2].length === 11) return { type: "youtube", embedUrl: "https://www.youtube.com/embed/" + ytMatch[2] };
