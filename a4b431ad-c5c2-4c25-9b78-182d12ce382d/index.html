@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>盧采嫻 Visaya</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <style>
+    body { background-color: #fff7ed; color: #6c5541; margin:0; padding:0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+    .bg-wrapper { position: relative; width: 100%; min-height: 100vh; }
+    @media (min-width: 600px) { .bg-wrapper { max-width: 420px; margin: 0 auto; box-shadow: 0 0 30px rgba(0,0,0,0.1); border-left: 1px solid rgba(0,0,0,0.05); border-right: 1px solid rgba(0,0,0,0.05); min-height: 100vh; } }
+    .top-bg-img { width: 100%; aspect-ratio: 4/5; background-size: cover; background-position: center; position: absolute; top:0; left:0; }
+    .top-bg-gradient { width: 100%; aspect-ratio: 4/5; position: absolute; top:0; left:0; background: linear-gradient(to top, #fff7ed 0%, transparent 100%); }
+    .content { position: relative; z-index: 10; padding: 20px 24px 60px 24px; display: flex; flex-direction: column; align-items: center; margin-top: calc(100vw * 1.25 - 160px); }
+    @media (min-width: 600px) { .content { margin-top: calc(420px * 1.25 - 160px); } }
+    .avatar { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.5); box-shadow: 0 4px 10px rgba(0,0,0,0.1); background-color: #f3f4f6; margin-bottom: 12px; }
+    .title-name { font-size: 24px; font-weight: 900; letter-spacing: 1.5px; margin-bottom: 4px; text-align: center; }
+    .bio-text { font-size: 13px; line-height: 1.6; text-align: center; white-space: pre-wrap; opacity: 0.9; margin-bottom: 20px; width: 100%; word-break: break-word; }
+    .social-icons { display: flex; gap: 16px; margin-bottom: 24px; justify-content: center; align-items: center; }
+    .social-icons a { color: #997748; font-size: 28px; text-decoration: none; transition: opacity 0.2s; }
+    .social-icons a:hover { opacity: 0.8; }
+    .btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 2px; text-decoration: none; font-weight: bold; font-size: 13px; letter-spacing: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: relative; overflow: hidden; }
+  </style>
+</head>
+<body>
+  <div class="bg-wrapper">
+    <div class="top-bg-img" style="background-image: url('https://drive.google.com/thumbnail?id=1rT7VD3Y3K600-65f2cAJ37djSQnKBPlS&sz=w1000');"></div><div class="top-bg-gradient"></div>
+    <div class="content">
+       <img src="https://drive.google.com/thumbnail?id=1XfPOZO-GmhoOjY0LHpuLAKDanDrQ0h1r&sz=w1000" class="avatar" alt="Avatar">
+       <div class="title-name">盧采嫻 Visaya</div>
+       <div class="bio-text">＊台灣B N l長展鑽石分會25、26
+教育培訓副組長、小組長
+＊星嫵蔬東南亞蔬食餐廳主理人
+＊雲朵天貝創辦人
+＊思達數學教育集團共同創辦人
+＊我也有聰明數學腦 作者</div>
+
+       <div class="social-icons">
+         <a href="https://www.facebook.com/share/1EHZL61YWp/?mibextid=wwXIfr " target="_blank"><i class="ph-fill ph-facebook-logo"></i></a>
+         <a href="https://www.instagram.com/cloudtempeh?igsh=aGp1czc0ZW9rMmJr" target="_blank"><i class="ph-fill ph-instagram-logo"></i></a>
+         <a href="https://line.me/ti/p/POdKiXGgpd" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor" style="width:28px;height:28px;"><path d="M24 12c0 6.627-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0s12 5.373 12 12zm-12-7.5c-4.606 0-8.25 3.03-8.25 6.75 0 3.35 2.5 6.17 6.13 6.68.25.05.58.15.65.37.06.2.04.5.02.7l-.1.65c-.03.2-.15.75.65.4 1-.45 5.5-2.3 7.4-4.25 1.25-1.25 1.75-2.7 1.75-4.3C20.25 7.53 16.606 4.5 12 4.5z"/></svg></a>
+         
+         
+       </div>
+
+       <div id="btn-container" style="width: 100%;"></div>
+    </div>
+  </div>
+  <script>
+    const buttons = [{"按鈕ID":"btn_mog3x6hg_akxdbb5u","會員ID":"a4b431ad-c5c2-4c25-9b78-182d12ce382d","顯示區塊":"Profile頁","排序數字":1,"按鈕文字":"引薦我 轉發電子名片","跳轉連結":"https://liff.line.me/2009561347-VUhbtrEC?id=a4b431ad-c5c2-4c25-9b78-182d12ce382d&autoShare=true","按鈕背景顏色":"#d2bea3","按鈕文字顏色":"#ffffff","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-04-26T18:34:38.700Z","fallback_id":"btn_mog3x6hg_akxdbb5u"}];
+    const container = document.getElementById('btn-container');
+    buttons.forEach(btn => {
+       const a = document.createElement('a');
+       a.href = btn['跳轉連結'] || btn.url || '#';
+       a.className = 'btn';
+       a.target = '_blank';
+       a.style.backgroundColor = btn['按鈕背景顏色'] || btn.color || '#d4af37';
+       a.style.color = btn['按鈕文字顏色'] || btn.textColor || '#000000';
+       a.innerText = btn['按鈕文字'] || btn.title || '按鈕';
+       container.appendChild(a);
+    });
+  </script>
+</body>
+</html>
