@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>黃隆昌 Lional - 專屬電子名片</title>
-  <meta name="description" content="策略顧問  方圓地產開發有限公司｜總經理 世界樹顧問股份有限公司｜策略顧問 中華民國購物中心商業地產協會｜中部執行長 USPACE中部代理 方陣新創｜營運總監 宜蘭爾本購物中心｜執行董事 朗居文旅｜執...">
+  <meta name="description" content="策略顧問  方圓地產開發有限公司｜總經理 世界樹顧問股份有限公司｜策略顧問 中華民國購物中心商業地產協會｜中部執行長 USPACE中部代理 方陣新創｜營運總監 宜蘭爾本購物中心｜執行董事 朗居文旅｜執行董事 麥客瘋迷你K｜開發副總...">
   <meta property="og:title" content="黃隆昌 Lional - 專屬電子名片">
-  <meta property="og:description" content="策略顧問  方圓地產開發有限公司｜總經理 世界樹顧問股份有限公司｜策略顧問 中華民國購物中心商業地產協會｜中部執行長 USPACE中部代理 方陣新創｜營運總監 宜蘭爾本購物中心｜執行董事 朗居文旅｜執...">
+  <meta property="og:description" content="策略顧問  方圓地產開發有限公司｜總經理 世界樹顧問股份有限公司｜策略顧問 中華民國購物中心商業地產協會｜中部執行長 USPACE中部代理 方陣新創｜營運總監 宜蘭爾本購物中心｜執行董事 朗居文旅｜執行董事 麥客瘋迷你K｜開發副總...">
   <meta property="og:image" content="https://drive.google.com/thumbnail?id=1D4H61j8A05e0nZ4cbU10Ml4QoqrBrcM_&sz=w1000">
   <meta property="og:type" content="website">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -21,7 +21,7 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
-  </head>
+</head>
 <body class="flex justify-center">
   <div id="app" v-cloak class="w-full max-w-md min-h-screen flex flex-col items-center relative overflow-y-auto no-scrollbar shadow-2xl transition-all duration-500" :style="{ backgroundColor: safeBgColor }">
     <div v-if="isLoading" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
@@ -93,7 +93,11 @@
                     </div>
                 </div>
             </div>
-            <p class="mt-4 pb-12 font-medium tracking-wider text-gray-400 opacity-60" style="font-size: 14px;">Powered by Ruby.Brand.Design</p>
+            <p class="mt-4 pb-12 font-medium tracking-wider text-gray-400 opacity-60" style="font-size: 14px;">
+  <a href="https://lin.ee/WKcncUr" target="_blank" class="hover:opacity-100 hover:text-gray-600 transition-all duration-300">
+    Powered by Ruby.Brand.Design
+  </a>
+</p>
         </div>
       </div>
     </transition>
@@ -104,14 +108,36 @@
     const LIFF_ID = "2009561347-VUhbtrEC";
     createApp({
       setup() {
-        const profile = ref({"顯示名稱":"黃隆昌 Lional","個人簡介文字":"策略顧問\n\n方圓地產開發有限公司｜總經理\n世界樹顧問股份有限公司｜策略顧問\n中華民國購物中心商業地產協會｜中部執行長\nUSPACE中部代理 方陣新創｜營運總監\n宜蘭爾本購物中心｜執行董事\n朗居文旅｜執行董事\n麥客瘋迷你K｜開發副總","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1D4H61j8A05e0nZ4cbU10Ml4QoqrBrcM_&sz=w1000","背景圖片URL":"https://drive.google.com/thumbnail?id=1P8glqg5sUuQbpSDpQSUSe_x4wdd7LksU&sz=w1000","背景主題顏色":"#dddddd","全域文字顏色":"#1a1a1a","社群Icon顏色":"#000000","FB連結":"","IG連結":"","LINE連結":"","WeChat連結":"","TikTok連結":"","YouTube影音連結":"","會員ID":"41a892ca-e488-40bd-a552-80912dbbd978"});
+        const profile = ref({"會員ID":"41a892ca-e488-40bd-a552-80912dbbd978","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1D4H61j8A05e0nZ4cbU10Ml4QoqrBrcM_&sz=w1000","顯示名稱":"黃隆昌 Lional","個人簡介文字":"策略顧問\n\n方圓地產開發有限公司｜總經理\n世界樹顧問股份有限公司｜策略顧問\n中華民國購物中心商業地產協會｜中部執行長\nUSPACE中部代理 方陣新創｜營運總監\n宜蘭爾本購物中心｜執行董事\n朗居文旅｜執行董事\n麥客瘋迷你K｜開發副總","背景主題顏色":"#dddddd","背景圖片URL":"https://drive.google.com/thumbnail?id=1P8glqg5sUuQbpSDpQSUSe_x4wdd7LksU&sz=w1000","全域文字顏色":"#1a1a1a","社群Icon顏色":"#000000","FB連結":"","IG連結":"","LINE連結":"","TikTok連結":"","YouTube影音連結":"","字體風格":"預設字體","最後更新時間":"2026-05-10T09:51:47.201Z","Wechat":""});
         const buttons = ref([]);
-        const slides = ref([{"id":"sld_mo8ohyle_qs9u4cb4","sort":1,"imageUrl":"https://drive.google.com/thumbnail?id=1UHVaOqb3Z-LrxT8C2Gr-fkSsxVzTgeww&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"title":"+ LINE 好友","color":"#505973","type":"line","linkValue":"https://line.me/ti/p/~lionalsamurai"},{"title":"轉發電子名片","color":"#2c2f38","type":"share","linkValue":"https://liff.line.me/2009561347-VUhbtrEC?id=41a892ca-e488-40bd-a552-80912dbbd978&autoShare=true"}]},{"id":"sld_mo8ohzxq_poyq4uot","sort":2,"imageUrl":"https://drive.google.com/thumbnail?id=1Vgph3PWnqePAg0sbZ50UEl7MEo-pPRar&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"title":"電話聯繫","color":"#505973","type":"tel","linkValue":"tel:0911112000"},{"title":"EMAIL","color":"#2c2f38","type":"email","linkValue":"mailto:lionalhuang@gmail.com"}]},{"id":"sld_mo8oi1jn_1zyj3s6o","sort":3,"imageUrl":"https://drive.google.com/thumbnail?id=1q_uaeksPuX9Mdw6l_if-6Twx6RUmFlR2&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"title":"蜂圖誌 網站","color":"#505973","type":"url","linkValue":"https://www.mapxus.com/media-coverage"},{"title":"品千年 網站","color":"#2c2f38","type":"url","linkValue":"https://wineways.pro/"}]},{"id":"sld_mo8oi2pc_3quski21","sort":4,"imageUrl":"https://drive.google.com/thumbnail?id=1QvAKAyQYTtcWNdM_Ig95r_JcuDt6JlXx&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"title":"世界樹 網站","color":"#346783","type":"url","linkValue":"https://www.summit-td.com"},{"title":"培訓課程表","color":"#2c2f38","type":"url","linkValue":"https://summit-td.com/training"}]}]);
+        
+        // --- 核心修正：完美對接 getParsedSlides 後端已整理好的資料結構 ---
+        const rawSlides = [{"id":"sld_mo8ohyle_qs9u4cb4","sort":1,"imageUrl":"https://drive.google.com/thumbnail?id=1UHVaOqb3Z-LrxT8C2Gr-fkSsxVzTgeww&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"+ LINE 好友","color":"#505973","type":"line","url":"https://line.me/ti/p/~lionalsamurai","clicks":1},{"text":"轉發電子名片","color":"#2c2f38","type":"share","url":"https://liff.line.me/2009561347-VUhbtrEC?id=41a892ca-e488-40bd-a552-80912dbbd978&autoShare=true","clicks":2}]},{"id":"sld_mo8ohzxq_poyq4uot","sort":2,"imageUrl":"https://drive.google.com/thumbnail?id=1Vgph3PWnqePAg0sbZ50UEl7MEo-pPRar&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"電話聯繫","color":"#505973","type":"tel","url":"tel:0911112000","clicks":0},{"text":"EMAIL","color":"#2c2f38","type":"email","url":"mailto:lionalhuang@gmail.com","clicks":1}]},{"id":"sld_mo8oi1jn_1zyj3s6o","sort":3,"imageUrl":"https://drive.google.com/thumbnail?id=1q_uaeksPuX9Mdw6l_if-6Twx6RUmFlR2&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"蜂圖誌 網站","color":"#505973","type":"url","url":"https://www.mapxus.com/media-coverage","clicks":1},{"text":"品千年 網站","color":"#2c2f38","type":"url","url":"https://wineways.pro/","clicks":1}]},{"id":"sld_mo8oi2pc_3quski21","sort":4,"imageUrl":"https://drive.google.com/thumbnail?id=1QvAKAyQYTtcWNdM_Ig95r_JcuDt6JlXx&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"世界樹 網站","color":"#346783","type":"url","url":"https://www.summit-td.com","clicks":1},{"text":"培訓課程表","color":"#2c2f38","type":"url","url":"https://summit-td.com/training","clicks":1}]}];
+        const processedSlides = rawSlides.map(s => {
+          const slideBtns = (s.buttons || []).map(b => ({
+            title: b.text || b.title || '',
+            linkValue: b.url || b.linkValue || '',
+            type: b.type || 'url',
+            color: b.color || '#6C0B22'
+          }));
+          return {
+            id: s.id || s['輪播ID'],
+            imageUrl: s.imageUrl || s['主圖片URL'],
+            bgColor: s.bgColor || '#ffffff',
+            buttonTextColor: s.buttonTextColor || '#ffffff',
+            buttonFont: s.buttonFont || '預設字體',
+            buttons: slideBtns
+          };
+        });
+        const slides = ref(processedSlides);
+        // ----------------------------------------------
+
         const flexMsg = ref(null);
         const isLoading = ref(true);
         const errorMessage = ref("");
         const isAutoShare = ref(false);
         const safeBgColor = ref("#fefce8");
+
         const getVideoData = (url) => {
             if (!url) return null;
             const ytMatch = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/);
@@ -150,9 +176,9 @@
             else window.close();
         };
         const trackClickAsync = (btn, index, specificType) => {
-            const targetUrl = btn['跳轉連結'] || btn.url;
-            const itemId = btn['按鈕ID'];
-            const btnText = btn['按鈕文字'] || "未知按鈕";
+            const targetUrl = btn['跳轉連結'] || btn.url || btn.linkValue;
+            const itemId = btn['按鈕ID'] || btn.id || "未知ID";
+            const btnText = btn['按鈕文字'] || btn.title || "未知按鈕";
             const memberId = profile.value['會員ID'];
             if (!memberId || !targetUrl) return;
             const reqType = specificType || "button";
