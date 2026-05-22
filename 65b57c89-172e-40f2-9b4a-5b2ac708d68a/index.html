@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>WEDDING INVITATION - 專屬電子名片</title>
-  <meta name="description" content="威成 & 宜庭 婚禮邀請卡  婚禮時間：  2026年7月18日 11:00   (12點準時開始，請提早入場)  婚禮地點：  金典酒店 13樓 台中市西區健行路1049號...">
+  <meta name="description" content="威成 & 宜庭 婚禮邀請卡  婚禮時間：  2026年7月18日 11點迎賓入場 12點宴會開席  婚禮地點：  金典酒店 13樓 台中市西區健行路1049號...">
   <meta property="og:title" content="WEDDING INVITATION - 專屬電子名片">
-  <meta property="og:description" content="威成 & 宜庭 婚禮邀請卡  婚禮時間：  2026年7月18日 11:00   (12點準時開始，請提早入場)  婚禮地點：  金典酒店 13樓 台中市西區健行路1049號...">
+  <meta property="og:description" content="威成 & 宜庭 婚禮邀請卡  婚禮時間：  2026年7月18日 11點迎賓入場 12點宴會開席  婚禮地點：  金典酒店 13樓 台中市西區健行路1049號...">
   <meta property="og:image" content="https://drive.google.com/thumbnail?id=1i6hwBZ6ie0YY_HeMdhbPCw-0eatnMht1&sz=w1000">
   <meta property="og:type" content="website">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -15,7 +15,7 @@
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
     body { font-family: "Helvetica Neue", Helvetica, Arial, "PingFang TC", "微軟正黑體", sans-serif; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s ease; }
-    .fade-enter-active, .fade-leave-active { transition: opacity 0.5s ease; }
+    .fade-enter-active, .fade-leave-active { transition: opacity 0.4s ease; }
     .fade-enter-from, .fade-leave-to { opacity: 0; }
     [v-cloak] { display: none !important; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -67,12 +67,31 @@
                 <iframe v-if="getVideoData(profile['YouTube影音連結']).type !== 'html5'" :src="getVideoData(profile['YouTube影音連結']).embedUrl" class="absolute inset-0 w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 <video v-if="getVideoData(profile['YouTube影音連結']).type === 'html5'" :src="getVideoData(profile['YouTube影音連結']).embedUrl" class="absolute inset-0 w-full h-full" controls playsinline controlslist="nodownload"></video>
             </div>
+            
             <div class="w-full space-y-4 pb-6">
-              <a v-for="(btn, index) in buttons" :key="index" :href="buildFinalLink(btn.type || 'url', btn['跳轉連結'] || btn.url)" target="_blank" @click="trackClickAsync(btn, index)" class="w-full flex items-center justify-center font-bold px-4 py-[16px] transition cursor-pointer relative overflow-hidden group shadow-sm transform hover:opacity-90" :style="{ backgroundColor: btn['按鈕背景顏色'] || '#D2B992', color: btn['按鈕文字顏色'] || '#000000', borderRadius: '13px', textDecoration: 'none' }">
-                <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <span class="tracking-[0.1em]" style="font-size: 17px;">{{ btn['按鈕文字'] || btn.title }}</span>
-              </a>
+              <template v-for="(btn, index) in buttons" :key="index">
+                <a v-if="btn['按鈕類型'] !== 'image'" :href="buildFinalLink(btn.type || 'url', btn['跳轉連結'] || btn.url)" target="_blank" @click="trackClickAsync(btn, index)" class="w-full flex items-center justify-center font-bold px-4 py-[16px] transition cursor-pointer relative overflow-hidden group shadow-sm transform hover:opacity-90" :style="{ backgroundColor: btn['按鈕背景顏色'] || '#D2B992', color: btn['按鈕文字顏色'] || '#000000', borderRadius: '13px', textDecoration: 'none' }">
+                  <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <span class="tracking-[0.1em]" style="font-size: 17px;">{{ btn['按鈕文字'] || btn.title }}</span>
+                </a>
+
+                <div v-else class="w-full aspect-[4/5] relative rounded-[13px] overflow-hidden shadow-sm group transform transition hover:opacity-[0.98] select-none touch-pan-y" 
+                     @touchstart="handleTouchStart($event)" 
+                     @touchend="handleTouchEnd($event, btn)">
+                  <a :href="buildFinalLink(btn.images[btn.currentImgIdx || 0]?.linkType || btn.type || 'url', btn.images[btn.currentImgIdx || 0]?.linkValue || btn['跳轉連結'] || btn.url)" target="_blank" @click="trackClickAsync(btn, index)" class="block w-full h-full relative cursor-pointer bg-gray-100">
+                    <transition-group name="fade">
+                      <img v-for="(imgObj, i) in btn.images" :key="imgObj.url + i" v-show="(btn.currentImgIdx || 0) === i" :src="imgObj.url" class="absolute inset-0 w-full h-full object-cover">
+                    </transition-group>
+                  </a>
+                  <div v-if="btn.images && btn.images.length > 1" class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-20 pointer-events-none">
+                    <div v-for="(imgObj, i) in btn.images" :key="'dot'+i" class="w-2 h-2 rounded-full transition-all duration-300 shadow-sm" :class="(btn.currentImgIdx || 0) === i ? 'bg-white scale-110' : 'bg-white/50'"></div>
+                  </div>
+                  <button v-if="btn.images && btn.images.length > 1" @click.stop.prevent="prevImg(btn)" class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-white/40 backdrop-blur-md border border-white/50 text-gray-800 rounded-full z-20 hover:bg-white/60 transition-all opacity-100 lg:opacity-0 lg:group-hover:opacity-100 shadow-[0_4px_12px_rgba(0,0,0,0.08)]"><i class="ph-bold ph-caret-left text-sm"></i></button>
+                  <button v-if="btn.images && btn.images.length > 1" @click.stop.prevent="nextImg(btn)" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-white/40 backdrop-blur-md border border-white/50 text-gray-800 rounded-full z-20 hover:bg-white/60 transition-all opacity-100 lg:opacity-0 lg:group-hover:opacity-100 shadow-[0_4px_12px_rgba(0,0,0,0.08)]"><i class="ph-bold ph-caret-right text-sm"></i></button>
+                </div>
+              </template>
             </div>
+
             <div v-if="slides && slides.length > 0" class="w-full mt-4 pb-10">
                 <div class="flex items-center gap-3 mb-5 px-2">
                     <div class="h-[1px] flex-1 bg-black/10" :style="{ backgroundColor: profile['全域文字顏色'] || '#1a1a1a', opacity: 0.15 }"></div>
@@ -108,9 +127,27 @@
     const LIFF_ID = "2009561347-VUhbtrEC";
     createApp({
       setup() {
-        const profile = ref({"會員ID":"65b57c89-172e-40f2-9b4a-5b2ac708d68a","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1i6hwBZ6ie0YY_HeMdhbPCw-0eatnMht1&sz=w1000","顯示名稱":"WEDDING INVITATION","個人簡介文字":"威成 & 宜庭 婚禮邀請卡\n\n婚禮時間：\n\n2026年7月18日 11:00  \n(12點準時開始，請提早入場)\n\n婚禮地點：\n\n金典酒店 13樓\n台中市西區健行路1049號","背景主題顏色":"#ede2d9","背景圖片URL":"https://drive.google.com/thumbnail?id=1mx8x1XTblpHO4ZwFLswtAVytLeaAu6Gl&sz=w1000","全域文字顏色":"#1a1a1a","社群Icon顏色":"#000000","FB連結":"","IG連結":"","LINE連結":"","TikTok連結":"","YouTube影音連結":"","字體風格":"預設字體","最後更新時間":"2026-05-09T12:40:29.796Z","Wechat":""});
-        const buttons = ref([]);
+        const profile = ref({"會員ID":"65b57c89-172e-40f2-9b4a-5b2ac708d68a","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1i6hwBZ6ie0YY_HeMdhbPCw-0eatnMht1&sz=w1000","顯示名稱":"WEDDING INVITATION","個人簡介文字":"威成 & 宜庭 婚禮邀請卡\n\n婚禮時間：\n\n2026年7月18日\n11點迎賓入場\n12點宴會開席\n\n婚禮地點：\n\n金典酒店 13樓\n台中市西區健行路1049號","背景主題顏色":"#ede2d9","背景圖片URL":"https://drive.google.com/thumbnail?id=1mx8x1XTblpHO4ZwFLswtAVytLeaAu6Gl&sz=w1000","全域文字顏色":"#1a1a1a","社群Icon顏色":"#000000","FB連結":"","IG連結":"instagram.com/c.0122.l?igsh=MW42cTM0cGNranBycg==","LINE連結":"","TikTok連結":"","YouTube影音連結":"","字體風格":"預設字體","最後更新時間":"2026-05-22T02:46:17.201Z","Wechat":""});
         
+        // --- 處理按鈕與其各別連結輪播圖片結構 ---
+        const rawButtons = [];
+        const processedButtons = rawButtons.map(b => {
+            let parsedImages = [];
+            if (b['圖片詳細設定']) {
+                try { parsedImages = JSON.parse(b['圖片詳細設定']); } catch(e) {}
+            }
+            // 兼容舊版：如果只有圖片清單，幫它生出預設的 URL 格式
+            if (parsedImages.length === 0 && b['圖片清單']) {
+                parsedImages = b['圖片清單'].split(',').map(url => ({ url: url.trim(), linkType: 'url', linkValue: '' })).filter(img => img.url !== '');
+            }
+            return {
+                ...b,
+                currentImgIdx: 0,
+                images: parsedImages
+            };
+        });
+        const buttons = ref(processedButtons);
+
         // --- 核心修正：完美對接 getParsedSlides 後端已整理好的資料結構 ---
         const rawSlides = [{"id":"sld_mopl6enc_loey21ax","sort":1,"imageUrl":"https://drive.google.com/thumbnail?id=1uH0r219bOU7mmSw2wOR-ic2M_ObeRZGZ&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"Invitation 入席表單","color":"#bc898e","type":"url","url":"https://docs.google.com/forms/d/e/1FAIpQLSejIl5kbAarJ_NaDixx0FVZ46z3s1ce-yrxxtG4SoA2UCqIKA/viewform?pli=1","clicks":0}]},{"id":"sld_mopl6eul_mxme3wyr","sort":2,"imageUrl":"https://drive.google.com/thumbnail?id=1ldyjc64tr3BplrLwY5zLMSjcmpHmwbxO&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"請加入 婚禮訊息公告LINE@","color":"#bc898e","type":"line","url":"https://line.me/ti/p/~%40775vyref","clicks":0}]},{"id":"sld_mopl6fbv_xrpqofe9","sort":3,"imageUrl":"https://drive.google.com/thumbnail?id=11KrwQT_JmuPrFVpkhN6Wnr8xjdNQ9lUB&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"我們的婚紗照","color":"#c68b8d","type":"url","url":"https://www.instagram.com/c.0122.l?igsh=MW42cTM0cGNranBycg==","clicks":0}]},{"id":"sld_mopl6fjz_46co0dhj","sort":4,"imageUrl":"https://drive.google.com/thumbnail?id=1K-WK4vhqCj4tC2NdkutjSxOstN1Ypbna&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"金典酒店13樓","color":"#c68b8d","type":"url","url":"https://maps.app.goo.gl/GowwkZCMKDsk78Rz9?g_st=il","clicks":0}]},{"id":"sld_mopl9xm7_qoke4kps","sort":5,"imageUrl":"https://drive.google.com/thumbnail?id=1-Jkm1lF3MN4HwTHOaxgBEtE6emRMhhXq&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"上傳照片/影片雲端","color":"#c9b3a1","type":"url","url":"https://drive.google.com/drive/folders/1bTFtmt10m03ZJsM2dhNOFhPZWXnDTlMa?usp=drive_link","clicks":0}]}];
         const processedSlides = rawSlides.map(s => {
@@ -137,6 +174,35 @@
         const errorMessage = ref("");
         const isAutoShare = ref(false);
         const safeBgColor = ref("#fefce8");
+        
+        // 觸控滑動狀態管理
+        const touchStartX = ref(0);
+
+        const handleTouchStart = (e) => {
+            touchStartX.value = e.changedTouches[0].screenX;
+        };
+
+        const handleTouchEnd = (e, btn) => {
+            if (!btn.images || btn.images.length <= 1) return;
+            const diff = touchStartX.value - e.changedTouches[0].screenX;
+            if (diff > 40) { // 向左滑 -> 下一張
+                nextImg(btn);
+            } else if (diff < -40) { // 向右滑 -> 上一張
+                prevImg(btn);
+            }
+        };
+
+        const nextImg = (btn) => {
+            if (btn.images && btn.images.length > 1) {
+                btn.currentImgIdx = (btn.currentImgIdx + 1) % btn.images.length;
+            }
+        };
+
+        const prevImg = (btn) => {
+            if (btn.images && btn.images.length > 1) {
+                btn.currentImgIdx = (btn.currentImgIdx - 1 + btn.images.length) % btn.images.length;
+            }
+        };
 
         const getVideoData = (url) => {
             if (!url) return null;
@@ -176,7 +242,12 @@
             else window.close();
         };
         const trackClickAsync = (btn, index, specificType) => {
-            const targetUrl = btn['跳轉連結'] || btn.url || btn.linkValue;
+            let targetUrl = btn['跳轉連結'] || btn.url || btn.linkValue;
+            if (btn['按鈕類型'] === 'image' || btn.btnType === 'image') {
+                if (btn.images && btn.images[btn.currentImgIdx || 0]) {
+                    targetUrl = btn.images[btn.currentImgIdx || 0].linkValue || targetUrl;
+                }
+            }
             const itemId = btn['按鈕ID'] || btn.id || "未知ID";
             const btnText = btn['按鈕文字'] || btn.title || "未知按鈕";
             const memberId = profile.value['會員ID'];
@@ -196,6 +267,21 @@
               safeBgColor.value = cleanColor;
           }
           document.body.style.backgroundColor = safeBgColor.value;
+          
+          // 前端防護：掛載階段自動檢驗是否帳號失效
+          try {
+              const checkRes = await fetch(GAS_API_URL + "?action=checkStatus&id=" + profile.value['會員ID']);
+              const checkData = await checkRes.json();
+              if (checkData.status === 'expired') {
+                  errorMessage.value = "此帳號已失效";
+                  isLoading.value = false;
+                  isAutoShare.value = false;
+                  return;
+              }
+          } catch(e) {
+              console.error(e);
+          }
+
           isLoading.value = false;
           if (isAutoShare.value) {
               if (!liff.isLoggedIn()) {
@@ -205,7 +291,10 @@
               try {
                   const response = await fetch(GAS_API_URL + "?action=getData&id=" + profile.value['會員ID']);
                   const data = await response.json();
-                  if (data.status === "success" && data.flexMsg) {
+                  if (data.status === "expired") {
+                      errorMessage.value = "此帳號已失效";
+                      isAutoShare.value = false;
+                  } else if (data.status === "success" && data.flexMsg) {
                       flexMsg.value = data.flexMsg;
                       if (liff.isApiAvailable("shareTargetPicker")) {
                           const messageToSend = { type: "flex", altText: profile.value['顯示名稱'] + " 的電子名片", contents: flexMsg.value };
@@ -227,7 +316,7 @@
               } catch (e) { errorMessage.value = "轉發資料載入失敗。"; }
           }
         });
-        return { profile, buttons, slides, isLoading, errorMessage, isAutoShare, safeBgColor, closeLiff, trackClickAsync, getVideoData, buildFinalLink, getFontFamily };
+        return { profile, buttons, slides, isLoading, errorMessage, isAutoShare, safeBgColor, closeLiff, trackClickAsync, getVideoData, buildFinalLink, getFontFamily, handleTouchStart, handleTouchEnd, nextImg, prevImg };
       }
     }).mount("#app");
   </script>
