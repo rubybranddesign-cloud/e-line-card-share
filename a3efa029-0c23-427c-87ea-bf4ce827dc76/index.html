@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>陳盈升/薩維爾皇家西服 - 專屬電子名片</title>
-  <meta name="description" content="薩維爾皇家西服 創辦人， 從事西服訂製與形象規劃逾22年， 專注英式手工西裝設計， 提供商務形象與專業穿搭建議， 協助企業主管與業務人士打造專業信任形象。...">
+  <meta name="description" content="薩維爾皇家西服 創辦人  從事西服訂製與形象規劃逾22年 專注英式手工西裝設計 提供商務形象與專業穿搭建議 協助企業主管與業務人士打造專業信任形象...">
   <meta property="og:title" content="陳盈升/薩維爾皇家西服 - 專屬電子名片">
-  <meta property="og:description" content="薩維爾皇家西服 創辦人， 從事西服訂製與形象規劃逾22年， 專注英式手工西裝設計， 提供商務形象與專業穿搭建議， 協助企業主管與業務人士打造專業信任形象。...">
+  <meta property="og:description" content="薩維爾皇家西服 創辦人  從事西服訂製與形象規劃逾22年 專注英式手工西裝設計 提供商務形象與專業穿搭建議 協助企業主管與業務人士打造專業信任形象...">
   <meta property="og:image" content="https://drive.google.com/thumbnail?id=1TmzaEw8rmFMpGz6WJeVUYvkMtq9RMhA4&sz=w1000">
   <meta property="og:type" content="website">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -15,7 +15,7 @@
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
     body { font-family: "Helvetica Neue", Helvetica, Arial, "PingFang TC", "微軟正黑體", sans-serif; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s ease; }
-    .fade-enter-active, .fade-leave-active { transition: opacity 0.5s ease; }
+    .fade-enter-active, .fade-leave-active { transition: opacity 0.4s ease; }
     .fade-enter-from, .fade-leave-to { opacity: 0; }
     [v-cloak] { display: none !important; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -63,16 +63,35 @@
                 <a v-if="profile['Wechat'] || profile['WeChat連結']" :href="profile['Wechat'] || profile['WeChat連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-wechat-logo" style="font-size: 37px;"></i></a>
                 <a v-if="profile['TikTok連結']" :href="profile['TikTok連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-tiktok-logo" style="font-size: 37px;"></i></a>
             </div>
-                <div v-if="profile['YouTube影音連結'] && getVideoData(profile['YouTube影音連結'])" class="relative w-full mb-8 overflow-hidden shadow-sm aspect-video bg-black shrink-0" style="border-radius: 13px;">
+            <div v-if="profile['YouTube影音連結'] && getVideoData(profile['YouTube影音連結'])" class="relative w-full mb-8 overflow-hidden shadow-sm aspect-video bg-black shrink-0" style="border-radius: 13px;">
                 <iframe v-if="getVideoData(profile['YouTube影音連結']).type !== 'html5'" :src="getVideoData(profile['YouTube影音連結']).embedUrl" class="absolute inset-0 w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 <video v-if="getVideoData(profile['YouTube影音連結']).type === 'html5'" :src="getVideoData(profile['YouTube影音連結']).embedUrl" class="absolute inset-0 w-full h-full" controls playsinline controlslist="nodownload"></video>
             </div>
+            
             <div class="w-full space-y-4 pb-6">
-              <a v-for="(btn, index) in buttons" :key="index" :href="buildFinalLink(btn.type || 'url', btn['跳轉連結'] || btn.url)" target="_blank" @click="trackClickAsync(btn, index)" class="w-full flex items-center justify-center font-bold px-4 py-[16px] transition cursor-pointer relative overflow-hidden group shadow-sm transform hover:opacity-90" :style="{ backgroundColor: btn['按鈕背景顏色'] || '#D2B992', color: btn['按鈕文字顏色'] || '#000000', borderRadius: '13px', textDecoration: 'none' }">
-                <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <span class="tracking-[0.1em]" style="font-size: 17px;">{{ btn['按鈕文字'] || btn.title }}</span>
-              </a>
+              <template v-for="(btn, index) in buttons" :key="index">
+                <a v-if="btn['按鈕類型'] !== 'image'" :href="buildFinalLink(btn.type || 'url', btn['跳轉連結'] || btn.url)" target="_blank" @click="trackClickAsync(btn, index)" class="w-full flex items-center justify-center font-bold px-4 py-[16px] transition cursor-pointer relative overflow-hidden group shadow-sm transform hover:opacity-90" :style="{ backgroundColor: btn['按鈕背景顏色'] || '#D2B992', color: btn['按鈕文字顏色'] || '#000000', borderRadius: '13px', textDecoration: 'none' }">
+                  <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <span class="tracking-[0.1em]" style="font-size: 17px;">{{ btn['按鈕文字'] || btn.title }}</span>
+                </a>
+
+                <div v-else class="w-full aspect-[4/5] relative rounded-[13px] overflow-hidden shadow-sm group transform transition hover:opacity-[0.98] select-none touch-pan-y" 
+                     @touchstart="handleTouchStart($event)" 
+                     @touchend="handleTouchEnd($event, btn)">
+                  <a :href="buildFinalLink(btn.images[btn.currentImgIdx || 0]?.linkType || btn.type || 'url', btn.images[btn.currentImgIdx || 0]?.linkValue || btn['跳轉連結'] || btn.url)" target="_blank" @click="trackClickAsync(btn, index)" class="block w-full h-full relative cursor-pointer bg-gray-100">
+                    <transition-group name="fade">
+                      <img v-for="(imgObj, i) in btn.images" :key="imgObj.url + i" v-show="(btn.currentImgIdx || 0) === i" :src="imgObj.url" class="absolute inset-0 w-full h-full object-cover">
+                    </transition-group>
+                  </a>
+                  <div v-if="btn.images && btn.images.length > 1" class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-20 pointer-events-none">
+                    <div v-for="(imgObj, i) in btn.images" :key="'dot'+i" class="w-2 h-2 rounded-full transition-all duration-300 shadow-sm" :class="(btn.currentImgIdx || 0) === i ? 'bg-white scale-110' : 'bg-white/50'"></div>
+                  </div>
+                  <button v-if="btn.images && btn.images.length > 1" @click.stop.prevent="prevImg(btn)" class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-white/40 backdrop-blur-md border border-white/50 text-gray-800 rounded-full z-20 hover:bg-white/60 transition-all opacity-100 lg:opacity-0 lg:group-hover:opacity-100 shadow-[0_4px_12px_rgba(0,0,0,0.08)]"><i class="ph-bold ph-caret-left text-sm"></i></button>
+                  <button v-if="btn.images && btn.images.length > 1" @click.stop.prevent="nextImg(btn)" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-white/40 backdrop-blur-md border border-white/50 text-gray-800 rounded-full z-20 hover:bg-white/60 transition-all opacity-100 lg:opacity-0 lg:group-hover:opacity-100 shadow-[0_4px_12px_rgba(0,0,0,0.08)]"><i class="ph-bold ph-caret-right text-sm"></i></button>
+                </div>
+              </template>
             </div>
+
             <div v-if="slides && slides.length > 0" class="w-full mt-4 pb-10">
                 <div class="flex items-center gap-3 mb-5 px-2">
                     <div class="h-[1px] flex-1 bg-black/10" :style="{ backgroundColor: profile['全域文字顏色'] || '#1a1a1a', opacity: 0.15 }"></div>
@@ -93,7 +112,11 @@
                     </div>
                 </div>
             </div>
-            <p class="mt-4 pb-12 font-medium tracking-wider text-gray-400 opacity-60" style="font-size: 14px;">Powered by Ruby.Brand.Design</p>
+            <p class="mt-4 pb-12 font-medium tracking-wider text-gray-400 opacity-60" style="font-size: 14px;">
+  <a href="https://lin.ee/WKcncUr" target="_blank" class="hover:opacity-100 hover:text-gray-600 transition-all duration-300">
+    Powered by Ruby.Brand.Design
+  </a>
+</p>
         </div>
       </div>
     </transition>
@@ -104,15 +127,84 @@
     const LIFF_ID = "2009561347-VUhbtrEC";
     createApp({
       setup() {
-        const profile = ref({"顯示名稱":"陳盈升/薩維爾皇家西服","個人簡介文字":"薩維爾皇家西服 創辦人，\n從事西服訂製與形象規劃逾22年，\n專注英式手工西裝設計，\n提供商務形象與專業穿搭建議，\n協助企業主管與業務人士打造專業信任形象。","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1TmzaEw8rmFMpGz6WJeVUYvkMtq9RMhA4&sz=w1000","背景圖片URL":"https://drive.google.com/thumbnail?id=1CxlDmA0cED1LnYTcqnNvnXLsbpFUhWO9&sz=w1000","背景主題顏色":"#071f00","全域文字顏色":"#d4af37","社群Icon顏色":"#eab308","FB連結":"https://www.facebook.com/profile.php?id=61582568789073","IG連結":"https://www.instagram.com/savile196?igsh=MTVvbzgwZ3NrOWp4bg%3D%3D&utm_source=qr","LINE連結":"https://lin.ee/7dCCdcL","WeChat連結":"","TikTok連結":"https://www.tiktok.com/@vensan196?_r=1&_t=ZS-95KVWgyWU6b","YouTube影音連結":"https://www.youtube.com/@savilebespoke/shorts","會員ID":"a3efa029-0c23-427c-87ea-bf4ce827dc76"});
-        const buttons = ref([{"按鈕ID":"btn_mo70egu0_4dzufxlw","按鈕文字":"分享電子名片","跳轉連結":"https://liff.line.me/2009561347-VUhbtrEC?id=a3efa029-0c23-427c-87ea-bf4ce827dc76&autoShare=true","按鈕背景顏色":"#d4af37","按鈕文字顏色":"#000000","type":"url"}]);
-        const slides = ref([{"id":"sld_mo58f1f1_xznac4vf","sort":1,"imageUrl":"https://drive.google.com/thumbnail?id=1kItdCpKB_vS2OJK8FTw6GK5scLxltXu1&sz=w1000","buttonFont":"圓體","buttonTextColor":"#5d4232","bgColor":"#5d4232","buttons":[{"title":"加入LINE@","color":"#172400","type":"url","linkValue":"https://lin.ee/7dCCdcL"},{"title":"Phone Call","color":"#172400","type":"tel","linkValue":"tel:0913006526"}]},{"id":"sld_mo5e7jm6_rjt0wc8l","sort":2,"imageUrl":"https://drive.google.com/thumbnail?id=1cxZHJ0-OYdd448Y237tkqA74qsYI9Klu&sz=w1000","buttonFont":"圓體","buttonTextColor":"#5d4232","bgColor":"#5d4232","buttons":[{"title":"FB粉專","color":"#172400","type":"url","linkValue":"https://www.facebook.com/profile.php?id=61582568789073"},{"title":"IG社群","color":"#172400","type":"url","linkValue":"https://www.instagram.com/savile196/"}]},{"id":"sld_mo5g0xvh_te6akbgd","sort":3,"imageUrl":"https://drive.google.com/thumbnail?id=1RjTKYoSjavgTzHVkoZvJ-Oi6XOoBSxNS&sz=w1000","buttonFont":"圓體","buttonTextColor":"#5d4232","bgColor":"#5d4232","buttons":[{"title":"YouTube","color":"#172400","type":"url","linkValue":"https://www.youtube.com/@savilebespoke/shorts"},{"title":"TikTok","color":"#172400","type":"url","linkValue":"https://www.tiktok.com/@vensan196?_r=1&_t=ZS-95KVWgyWU6b"}]},{"id":"sld_mo5o2uoc_an0oe2wz","sort":4,"imageUrl":"https://drive.google.com/thumbnail?id=12FEc04bbrR0wfWoAIek5dKHqLvp1bvOY&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#5d4232","bgColor":"#5d4232","buttons":[{"title":"薩維爾官網","color":"#172400","type":"url","linkValue":"https://www.savileroyalsuit.com/"},{"title":"預約訂製專線","color":"#172400","type":"tel","linkValue":"tel:0422115552"}]},{"id":"sld_mo5qevat_v4492kv1","sort":5,"imageUrl":"https://drive.google.com/thumbnail?id=19K3qr-XSjaiMkUqd6ymueTz-tnX11cUm&sz=w1000","buttonFont":"圓體","buttonTextColor":"#5d4232","bgColor":"#5d4232","buttons":[{"title":"導航MAP","color":"#172400","type":"url","linkValue":"https://maps.app.goo.gl/7RwuU4oU1BDhjkJK7"},{"title":"體態檢視表單","color":"#172400","type":"url","linkValue":"https://forms.gle/RAWJgPKjfgCvabbZA"}]},{"id":"sld_mo6znufa_m6ap6nfr","sort":6,"imageUrl":"https://drive.google.com/thumbnail?id=1eJxjhS3b1IaXukYhEG3ClL_9HbfBHrq-&sz=w1000","buttonFont":"圓體","buttonTextColor":"#5d4232","bgColor":"#5d4232","buttons":[{"title":" 分享我的名片","color":"#172400","type":"url","linkValue":"https://www.google.com/url?q=https://liff.line.me/2009561347-VUhbtrEC?id%3Da3efa029-0c23-427c-87ea-bf4ce827dc76%26autoShare%3Dtrue&sa=D&source=editors&ust=1776679341403716&usg=AOvVaw0XJ3NNSdd-m_OtTFPn9UV0"},{"title":"設計電子名片","color":"#172400","type":"url","linkValue":"https://rubybranddesign-cloud.github.io/e-line-card-share/cdcec815-6673-453d-8454-405bfbb30100/"}]},{"id":"sld_mo5rsfas_baptpryg","sort":7,"imageUrl":"https://drive.google.com/thumbnail?id=1dYWDH1zKnH5ASyp1zwoJwXxyyVEp2eH7&sz=w1000","buttonFont":"圓體","buttonTextColor":"#5d4232","bgColor":"#5d4232","buttons":[{"title":"形象顧問IG","color":"#172400","type":"url","linkValue":"https://www.instagram.com/in.out.plan/"},{"title":"形象課程報名","color":"#172400","type":"url","linkValue":"https://forms.gle/W1rYUmnY1zsTCSfi7"}]}]);
+        const profile = ref({"會員ID":"a3efa029-0c23-427c-87ea-bf4ce827dc76","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1TmzaEw8rmFMpGz6WJeVUYvkMtq9RMhA4&sz=w1000","顯示名稱":"陳盈升/薩維爾皇家西服","個人簡介文字":"薩維爾皇家西服 創辦人\n\n從事西服訂製與形象規劃逾22年\n專注英式手工西裝設計\n提供商務形象與專業穿搭建議\n協助企業主管與業務人士打造專業信任形象","背景主題顏色":"#0e3434","背景圖片URL":"https://drive.google.com/thumbnail?id=1CxlDmA0cED1LnYTcqnNvnXLsbpFUhWO9&sz=w1000","全域文字顏色":"#e2dcc5","社群Icon顏色":"#d0c19a","FB連結":"https://www.facebook.com/profile.php?id=61582568789073","IG連結":"https://www.instagram.com/savile196?igsh=MTVvbzgwZ3NrOWp4bg%3D%3D&utm_source=qr","LINE連結":"https://lin.ee/7dCCdcL","TikTok連結":"https://www.tiktok.com/@vensan196?_r=1&_t=ZS-95KVWgyWU6b","YouTube影音連結":"https://youtu.be/MM5svrsfkSw?si=0aUDCLcUAxJcVF6R","字體風格":"預設字體","最後更新時間":"2026-05-24T13:28:53.650Z","Wechat":""});
+        
+        // --- 處理按鈕與其各別連結輪播圖片結構 ---
+        const rawButtons = [{"按鈕ID":"btn_mpjt5f5q_6zgvz22o","會員ID":"a3efa029-0c23-427c-87ea-bf4ce827dc76","顯示區塊":"Profile頁","排序數字":1,"按鈕文字":"+ LINE","跳轉連結":"https://lin.ee/7dCCdcL","按鈕背景顏色":"#a4966a","按鈕文字顏色":"#000000","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-05-24T13:28:54.110Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mpjt5f5q_6zgvz22o"},{"按鈕ID":"btn_mpjt432k_cwgzonv9","會員ID":"a3efa029-0c23-427c-87ea-bf4ce827dc76","顯示區塊":"Profile頁","排序數字":2,"按鈕文字":"西裝達人升級計畫 YT頻道","跳轉連結":"https://www.youtube.com/@savilebespoke/shorts","按鈕背景顏色":"#c2b589","按鈕文字顏色":"#000000","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-05-24T13:28:54.114Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mpjt432k_cwgzonv9"},{"按鈕ID":"btn_mo70egu0_4dzufxlw","會員ID":"a3efa029-0c23-427c-87ea-bf4ce827dc76","顯示區塊":"Profile頁","排序數字":3,"按鈕文字":"分享電子名片","跳轉連結":"https://liff.line.me/2009561347-VUhbtrEC?id=a3efa029-0c23-427c-87ea-bf4ce827dc76&autoShare=true","按鈕背景顏色":"#d8ca9d","按鈕文字顏色":"#333333","Icon圖片URL":"","點擊總次數":2,"建立時間":"2026-05-24T13:28:54.118Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mo70egu0_4dzufxlw"}];
+        const processedButtons = rawButtons.map(b => {
+            let parsedImages = [];
+            if (b['圖片詳細設定']) {
+                try { parsedImages = JSON.parse(b['圖片詳細設定']); } catch(e) {}
+            }
+            // 兼容舊版：如果只有圖片清單，幫它生出預設的 URL 格式
+            if (parsedImages.length === 0 && b['圖片清單']) {
+                parsedImages = b['圖片清單'].split(',').map(url => ({ url: url.trim(), linkType: 'url', linkValue: '' })).filter(img => img.url !== '');
+            }
+            return {
+                ...b,
+                currentImgIdx: 0,
+                images: parsedImages
+            };
+        });
+        const buttons = ref(processedButtons);
+
+        // --- 核心修正：完美對接 getParsedSlides 後端已整理好的資料結構 ---
+        const rawSlides = [{"id":"sld_mo58f1f1_xznac4vf","sort":1,"imageUrl":"https://drive.google.com/thumbnail?id=1kItdCpKB_vS2OJK8FTw6GK5scLxltXu1&sz=w1000","buttonFont":"圓體","buttonTextColor":"#5d4232","bgColor":"#5d4232","buttons":[{"text":"加入LINE@","color":"#172400","type":"url","url":"https://lin.ee/7dCCdcL","clicks":0},{"text":"Phone Call","color":"#172400","type":"tel","url":"tel:0913006526","clicks":0}]},{"id":"sld_mo5e7jm6_rjt0wc8l","sort":2,"imageUrl":"https://drive.google.com/thumbnail?id=1cxZHJ0-OYdd448Y237tkqA74qsYI9Klu&sz=w1000","buttonFont":"圓體","buttonTextColor":"#5d4232","bgColor":"#5d4232","buttons":[{"text":"FB粉專","color":"#172400","type":"url","url":"https://www.facebook.com/profile.php?id=61582568789073","clicks":0},{"text":"IG社群","color":"#172400","type":"url","url":"https://www.instagram.com/savile196/","clicks":0}]},{"id":"sld_mo5g0xvh_te6akbgd","sort":3,"imageUrl":"https://drive.google.com/thumbnail?id=1RjTKYoSjavgTzHVkoZvJ-Oi6XOoBSxNS&sz=w1000","buttonFont":"圓體","buttonTextColor":"#5d4232","bgColor":"#5d4232","buttons":[{"text":"YouTube","color":"#172400","type":"url","url":"https://www.youtube.com/@savilebespoke/shorts","clicks":0},{"text":"TikTok","color":"#172400","type":"url","url":"https://www.tiktok.com/@vensan196?_r=1&_t=ZS-95KVWgyWU6b","clicks":0}]},{"id":"sld_mo5o2uoc_an0oe2wz","sort":4,"imageUrl":"https://drive.google.com/thumbnail?id=12FEc04bbrR0wfWoAIek5dKHqLvp1bvOY&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#5d4232","bgColor":"#5d4232","buttons":[{"text":"薩維爾官網","color":"#172400","type":"url","url":"https://www.savileroyalsuit.com/","clicks":0},{"text":"預約訂製專線","color":"#172400","type":"tel","url":"tel:0422115552","clicks":0}]},{"id":"sld_mo5qevat_v4492kv1","sort":5,"imageUrl":"https://drive.google.com/thumbnail?id=19K3qr-XSjaiMkUqd6ymueTz-tnX11cUm&sz=w1000","buttonFont":"圓體","buttonTextColor":"#5d4232","bgColor":"#5d4232","buttons":[{"text":"導航MAP","color":"#172400","type":"url","url":"https://maps.app.goo.gl/7RwuU4oU1BDhjkJK7","clicks":0},{"text":"體態檢視表單","color":"#172400","type":"url","url":"https://forms.gle/RAWJgPKjfgCvabbZA","clicks":0}]},{"id":"sld_mo6znufa_m6ap6nfr","sort":6,"imageUrl":"https://drive.google.com/thumbnail?id=1eJxjhS3b1IaXukYhEG3ClL_9HbfBHrq-&sz=w1000","buttonFont":"圓體","buttonTextColor":"#5d4232","bgColor":"#5d4232","buttons":[{"text":" 分享我的名片","color":"#172400","type":"url","url":"https://www.google.com/url?q=https://liff.line.me/2009561347-VUhbtrEC?id%3Da3efa029-0c23-427c-87ea-bf4ce827dc76%26autoShare%3Dtrue&sa=D&source=editors&ust=1776679341403716&usg=AOvVaw0XJ3NNSdd-m_OtTFPn9UV0","clicks":0},{"text":"設計電子名片","color":"#172400","type":"url","url":"https://rubybranddesign-cloud.github.io/e-line-card-share/cdcec815-6673-453d-8454-405bfbb30100/","clicks":0}]},{"id":"sld_mo5rsfas_baptpryg","sort":7,"imageUrl":"https://drive.google.com/thumbnail?id=1dYWDH1zKnH5ASyp1zwoJwXxyyVEp2eH7&sz=w1000","buttonFont":"圓體","buttonTextColor":"#5d4232","bgColor":"#5d4232","buttons":[{"text":"形象顧問IG","color":"#172400","type":"url","url":"https://www.instagram.com/in.out.plan/","clicks":0},{"text":"形象課程報名","color":"#172400","type":"url","url":"https://forms.gle/W1rYUmnY1zsTCSfi7","clicks":0}]}];
+        const processedSlides = rawSlides.map(s => {
+          const slideBtns = (s.buttons || []).map(b => ({
+            title: b.text || b.title || '',
+            linkValue: b.url || b.linkValue || '',
+            type: b.type || 'url',
+            color: b.color || '#6C0B22'
+          }));
+          return {
+            id: s.id || s['輪播ID'],
+            imageUrl: s.imageUrl || s['主圖片URL'],
+            bgColor: s.bgColor || '#ffffff',
+            buttonTextColor: s.buttonTextColor || '#ffffff',
+            buttonFont: s.buttonFont || '預設字體',
+            buttons: slideBtns
+          };
+        });
+        const slides = ref(processedSlides);
+        // ----------------------------------------------
+
         const flexMsg = ref(null);
         const isLoading = ref(true);
         const errorMessage = ref("");
         const isAutoShare = ref(false);
         const safeBgColor = ref("#fefce8");
-              const getVideoData = (url) => {
+        
+        // 觸控滑動狀態管理
+        const touchStartX = ref(0);
+
+        const handleTouchStart = (e) => {
+            touchStartX.value = e.changedTouches[0].screenX;
+        };
+
+        const handleTouchEnd = (e, btn) => {
+            if (!btn.images || btn.images.length <= 1) return;
+            const diff = touchStartX.value - e.changedTouches[0].screenX;
+            if (diff > 40) { // 向左滑 -> 下一張
+                nextImg(btn);
+            } else if (diff < -40) { // 向右滑 -> 上一張
+                prevImg(btn);
+            }
+        };
+
+        const nextImg = (btn) => {
+            if (btn.images && btn.images.length > 1) {
+                btn.currentImgIdx = (btn.currentImgIdx + 1) % btn.images.length;
+            }
+        };
+
+        const prevImg = (btn) => {
+            if (btn.images && btn.images.length > 1) {
+                btn.currentImgIdx = (btn.currentImgIdx - 1 + btn.images.length) % btn.images.length;
+            }
+        };
+
+        const getVideoData = (url) => {
             if (!url) return null;
             const ytMatch = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/);
             if (ytMatch && ytMatch[2].length === 11) return { type: "youtube", embedUrl: "https://www.youtube.com/embed/" + ytMatch[2] };
@@ -138,7 +230,7 @@
                 else shareText = "哈囉！這是「" + (profile.value['顯示名稱'] || "我") + "」的電子名片，請點擊連結查看：\nhttps://liff.line.me/" + LIFF_ID + "?id=" + profile.value['會員ID'];
                 return "https://social-plugins.line.me/lineit/share?text=" + encodeURIComponent(shareText);
             }
-            if (type === "line") {
+            if (type === "line" || type === "line_personal") {
                 if (value.startsWith("http")) return value;
                 return "https://line.me/ti/p/~" + value.replace("@", "%40");
             }
@@ -150,9 +242,14 @@
             else window.close();
         };
         const trackClickAsync = (btn, index, specificType) => {
-            const targetUrl = btn['跳轉連結'] || btn.url;
-            const itemId = btn['按鈕ID'];
-            const btnText = btn['按鈕文字'] || "未知按鈕";
+            let targetUrl = btn['跳轉連結'] || btn.url || btn.linkValue;
+            if (btn['按鈕類型'] === 'image' || btn.btnType === 'image') {
+                if (btn.images && btn.images[btn.currentImgIdx || 0]) {
+                    targetUrl = btn.images[btn.currentImgIdx || 0].linkValue || targetUrl;
+                }
+            }
+            const itemId = btn['按鈕ID'] || btn.id || "未知ID";
+            const btnText = btn['按鈕文字'] || btn.title || "未知按鈕";
             const memberId = profile.value['會員ID'];
             if (!memberId || !targetUrl) return;
             const reqType = specificType || "button";
@@ -170,6 +267,21 @@
               safeBgColor.value = cleanColor;
           }
           document.body.style.backgroundColor = safeBgColor.value;
+          
+          // 前端防護：掛載階段自動檢驗是否帳號失效
+          try {
+              const checkRes = await fetch(GAS_API_URL + "?action=checkStatus&id=" + profile.value['會員ID']);
+              const checkData = await checkRes.json();
+              if (checkData.status === 'expired') {
+                  errorMessage.value = "此帳號已失效";
+                  isLoading.value = false;
+                  isAutoShare.value = false;
+                  return;
+              }
+          } catch(e) {
+              console.error(e);
+          }
+
           isLoading.value = false;
           if (isAutoShare.value) {
               if (!liff.isLoggedIn()) {
@@ -179,7 +291,10 @@
               try {
                   const response = await fetch(GAS_API_URL + "?action=getData&id=" + profile.value['會員ID']);
                   const data = await response.json();
-                  if (data.status === "success" && data.flexMsg) {
+                  if (data.status === "expired") {
+                      errorMessage.value = "此帳號已失效";
+                      isAutoShare.value = false;
+                  } else if (data.status === "success" && data.flexMsg) {
                       flexMsg.value = data.flexMsg;
                       if (liff.isApiAvailable("shareTargetPicker")) {
                           const messageToSend = { type: "flex", altText: profile.value['顯示名稱'] + " 的電子名片", contents: flexMsg.value };
@@ -201,7 +316,7 @@
               } catch (e) { errorMessage.value = "轉發資料載入失敗。"; }
           }
         });
-        return { profile, buttons, slides, isLoading, errorMessage, isAutoShare, safeBgColor, closeLiff, trackClickAsync, getVideoData, buildFinalLink, getFontFamily };
+        return { profile, buttons, slides, isLoading, errorMessage, isAutoShare, safeBgColor, closeLiff, trackClickAsync, getVideoData, buildFinalLink, getFontFamily, handleTouchStart, handleTouchEnd, nextImg, prevImg };
       }
     }).mount("#app");
   </script>
