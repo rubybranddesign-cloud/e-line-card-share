@@ -125,10 +125,10 @@
     const LIFF_ID = "2009561347-VUhbtrEC";
     createApp({
       setup() {
-        const profile = ref({"會員ID":"6422ba8a-a7d8-444e-afa0-db6a21496dc3","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1xbG90B21Cd9WeZOp-rtahdRkF5BQNC5j&sz=w1000","顯示名稱":"劉家妤/家家","個人簡介文字":"・康盈家泰 創辦人\n・共好發展總會 業務長 \n\n讓夢想不再停留於想像\n而是成為能被規劃、實踐，並持續累積的未來\n\n我們以房產與金融為核心\n結合財商教育、資產優化、市場行銷與品牌賦能，打造一個能陪伴個人與團隊持續成長的顧問平台","背景主題顏色":"#fff4e5","背景圖片URL":"https://drive.google.com/thumbnail?id=1Pk85Emt-nKXxtWsJpR22o4qanMwsdlN7&sz=w1000","全域文字顏色":"#685540","社群Icon顏色":"#c9af97","FB連結":"","IG連結":"","LINE連結":"","TikTok連結":"","YouTube影音連結":"","字體風格":"預設字體","最後更新時間":"2026-06-19T18:09:02.071Z","Wechat":""});
+        const profile = ref({"會員ID":"6422ba8a-a7d8-444e-afa0-db6a21496dc3","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1xbG90B21Cd9WeZOp-rtahdRkF5BQNC5j&sz=w1000","顯示名稱":"劉家妤/家家","個人簡介文字":"・康盈家泰 創辦人\n・共好發展總會 業務長 \n\n讓夢想不再停留於想像\n而是成為能被規劃、實踐，並持續累積的未來\n\n我們以房產與金融為核心\n結合財商教育、資產優化、市場行銷與品牌賦能，打造一個能陪伴個人與團隊持續成長的顧問平台","背景主題顏色":"#fff4e5","背景圖片URL":"https://drive.google.com/thumbnail?id=1Pk85Emt-nKXxtWsJpR22o4qanMwsdlN7&sz=w1000","全域文字顏色":"#685540","社群Icon顏色":"#c9af97","FB連結":"","IG連結":"","LINE連結":"","TikTok連結":"","YouTube影音連結":"","字體風格":"預設字體","最後更新時間":"2026-06-26T12:20:03.288Z","Wechat":""});
         
         // --- 處理按鈕與其各別連結輪播圖片結構 ---
-        const rawButtons = [{"按鈕ID":"btn_mql884tq_ztlig57a","會員ID":"6422ba8a-a7d8-444e-afa0-db6a21496dc3","顯示區塊":"Profile頁","排序數字":1,"按鈕文字":"轉發我的電子名片","跳轉連結":"https://liff.line.me/2009561347-VUhbtrEC?id=6422ba8a-a7d8-444e-afa0-db6a21496dc3&autoShare=true","按鈕背景顏色":"#bda789","按鈕文字顏色":"#ffffff","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-06-19T18:09:02.557Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mql884tq_ztlig57a"}];
+        const rawButtons = [{"按鈕ID":"btn_mql884tq_ztlig57a","會員ID":"6422ba8a-a7d8-444e-afa0-db6a21496dc3","顯示區塊":"Profile頁","排序數字":1,"按鈕文字":"分享我的電子名片","跳轉連結":"https://liff.line.me/2009561347-VUhbtrEC?id=6422ba8a-a7d8-444e-afa0-db6a21496dc3&autoShare=true","按鈕背景顏色":"#bda789","按鈕文字顏色":"#ffffff","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-06-26T12:20:03.937Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mql884tq_ztlig57a"}];
         const processedButtons = rawButtons.map(b => {
             let parsedImages = [];
             if (b['圖片詳細設定']) {
