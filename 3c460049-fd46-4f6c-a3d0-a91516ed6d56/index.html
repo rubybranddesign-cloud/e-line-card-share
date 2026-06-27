@@ -24,14 +24,17 @@
 </head>
 <body class="flex justify-center">
   <div id="app" v-cloak class="w-full max-w-md min-h-screen flex flex-col items-center relative overflow-y-auto no-scrollbar shadow-2xl transition-all duration-500" :style="{ backgroundColor: safeBgColor }">
+    
     <div v-if="isLoading" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
       <i class="ph ph-spinner animate-spin text-pink-500 mb-4" style="font-size: 51px;"></i>
-      <p class="text-gray-500 font-bold" style="font-size: 19px;">資料準備中...</p>
+      <p class="text-gray-500 font-bold" style="font-size: 19px;">準備專屬轉發內容中...</p>
     </div>
+    
     <div v-else-if="errorMessage" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/90 p-6">
       <i class="ph-fill ph-warning-circle text-red-500 mb-2" style="font-size: 39px;"></i>
       <p class="text-gray-800 font-bold text-center" style="font-size: 19px;">{{ errorMessage }}</p>
     </div>
+
     <transition name="fade">
       <div v-if="!isLoading && !errorMessage && isAutoShare" class="absolute inset-0 z-50 bg-white/90 backdrop-blur-md flex flex-col items-center justify-center text-center h-screen">
         <div class="w-20 h-20 bg-white rounded-full shadow-lg flex items-center justify-center mb-6">
@@ -42,8 +45,9 @@
         <button @click="closeLiff" class="text-gray-400 font-bold underline" style="font-size: 17px;">取消並關閉視窗</button>
       </div>
     </transition>
+
     <transition name="fade">
-      <div v-if="!isLoading && !errorMessage && !isAutoShare" class="w-full flex flex-col items-center relative min-h-full">
+      <div v-show="!errorMessage && !isAutoShare" class="w-full flex flex-col items-center relative min-h-full">
         <div v-if="profile['背景圖片URL']" class="relative w-full aspect-[4/5] shrink-0 bg-cover bg-center flex flex-col justify-end items-center" :style="{ backgroundImage: 'url(' + profile['背景圖片URL'] + ')' }">
             <div class="absolute bottom-0 left-0 w-full h-[50%]" :style="{ backgroundImage: 'linear-gradient(to top, ' + safeBgColor + ' 0%, transparent 100%)' }"></div>
         </div>
@@ -54,11 +58,13 @@
         <div class="relative z-10 w-full flex flex-col items-center px-8">
             <h1 class="font-black text-center mb-5 tracking-[0.15em]" :style="{ color: profile['全域文字顏色'] || '#1a1a1a', fontSize: '27px' }">{{ profile['顯示名稱'] }}</h1>
             <p class="text-center whitespace-pre-wrap leading-[2.5] tracking-widest w-full break-words opacity-90 mb-8 font-medium" :style="{ color: profile['全域文字顏色'] || '#1a1a1a', fontSize: '16px' }">{{ profile['個人簡介文字'] }}</p>
+            
             <div v-if="profile['FB連結'] || profile['IG連結'] || profile['TikTok連結']" class="flex gap-5 mb-8 justify-center items-center">
                 <a v-if="profile['FB連結']" :href="profile['FB連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-facebook-logo" style="font-size: 37px;"></i></a>
                 <a v-if="profile['IG連結']" :href="profile['IG連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-instagram-logo" style="font-size: 37px;"></i></a>
                 <a v-if="profile['TikTok連結']" :href="profile['TikTok連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-tiktok-logo" style="font-size: 37px;"></i></a>
             </div>
+
             <div v-if="profile['YouTube影音連結'] && getVideoData(profile['YouTube影音連結'])" class="relative w-full mb-8 overflow-hidden shadow-sm aspect-video bg-black shrink-0" style="border-radius: 13px;">
                 <iframe v-if="getVideoData(profile['YouTube影音連結']).type !== 'html5'" :src="getVideoData(profile['YouTube影音連結']).embedUrl" class="absolute inset-0 w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 <video v-if="getVideoData(profile['YouTube影音連結']).type === 'html5'" :src="getVideoData(profile['YouTube影音連結']).embedUrl" class="absolute inset-0 w-full h-full" controls playsinline controlslist="nodownload"></video>
@@ -123,16 +129,15 @@
     const LIFF_ID = "2009561347-VUhbtrEC";
     createApp({
       setup() {
-        const profile = ref({"會員ID":"3c460049-fd46-4f6c-a3d0-a91516ed6d56","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1wjPrSmbySQOMdbrWAhgn_Jnbgliu6RET&sz=w1000","顯示名稱":"妍之馨 官璤馨","個人簡介文字":"Namis 妍之馨 創辦人\n一璤一馨\n每一次的分享，都是馨意\n從保養的妝容，陪你找到自信美\n\n結合頂級植萃成分與科學技術，專為肌膚設計的溫和保養。啟動28天肌膚代謝奇蹟，找回你原本的純淨光采。","背景主題顏色":"#fdfdfd","背景圖片URL":"https://drive.google.com/thumbnail?id=11Gf-rRoMZR2Vty8Ga91xRrZ2WtcWGfap&sz=w1000","全域文字顏色":"#333333","社群Icon顏色":"#f1caca","FB連結":"https://www.facebook.com/share/1GYpYcCijv/?mibextid=wwXIfr","IG連結":"https://www.instagram.com/angel0916_?igsh=eDZvMDRhM2tyZ3k0&utm_source=qr","LINE連結":"","TikTok連結":"https://www.tiktok.com/@di4134159?_r=1&_t=ZS-96cqVRtX49F","YouTube影音連結":"","字體風格":"預設字體","最後更新時間":"2026-05-24T15:23:06.194Z","Wechat":""});
+        const profile = ref({"會員ID":"3c460049-fd46-4f6c-a3d0-a91516ed6d56","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1wjPrSmbySQOMdbrWAhgn_Jnbgliu6RET&sz=w1000","顯示名稱":"妍之馨 官璤馨","個人簡介文字":"Namis 妍之馨 創辦人\n一璤一馨\n每一次的分享，都是馨意\n從保養的妝容，陪你找到自信美\n\n結合頂級植萃成分與科學技術，專為肌膚設計的溫和保養。啟動28天肌膚代謝奇蹟，找回你原本的純淨光采。","背景主題顏色":"#fdfdfd","背景圖片URL":"https://drive.google.com/thumbnail?id=11Gf-rRoMZR2Vty8Ga91xRrZ2WtcWGfap&sz=w1000","全域文字顏色":"#333333","社群Icon顏色":"#f1caca","FB連結":"https://www.facebook.com/share/1GYpYcCijv/?mibextid=wwXIfr","IG連結":"https://www.instagram.com/angel0916_?igsh=eDZvMDRhM2tyZ3k0&utm_source=qr","LINE連結":"","TikTok連結":"https://www.tiktok.com/@di4134159?_r=1&_t=ZS-96cqVRtX49F","YouTube影音連結":"","字體風格":"預設字體","最後更新時間":"2026-06-27T17:43:01.114Z","Wechat":""});
         
         // --- 處理按鈕與其各別連結輪播圖片結構 ---
-        const rawButtons = [{"按鈕ID":"btn_mpjrrmvs_epf5w3bw","會員ID":"3c460049-fd46-4f6c-a3d0-a91516ed6d56","顯示區塊":"Profile頁","排序數字":1,"按鈕文字":"+ LINE","跳轉連結":"https://line.me/ti/p/UDUdnTfYjs","按鈕背景顏色":"#f1caca","按鈕文字顏色":"#000000","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-05-24T15:23:06.539Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mpjrrmvs_epf5w3bw"},{"按鈕ID":"btn_mpjrlu9x_8ixes5cj","會員ID":"3c460049-fd46-4f6c-a3d0-a91516ed6d56","顯示區塊":"Profile頁","排序數字":2,"按鈕文字":"妍之馨官方客服","跳轉連結":"https://lin.ee/QiyJdtg","按鈕背景顏色":"#cae4f1","按鈕文字顏色":"#333333","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-05-24T15:23:06.542Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mpjrlu9x_8ixes5cj"},{"按鈕ID":"btn_mpjrmemt_5cchot4s","會員ID":"3c460049-fd46-4f6c-a3d0-a91516ed6d56","顯示區塊":"Profile頁","排序數字":3,"按鈕文字":"保養群組","跳轉連結":"https://line.me/ti/g/bCQC8hyMUT","按鈕背景顏色":"#cae4f1","按鈕文字顏色":"#000000","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-05-24T15:23:06.545Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mpjrmemt_5cchot4s"},{"按鈕ID":"btn_mpjrmsth_n8w766m7","會員ID":"3c460049-fd46-4f6c-a3d0-a91516ed6d56","顯示區塊":"Profile頁","排序數字":4,"按鈕文字":"調單區","跳轉連結":"https://line.me/ti/p/ULHp34WMQ6","按鈕背景顏色":"#77bde9","按鈕文字顏色":"#333333","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-05-24T15:23:06.549Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mpjrmsth_n8w766m7"},{"按鈕ID":"btn_mpjrnuql_wom2usmi","會員ID":"3c460049-fd46-4f6c-a3d0-a91516ed6d56","顯示區塊":"Profile頁","排序數字":5,"按鈕文字":"妍之馨 官方網站","跳轉連結":"https://www.namis-biotech.com/","按鈕背景顏色":"#77bde9","按鈕文字顏色":"#333333","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-05-24T15:23:06.552Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mpjrnuql_wom2usmi"},{"按鈕ID":"btn_mpjskmlw_4wjgsqkq","會員ID":"3c460049-fd46-4f6c-a3d0-a91516ed6d56","顯示區塊":"Profile頁","排序數字":6,"按鈕文字":"","跳轉連結":"https://#","按鈕背景顏色":"#d4af37","按鈕文字顏色":"#000000","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-05-24T15:23:06.556Z","按鈕類型":"image","圖片清單":"https://drive.google.com/thumbnail?id=1tYvpxLFbRjiKdVWRpNcDLyXSUdy9F8By&sz=w1000,https://drive.google.com/thumbnail?id=1gn36ucBtmZ8FTozo4bqfon3YKhLc-3T3&sz=w1000","圖片詳細設定":"[{\"url\":\"https://drive.google.com/thumbnail?id=1tYvpxLFbRjiKdVWRpNcDLyXSUdy9F8By&sz=w1000\",\"linkType\":\"url\",\"linkValue\":\"\"},{\"url\":\"https://drive.google.com/thumbnail?id=1gn36ucBtmZ8FTozo4bqfon3YKhLc-3T3&sz=w1000\",\"linkType\":\"url\",\"linkValue\":\"\"}]","fallback_id":"btn_mpjskmlw_4wjgsqkq"}];
+        const rawButtons = [{"按鈕ID":"btn_mpjrlu9x_8ixes5cj","會員ID":"3c460049-fd46-4f6c-a3d0-a91516ed6d56","顯示區塊":"Profile頁","排序數字":1,"按鈕文字":"妍之馨官方客服","跳轉連結":"https://lin.ee/QiyJdtg","按鈕背景顏色":"#cae4f1","按鈕文字顏色":"#333333","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-06-27T17:43:01.821Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mpjrlu9x_8ixes5cj"},{"按鈕ID":"btn_mpjrmemt_5cchot4s","會員ID":"3c460049-fd46-4f6c-a3d0-a91516ed6d56","顯示區塊":"Profile頁","排序數字":2,"按鈕文字":"保養群組","跳轉連結":"https://line.me/ti/g/bCQC8hyMUT","按鈕背景顏色":"#cae4f1","按鈕文字顏色":"#000000","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-06-27T17:43:01.825Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mpjrmemt_5cchot4s"},{"按鈕ID":"btn_mpjrmsth_n8w766m7","會員ID":"3c460049-fd46-4f6c-a3d0-a91516ed6d56","顯示區塊":"Profile頁","排序數字":3,"按鈕文字":"調單區","跳轉連結":"https://line.me/ti/p/ULHp34WMQ6","按鈕背景顏色":"#77bde9","按鈕文字顏色":"#333333","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-06-27T17:43:01.828Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mpjrmsth_n8w766m7"},{"按鈕ID":"btn_mpjrnuql_wom2usmi","會員ID":"3c460049-fd46-4f6c-a3d0-a91516ed6d56","顯示區塊":"Profile頁","排序數字":4,"按鈕文字":"妍之馨 官方網站","跳轉連結":"https://www.namis-biotech.com/","按鈕背景顏色":"#77bde9","按鈕文字顏色":"#333333","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-06-27T17:43:01.832Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mpjrnuql_wom2usmi"},{"按鈕ID":"btn_mpjskmlw_4wjgsqkq","會員ID":"3c460049-fd46-4f6c-a3d0-a91516ed6d56","顯示區塊":"Profile頁","排序數字":5,"按鈕文字":"","跳轉連結":"https://#","按鈕背景顏色":"#d4af37","按鈕文字顏色":"#000000","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-06-27T17:43:01.836Z","按鈕類型":"image","圖片清單":"https://drive.google.com/thumbnail?id=1tYvpxLFbRjiKdVWRpNcDLyXSUdy9F8By&sz=w1000,https://drive.google.com/thumbnail?id=1gn36ucBtmZ8FTozo4bqfon3YKhLc-3T3&sz=w1000","圖片詳細設定":"[{\"url\":\"https://drive.google.com/thumbnail?id=1tYvpxLFbRjiKdVWRpNcDLyXSUdy9F8By&sz=w1000\",\"linkType\":\"url\",\"linkValue\":\"\"},{\"url\":\"https://drive.google.com/thumbnail?id=1gn36ucBtmZ8FTozo4bqfon3YKhLc-3T3&sz=w1000\",\"linkType\":\"url\",\"linkValue\":\"\"}]","fallback_id":"btn_mpjskmlw_4wjgsqkq"}];
         const processedButtons = rawButtons.map(b => {
             let parsedImages = [];
             if (b['圖片詳細設定']) {
                 try { parsedImages = JSON.parse(b['圖片詳細設定']); } catch(e) {}
             }
-            // 兼容舊版：如果只有圖片清單，幫它生出預設的 URL 格式
             if (parsedImages.length === 0 && b['圖片清單']) {
                 parsedImages = b['圖片清單'].split(',').map(url => ({ url: url.trim(), linkType: 'url', linkValue: '' })).filter(img => img.url !== '');
             }
@@ -144,7 +149,7 @@
         });
         const buttons = ref(processedButtons);
 
-        // --- 核心修正：完美對接 getParsedSlides 後端已整理好的資料結構 ---
+        // --- 處理輪播資料結構 ---
         const rawSlides = [];
         const processedSlides = rawSlides.map(s => {
           const slideBtns = (s.buttons || []).map(b => ({
@@ -166,7 +171,9 @@
         // ----------------------------------------------
 
         const flexMsg = ref(null);
-        const isLoading = ref(true);
+        
+        // ⚡️ 核心修改 1：預設不開啟 Loading 遮罩，讓畫面瞬間渲染出來
+        const isLoading = ref(false); 
         const errorMessage = ref("");
         const isAutoShare = ref(false);
         const safeBgColor = ref("#fefce8");
@@ -174,31 +181,15 @@
         // 觸控滑動狀態管理
         const touchStartX = ref(0);
 
-        const handleTouchStart = (e) => {
-            touchStartX.value = e.changedTouches[0].screenX;
-        };
-
+        const handleTouchStart = (e) => { touchStartX.value = e.changedTouches[0].screenX; };
         const handleTouchEnd = (e, btn) => {
             if (!btn.images || btn.images.length <= 1) return;
             const diff = touchStartX.value - e.changedTouches[0].screenX;
-            if (diff > 40) { // 向左滑 -> 下一張
-                nextImg(btn);
-            } else if (diff < -40) { // 向右滑 -> 上一張
-                prevImg(btn);
-            }
+            if (diff > 40) { nextImg(btn); } 
+            else if (diff < -40) { prevImg(btn); }
         };
-
-        const nextImg = (btn) => {
-            if (btn.images && btn.images.length > 1) {
-                btn.currentImgIdx = (btn.currentImgIdx + 1) % btn.images.length;
-            }
-        };
-
-        const prevImg = (btn) => {
-            if (btn.images && btn.images.length > 1) {
-                btn.currentImgIdx = (btn.currentImgIdx - 1 + btn.images.length) % btn.images.length;
-            }
-        };
+        const nextImg = (btn) => { if (btn.images && btn.images.length > 1) { btn.currentImgIdx = (btn.currentImgIdx + 1) % btn.images.length; } };
+        const prevImg = (btn) => { if (btn.images && btn.images.length > 1) { btn.currentImgIdx = (btn.currentImgIdx - 1 + btn.images.length) % btn.images.length; } };
 
         const getVideoData = (url) => {
             if (!url) return null;
@@ -252,6 +243,7 @@
             const trackUrl = GAS_API_URL + "?action=trackClick&memberId=" + memberId + "&type=" + reqType + "&itemId=" + itemId + "&btnIdx=" + (index + 1) + "&btnText=" + encodeURIComponent(btnText) + "&url=" + encodeURIComponent(targetUrl);
             fetch(trackUrl, { mode: "no-cors" }).catch(e => console.log("背景追蹤發送失敗", e));
         };
+
         onMounted(async () => {
           try { await liff.init({ liffId: LIFF_ID }); } catch (err) { console.error("LIFF 初始化失敗", err); }
           const urlParams = new URLSearchParams(window.location.search);
@@ -264,22 +256,20 @@
           }
           document.body.style.backgroundColor = safeBgColor.value;
           
-          // 前端防護：掛載階段自動檢驗是否帳號失效
-          try {
-              const checkRes = await fetch(GAS_API_URL + "?action=checkStatus&id=" + profile.value['會員ID']);
-              const checkData = await checkRes.json();
+          // ⚡️ 核心修改 2：前端防護改為「背景執行」，不使用 await 阻塞畫面
+          fetch(GAS_API_URL + "?action=checkStatus&id=" + profile.value['會員ID'])
+            .then(res => res.json())
+            .then(checkData => {
               if (checkData.status === 'expired') {
-                  errorMessage.value = "此帳號已失效";
-                  isLoading.value = false;
+                  errorMessage.value = "此帳號已失效"; // 如果過期，才把錯誤畫面蓋上去
                   isAutoShare.value = false;
-                  return;
               }
-          } catch(e) {
-              console.error(e);
-          }
+            })
+            .catch(e => console.error("背景驗證狀態失敗", e));
 
-          isLoading.value = false;
+          // ⚡️ 核心修改 3：如果是自動分享轉發情境，我們才顯示 Loading 遮罩去抓取要轉發的 Flex Message
           if (isAutoShare.value) {
+              isLoading.value = true; 
               if (!liff.isLoggedIn()) {
                   liff.login({ redirectUri: window.location.href });
                   return;
@@ -290,26 +280,33 @@
                   if (data.status === "expired") {
                       errorMessage.value = "此帳號已失效";
                       isAutoShare.value = false;
+                      isLoading.value = false;
                   } else if (data.status === "success" && data.flexMsg) {
                       flexMsg.value = data.flexMsg;
                       if (liff.isApiAvailable("shareTargetPicker")) {
                           const messageToSend = { type: "flex", altText: profile.value['顯示名稱'] + " 的電子名片", contents: flexMsg.value };
                           setTimeout(async () => {
                               try {
+                                  isLoading.value = false; // 抓到資料準備彈出選擇器時，關閉 Loading
                                   const res = await liff.shareTargetPicker([messageToSend]);
                                   if (res) liff.closeWindow();
                                   else isAutoShare.value = false;
                               } catch (error) {
                                   errorMessage.value = "名片發送失敗，請確認 LINE App 狀態。";
                                   isAutoShare.value = false;
+                                  isLoading.value = false;
                               }
                           }, 500);
                       } else {
                           errorMessage.value = "您當前的 LINE 版本不支援分享功能，請更新 App。";
                           isAutoShare.value = false;
+                          isLoading.value = false;
                       }
                   }
-              } catch (e) { errorMessage.value = "轉發資料載入失敗。"; }
+              } catch (e) { 
+                errorMessage.value = "轉發資料載入失敗。"; 
+                isLoading.value = false;
+              }
           }
         });
         return { profile, buttons, slides, isLoading, errorMessage, isAutoShare, safeBgColor, closeLiff, trackClickAsync, getVideoData, buildFinalLink, getFontFamily, handleTouchStart, handleTouchEnd, nextImg, prevImg };
