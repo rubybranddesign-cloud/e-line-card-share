@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>恆光法律事務所｜賴元禧律師 - 專屬電子名片</title>
-  <meta name="description" content="百件訴訟經驗豐富｜60秒找出決勝點 擅長不動產/遺產/工程/資產傳承糾紛 加官方line@免費線上諮詢！ ✨恆光法律事務所✨ 地址｜台中市北區雙十路二段73號2樓（來所請先預約） 電話｜04-2233-0502...">
+  <meta name="description" content="百件訴訟經驗豐富｜60秒找出決勝點 擅長不動產/遺產/工程/資產傳承糾紛 加官方line@免費線上諮詢！  ✨恆光法律事務所✨ 地址｜台中市北區雙十路二段73號2樓 （來所請先預約） 電話｜04-2233-0502...">
   <meta property="og:title" content="恆光法律事務所｜賴元禧律師 - 專屬電子名片">
-  <meta property="og:description" content="百件訴訟經驗豐富｜60秒找出決勝點 擅長不動產/遺產/工程/資產傳承糾紛 加官方line@免費線上諮詢！ ✨恆光法律事務所✨ 地址｜台中市北區雙十路二段73號2樓（來所請先預約） 電話｜04-2233-0502...">
+  <meta property="og:description" content="百件訴訟經驗豐富｜60秒找出決勝點 擅長不動產/遺產/工程/資產傳承糾紛 加官方line@免費線上諮詢！  ✨恆光法律事務所✨ 地址｜台中市北區雙十路二段73號2樓 （來所請先預約） 電話｜04-2233-0502...">
   <meta property="og:image" content="https://drive.google.com/thumbnail?id=1YaneLf6-OCDA2gvMQvHF66RH8RgSmVJv&sz=w1000">
   <meta property="og:type" content="website">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -24,14 +24,17 @@
 </head>
 <body class="flex justify-center">
   <div id="app" v-cloak class="w-full max-w-md min-h-screen flex flex-col items-center relative overflow-y-auto no-scrollbar shadow-2xl transition-all duration-500" :style="{ backgroundColor: safeBgColor }">
+    
     <div v-if="isLoading" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
       <i class="ph ph-spinner animate-spin text-pink-500 mb-4" style="font-size: 51px;"></i>
-      <p class="text-gray-500 font-bold" style="font-size: 19px;">資料準備中...</p>
+      <p class="text-gray-500 font-bold" style="font-size: 19px;">準備專屬轉發內容中...</p>
     </div>
+    
     <div v-else-if="errorMessage" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/90 p-6">
       <i class="ph-fill ph-warning-circle text-red-500 mb-2" style="font-size: 39px;"></i>
       <p class="text-gray-800 font-bold text-center" style="font-size: 19px;">{{ errorMessage }}</p>
     </div>
+
     <transition name="fade">
       <div v-if="!isLoading && !errorMessage && isAutoShare" class="absolute inset-0 z-50 bg-white/90 backdrop-blur-md flex flex-col items-center justify-center text-center h-screen">
         <div class="w-20 h-20 bg-white rounded-full shadow-lg flex items-center justify-center mb-6">
@@ -42,8 +45,9 @@
         <button @click="closeLiff" class="text-gray-400 font-bold underline" style="font-size: 17px;">取消並關閉視窗</button>
       </div>
     </transition>
+
     <transition name="fade">
-      <div v-if="!isLoading && !errorMessage && !isAutoShare" class="w-full flex flex-col items-center relative min-h-full">
+      <div v-show="!errorMessage && !isAutoShare" class="w-full flex flex-col items-center relative min-h-full">
         <div v-if="profile['背景圖片URL']" class="relative w-full aspect-[4/5] shrink-0 bg-cover bg-center flex flex-col justify-end items-center" :style="{ backgroundImage: 'url(' + profile['背景圖片URL'] + ')' }">
             <div class="absolute bottom-0 left-0 w-full h-[50%]" :style="{ backgroundImage: 'linear-gradient(to top, ' + safeBgColor + ' 0%, transparent 100%)' }"></div>
         </div>
@@ -125,16 +129,15 @@
     const LIFF_ID = "2009561347-VUhbtrEC";
     createApp({
       setup() {
-        const profile = ref({"會員ID":"8696e482-7401-4382-bb4b-0e5d9f4241c8","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1YaneLf6-OCDA2gvMQvHF66RH8RgSmVJv&sz=w1000","顯示名稱":"恆光法律事務所｜賴元禧律師","個人簡介文字":"百件訴訟經驗豐富｜60秒找出決勝點\n擅長不動產/遺產/工程/資產傳承糾紛\n加官方line@免費線上諮詢！\n✨恆光法律事務所✨\n地址｜台中市北區雙十路二段73號2樓（來所請先預約）\n電話｜04-2233-0502","背景主題顏色":"#0c4a6e","背景圖片URL":"https://drive.google.com/thumbnail?id=1VnBq4kmI5v1BYt-yGFwmO10ZSUGZ2SdQ&sz=w1000","全域文字顏色":"#f9fafb","社群Icon顏色":"#70baff","FB連結":"https://www.facebook.com/profile.php?id=61553866226435","IG連結":"https://www.instagram.com/yclawyer.consult/","LINE連結":"","TikTok連結":"https://www.tiktok.com/@user294036004766?_r=1&_d=f2gfc69b8ibibg&sec_uid=MS4wLjABAAAAQfF3mfyT51WHBONL9FLRhMBdvv8AZv5LU5auiEQC82NWZyKdV3baxhP1h5vxayYv&share_author_id=7534214900811072517&sharer_language=zh-Hant&source=h5_t&u_code=eli896fag1654k&item_author_type=1&utm_source=copy&tt_from=copy&enable_checksum=1&utm_medium=ios&share_link_id=8831D84B-2431-41BD-B1EB-3E78919BBE23&user_id=7534214900811072517&sec_user_id=MS4wLjABAAAAQfF3mfyT51WHBONL9FLRhMBdvv8AZv5LU5auiEQC82NWZyKdV3baxhP1h5vxayYv&social_share_type=4&ug_btm=b8727,b0&utm_campaign=client_share&share_app_id=1180","YouTube影音連結":"","字體風格":"預設字體","最後更新時間":"2026-06-18T15:14:49.222Z","Wechat":""});
+        const profile = ref({"會員ID":"8696e482-7401-4382-bb4b-0e5d9f4241c8","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1YaneLf6-OCDA2gvMQvHF66RH8RgSmVJv&sz=w1000","顯示名稱":"恆光法律事務所｜賴元禧律師","個人簡介文字":"百件訴訟經驗豐富｜60秒找出決勝點\n擅長不動產/遺產/工程/資產傳承糾紛\n加官方line@免費線上諮詢！\n\n✨恆光法律事務所✨\n地址｜台中市北區雙十路二段73號2樓\n（來所請先預約）\n電話｜04-2233-0502","背景主題顏色":"#0c4a6e","背景圖片URL":"https://drive.google.com/thumbnail?id=1VnBq4kmI5v1BYt-yGFwmO10ZSUGZ2SdQ&sz=w1000","全域文字顏色":"#f9fafb","社群Icon顏色":"#70baff","FB連結":"https://www.facebook.com/profile.php?id=61553866226435","IG連結":"https://www.instagram.com/yclawyer.consult/","LINE連結":"","TikTok連結":"https://www.tiktok.com/@user294036004766?_r=1&_d=f2gfc69b8ibibg&sec_uid=MS4wLjABAAAAQfF3mfyT51WHBONL9FLRhMBdvv8AZv5LU5auiEQC82NWZyKdV3baxhP1h5vxayYv&share_author_id=7534214900811072517&sharer_language=zh-Hant&source=h5_t&u_code=eli896fag1654k&item_author_type=1&utm_source=copy&tt_from=copy&enable_checksum=1&utm_medium=ios&share_link_id=8831D84B-2431-41BD-B1EB-3E78919BBE23&user_id=7534214900811072517&sec_user_id=MS4wLjABAAAAQfF3mfyT51WHBONL9FLRhMBdvv8AZv5LU5auiEQC82NWZyKdV3baxhP1h5vxayYv&social_share_type=4&ug_btm=b8727,b0&utm_campaign=client_share&share_app_id=1180","YouTube影音連結":"","字體風格":"預設字體","最後更新時間":"2026-06-27T17:53:56.694Z","Wechat":""});
         
         // --- 處理按鈕與其各別連結輪播圖片結構 ---
-        const rawButtons = [{"按鈕ID":"btn_mqgd6wea_yrq5c3qi","會員ID":"8696e482-7401-4382-bb4b-0e5d9f4241c8","顯示區塊":"Profile頁","排序數字":1,"按鈕文字":"加入官方LINE免費諮詢","跳轉連結":"https://line.me/ti/p/~＠734itrga","按鈕背景顏色":"#328de2","按鈕文字顏色":"#fff7ed","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-06-18T15:14:49.656Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mqgd6wea_yrq5c3qi"},{"按鈕ID":"btn_mqge61b7_leychwba","會員ID":"8696e482-7401-4382-bb4b-0e5d9f4241c8","顯示區塊":"Profile頁","排序數字":2,"按鈕文字":"電子名片","跳轉連結":"https://liff.line.me/2009561347-VUhbtrEC?id=8696e482-7401-4382-bb4b-0e5d9f4241c8&autoShare=true","按鈕背景顏色":"#fefce8","按鈕文字顏色":"#0c4a6e","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-06-18T15:14:49.659Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mqge61b7_leychwba"},{"按鈕ID":"btn_mqge6smt_26wtbt4o","會員ID":"8696e482-7401-4382-bb4b-0e5d9f4241c8","顯示區塊":"Profile頁","排序數字":3,"按鈕文字":"看IG學法律","跳轉連結":"https://www.instagram.com/yclawyer.consult/","按鈕背景顏色":"#fefce8","按鈕文字顏色":"#0c4a6e","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-06-18T15:14:49.661Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mqge6smt_26wtbt4o"}];
+        const rawButtons = [{"按鈕ID":"btn_mqgd6wea_yrq5c3qi","會員ID":"8696e482-7401-4382-bb4b-0e5d9f4241c8","顯示區塊":"Profile頁","排序數字":1,"按鈕文字":"加入官方LINE免費諮詢","跳轉連結":"https://line.me/ti/p/~＠734itrga","按鈕背景顏色":"#328de2","按鈕文字顏色":"#fff7ed","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-06-27T17:53:56.985Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mqgd6wea_yrq5c3qi"},{"按鈕ID":"btn_mqge61b7_leychwba","會員ID":"8696e482-7401-4382-bb4b-0e5d9f4241c8","顯示區塊":"Profile頁","排序數字":2,"按鈕文字":"電子名片","跳轉連結":"https://liff.line.me/2009561347-VUhbtrEC?id=8696e482-7401-4382-bb4b-0e5d9f4241c8&autoShare=true","按鈕背景顏色":"#fefce8","按鈕文字顏色":"#0c4a6e","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-06-27T17:53:56.987Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mqge61b7_leychwba"},{"按鈕ID":"btn_mqge6smt_26wtbt4o","會員ID":"8696e482-7401-4382-bb4b-0e5d9f4241c8","顯示區塊":"Profile頁","排序數字":3,"按鈕文字":"看IG學法律","跳轉連結":"https://www.instagram.com/yclawyer.consult/","按鈕背景顏色":"#fefce8","按鈕文字顏色":"#0c4a6e","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-06-27T17:53:56.989Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mqge6smt_26wtbt4o"}];
         const processedButtons = rawButtons.map(b => {
             let parsedImages = [];
             if (b['圖片詳細設定']) {
                 try { parsedImages = JSON.parse(b['圖片詳細設定']); } catch(e) {}
             }
-            // 兼容舊版：如果只有圖片清單，幫它生出預設的 URL 格式
             if (parsedImages.length === 0 && b['圖片清單']) {
                 parsedImages = b['圖片清單'].split(',').map(url => ({ url: url.trim(), linkType: 'url', linkValue: '' })).filter(img => img.url !== '');
             }
@@ -146,7 +149,7 @@
         });
         const buttons = ref(processedButtons);
 
-        // --- 核心修正：完美對接 getParsedSlides 後端已整理好的資料結構 ---
+        // --- 處理輪播資料結構 ---
         const rawSlides = [{"id":"sld_mqhzojme_hjs5kbh2","sort":1,"imageUrl":"https://drive.google.com/thumbnail?id=1chKb7tdmIWyZlK9h6rfLq8vyz7Z_VzgN&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"轉發我的電子名片","color":"#328de2","type":"share","url":"https://liff.line.me/2009561347-VUhbtrEC?id=8696e482-7401-4382-bb4b-0e5d9f4241c8&autoShare=true","clicks":0}]},{"id":"sld_mqhzolf7_66xb0tko","sort":2,"imageUrl":"https://drive.google.com/thumbnail?id=1VFxAHjIw2-9lvdQbPVoy_aW-vVf88uDE&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"加入官方line免費諮詢","color":"#328de2","type":"line","url":"https://lin.ee/9GNboJRb","clicks":0}]},{"id":"sld_mqhzomdg_wavzhg77","sort":3,"imageUrl":"https://drive.google.com/thumbnail?id=1xqhKkJSPh8Zku_GP3qlvlcmgjUkU9v1q&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"點我預約免費諮詢","color":"#328de2","type":"url","url":"https://docs.google.com/forms/d/1INsZX6XU31ET7LBoENSXsRW4O54EzcXcv7_nwg9byuc/edit","clicks":0}]},{"id":"sld_mqhzomjx_all5ruiz","sort":4,"imageUrl":"https://drive.google.com/thumbnail?id=15QYVec13LjjA14svj4h5uhxC334GkBJZ&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"看IG學法律","color":"#328de2","type":"social","url":"https://www.instagram.com/yclawyer.consult/","clicks":0}]}];
         const processedSlides = rawSlides.map(s => {
           const slideBtns = (s.buttons || []).map(b => ({
@@ -168,7 +171,9 @@
         // ----------------------------------------------
 
         const flexMsg = ref(null);
-        const isLoading = ref(true);
+        
+        // ⚡️ 核心修改 1：預設不開啟 Loading 遮罩，讓畫面瞬間渲染出來
+        const isLoading = ref(false); 
         const errorMessage = ref("");
         const isAutoShare = ref(false);
         const safeBgColor = ref("#fefce8");
@@ -176,31 +181,15 @@
         // 觸控滑動狀態管理
         const touchStartX = ref(0);
 
-        const handleTouchStart = (e) => {
-            touchStartX.value = e.changedTouches[0].screenX;
-        };
-
+        const handleTouchStart = (e) => { touchStartX.value = e.changedTouches[0].screenX; };
         const handleTouchEnd = (e, btn) => {
             if (!btn.images || btn.images.length <= 1) return;
             const diff = touchStartX.value - e.changedTouches[0].screenX;
-            if (diff > 40) { // 向左滑 -> 下一張
-                nextImg(btn);
-            } else if (diff < -40) { // 向右滑 -> 上一張
-                prevImg(btn);
-            }
+            if (diff > 40) { nextImg(btn); } 
+            else if (diff < -40) { prevImg(btn); }
         };
-
-        const nextImg = (btn) => {
-            if (btn.images && btn.images.length > 1) {
-                btn.currentImgIdx = (btn.currentImgIdx + 1) % btn.images.length;
-            }
-        };
-
-        const prevImg = (btn) => {
-            if (btn.images && btn.images.length > 1) {
-                btn.currentImgIdx = (btn.currentImgIdx - 1 + btn.images.length) % btn.images.length;
-            }
-        };
+        const nextImg = (btn) => { if (btn.images && btn.images.length > 1) { btn.currentImgIdx = (btn.currentImgIdx + 1) % btn.images.length; } };
+        const prevImg = (btn) => { if (btn.images && btn.images.length > 1) { btn.currentImgIdx = (btn.currentImgIdx - 1 + btn.images.length) % btn.images.length; } };
 
         const getVideoData = (url) => {
             if (!url) return null;
@@ -254,6 +243,7 @@
             const trackUrl = GAS_API_URL + "?action=trackClick&memberId=" + memberId + "&type=" + reqType + "&itemId=" + itemId + "&btnIdx=" + (index + 1) + "&btnText=" + encodeURIComponent(btnText) + "&url=" + encodeURIComponent(targetUrl);
             fetch(trackUrl, { mode: "no-cors" }).catch(e => console.log("背景追蹤發送失敗", e));
         };
+
         onMounted(async () => {
           try { await liff.init({ liffId: LIFF_ID }); } catch (err) { console.error("LIFF 初始化失敗", err); }
           const urlParams = new URLSearchParams(window.location.search);
@@ -266,22 +256,20 @@
           }
           document.body.style.backgroundColor = safeBgColor.value;
           
-          // 前端防護：掛載階段自動檢驗是否帳號失效
-          try {
-              const checkRes = await fetch(GAS_API_URL + "?action=checkStatus&id=" + profile.value['會員ID']);
-              const checkData = await checkRes.json();
+          // ⚡️ 核心修改 2：前端防護改為「背景執行」，不使用 await 阻塞畫面
+          fetch(GAS_API_URL + "?action=checkStatus&id=" + profile.value['會員ID'])
+            .then(res => res.json())
+            .then(checkData => {
               if (checkData.status === 'expired') {
-                  errorMessage.value = "此帳號已失效";
-                  isLoading.value = false;
+                  errorMessage.value = "此帳號已失效"; // 如果過期，才把錯誤畫面蓋上去
                   isAutoShare.value = false;
-                  return;
               }
-          } catch(e) {
-              console.error(e);
-          }
+            })
+            .catch(e => console.error("背景驗證狀態失敗", e));
 
-          isLoading.value = false;
+          // ⚡️ 核心修改 3：如果是自動分享轉發情境，我們才顯示 Loading 遮罩去抓取要轉發的 Flex Message
           if (isAutoShare.value) {
+              isLoading.value = true; 
               if (!liff.isLoggedIn()) {
                   liff.login({ redirectUri: window.location.href });
                   return;
@@ -292,26 +280,33 @@
                   if (data.status === "expired") {
                       errorMessage.value = "此帳號已失效";
                       isAutoShare.value = false;
+                      isLoading.value = false;
                   } else if (data.status === "success" && data.flexMsg) {
                       flexMsg.value = data.flexMsg;
                       if (liff.isApiAvailable("shareTargetPicker")) {
                           const messageToSend = { type: "flex", altText: profile.value['顯示名稱'] + " 的電子名片", contents: flexMsg.value };
                           setTimeout(async () => {
                               try {
+                                  isLoading.value = false; // 抓到資料準備彈出選擇器時，關閉 Loading
                                   const res = await liff.shareTargetPicker([messageToSend]);
                                   if (res) liff.closeWindow();
                                   else isAutoShare.value = false;
                               } catch (error) {
                                   errorMessage.value = "名片發送失敗，請確認 LINE App 狀態。";
                                   isAutoShare.value = false;
+                                  isLoading.value = false;
                               }
                           }, 500);
                       } else {
                           errorMessage.value = "您當前的 LINE 版本不支援分享功能，請更新 App。";
                           isAutoShare.value = false;
+                          isLoading.value = false;
                       }
                   }
-              } catch (e) { errorMessage.value = "轉發資料載入失敗。"; }
+              } catch (e) { 
+                errorMessage.value = "轉發資料載入失敗。"; 
+                isLoading.value = false;
+              }
           }
         });
         return { profile, buttons, slides, isLoading, errorMessage, isAutoShare, safeBgColor, closeLiff, trackClickAsync, getVideoData, buildFinalLink, getFontFamily, handleTouchStart, handleTouchEnd, nextImg, prevImg };
