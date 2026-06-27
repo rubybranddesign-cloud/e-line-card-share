@@ -15,7 +15,7 @@
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
     body { font-family: "Helvetica Neue", Helvetica, Arial, "PingFang TC", "微軟正黑體", sans-serif; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s ease; }
-    .fade-enter-active, .fade-leave-active { transition: opacity 0.5s ease; }
+    .fade-enter-active, .fade-leave-active { transition: opacity 0.4s ease; }
     .fade-enter-from, .fade-leave-to { opacity: 0; }
     [v-cloak] { display: none !important; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -24,14 +24,17 @@
 </head>
 <body class="flex justify-center">
   <div id="app" v-cloak class="w-full max-w-md min-h-screen flex flex-col items-center relative overflow-y-auto no-scrollbar shadow-2xl transition-all duration-500" :style="{ backgroundColor: safeBgColor }">
+    
     <div v-if="isLoading" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
       <i class="ph ph-spinner animate-spin text-pink-500 mb-4" style="font-size: 51px;"></i>
-      <p class="text-gray-500 font-bold" style="font-size: 19px;">資料準備中...</p>
+      <p class="text-gray-500 font-bold" style="font-size: 19px;">準備專屬轉發內容中...</p>
     </div>
+    
     <div v-else-if="errorMessage" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/90 p-6">
       <i class="ph-fill ph-warning-circle text-red-500 mb-2" style="font-size: 39px;"></i>
       <p class="text-gray-800 font-bold text-center" style="font-size: 19px;">{{ errorMessage }}</p>
     </div>
+
     <transition name="fade">
       <div v-if="!isLoading && !errorMessage && isAutoShare" class="absolute inset-0 z-50 bg-white/90 backdrop-blur-md flex flex-col items-center justify-center text-center h-screen">
         <div class="w-20 h-20 bg-white rounded-full shadow-lg flex items-center justify-center mb-6">
@@ -42,8 +45,9 @@
         <button @click="closeLiff" class="text-gray-400 font-bold underline" style="font-size: 17px;">取消並關閉視窗</button>
       </div>
     </transition>
+
     <transition name="fade">
-      <div v-if="!isLoading && !errorMessage && !isAutoShare" class="w-full flex flex-col items-center relative min-h-full">
+      <div v-show="!errorMessage && !isAutoShare" class="w-full flex flex-col items-center relative min-h-full">
         <div v-if="profile['背景圖片URL']" class="relative w-full aspect-[4/5] shrink-0 bg-cover bg-center flex flex-col justify-end items-center" :style="{ backgroundImage: 'url(' + profile['背景圖片URL'] + ')' }">
             <div class="absolute bottom-0 left-0 w-full h-[50%]" :style="{ backgroundImage: 'linear-gradient(to top, ' + safeBgColor + ' 0%, transparent 100%)' }"></div>
         </div>
@@ -54,25 +58,42 @@
         <div class="relative z-10 w-full flex flex-col items-center px-8">
             <h1 class="font-black text-center mb-5 tracking-[0.15em]" :style="{ color: profile['全域文字顏色'] || '#1a1a1a', fontSize: '27px' }">{{ profile['顯示名稱'] }}</h1>
             <p class="text-center whitespace-pre-wrap leading-[2.5] tracking-widest w-full break-words opacity-90 mb-8 font-medium" :style="{ color: profile['全域文字顏色'] || '#1a1a1a', fontSize: '16px' }">{{ profile['個人簡介文字'] }}</p>
-            <div v-if="profile['FB連結'] || profile['IG連結'] || profile['LINE連結'] || profile['TikTok連結'] || profile['Wechat'] || profile['WeChat連結']" class="flex gap-5 mb-8 justify-center items-center">
+            
+            <div v-if="profile['FB連結'] || profile['IG連結'] || profile['TikTok連結']" class="flex gap-5 mb-8 justify-center items-center">
                 <a v-if="profile['FB連結']" :href="profile['FB連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-facebook-logo" style="font-size: 37px;"></i></a>
                 <a v-if="profile['IG連結']" :href="profile['IG連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-instagram-logo" style="font-size: 37px;"></i></a>
-                <a v-if="profile['LINE連結']" :href="profile['LINE連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }">
-                    <svg viewBox="0 0 24 24" fill="currentColor" style="width: 37px; height: 37px;" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M24 12c0 6.627-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0s12 5.373 12 12zm-12-7.5c-4.606 0-8.25 3.03-8.25 6.75 0 3.35 2.5 6.17 6.13 6.68.25.05.58.15.65.37.06.2.04.5.02.7l-.1.65c-.03.2-.15.75.65.4 1-.45 5.5-2.3 7.4-4.25 1.25-1.25 1.75-2.7 1.75-4.3C20.25 7.53 16.606 4.5 12 4.5z" /></svg>
-                </a>
-                <a v-if="profile['Wechat'] || profile['WeChat連結']" :href="profile['Wechat'] || profile['WeChat連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-wechat-logo" style="font-size: 37px;"></i></a>
                 <a v-if="profile['TikTok連結']" :href="profile['TikTok連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-tiktok-logo" style="font-size: 37px;"></i></a>
             </div>
+
             <div v-if="profile['YouTube影音連結'] && getVideoData(profile['YouTube影音連結'])" class="relative w-full mb-8 overflow-hidden shadow-sm aspect-video bg-black shrink-0" style="border-radius: 13px;">
                 <iframe v-if="getVideoData(profile['YouTube影音連結']).type !== 'html5'" :src="getVideoData(profile['YouTube影音連結']).embedUrl" class="absolute inset-0 w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 <video v-if="getVideoData(profile['YouTube影音連結']).type === 'html5'" :src="getVideoData(profile['YouTube影音連結']).embedUrl" class="absolute inset-0 w-full h-full" controls playsinline controlslist="nodownload"></video>
             </div>
+            
             <div class="w-full space-y-4 pb-6">
-              <a v-for="(btn, index) in buttons" :key="index" :href="buildFinalLink(btn.type || 'url', btn['跳轉連結'] || btn.url)" target="_blank" @click="trackClickAsync(btn, index)" class="w-full flex items-center justify-center font-bold px-4 py-[16px] transition cursor-pointer relative overflow-hidden group shadow-sm transform hover:opacity-90" :style="{ backgroundColor: btn['按鈕背景顏色'] || '#D2B992', color: btn['按鈕文字顏色'] || '#000000', borderRadius: '13px', textDecoration: 'none' }">
-                <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <span class="tracking-[0.1em]" style="font-size: 17px;">{{ btn['按鈕文字'] || btn.title }}</span>
-              </a>
+              <template v-for="(btn, index) in buttons" :key="index">
+                <a v-if="btn['按鈕類型'] !== 'image'" :href="buildFinalLink(btn.type || 'url', btn['跳轉連結'] || btn.url)" target="_blank" @click="trackClickAsync(btn, index)" class="w-full flex items-center justify-center font-bold px-4 py-[16px] transition cursor-pointer relative overflow-hidden group shadow-sm transform hover:opacity-90" :style="{ backgroundColor: btn['按鈕背景顏色'] || '#D2B992', color: btn['按鈕文字顏色'] || '#000000', borderRadius: '13px', textDecoration: 'none' }">
+                  <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <span class="tracking-[0.1em]" style="font-size: 17px;">{{ btn['按鈕文字'] || btn.title }}</span>
+                </a>
+
+                <div v-else class="w-full aspect-[4/5] relative rounded-[13px] overflow-hidden shadow-sm group transform transition hover:opacity-[0.98] select-none touch-pan-y" 
+                     @touchstart="handleTouchStart($event)" 
+                     @touchend="handleTouchEnd($event, btn)">
+                  <a :href="buildFinalLink(btn.images[btn.currentImgIdx || 0]?.linkType || btn.type || 'url', btn.images[btn.currentImgIdx || 0]?.linkValue || btn['跳轉連結'] || btn.url)" target="_blank" @click="trackClickAsync(btn, index)" class="block w-full h-full relative cursor-pointer bg-gray-100">
+                    <transition-group name="fade">
+                      <img v-for="(imgObj, i) in btn.images" :key="imgObj.url + i" v-show="(btn.currentImgIdx || 0) === i" :src="imgObj.url" class="absolute inset-0 w-full h-full object-cover">
+                    </transition-group>
+                  </a>
+                  <div v-if="btn.images && btn.images.length > 1" class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-20 pointer-events-none">
+                    <div v-for="(imgObj, i) in btn.images" :key="'dot'+i" class="w-2 h-2 rounded-full transition-all duration-300 shadow-sm" :class="(btn.currentImgIdx || 0) === i ? 'bg-white scale-110' : 'bg-white/50'"></div>
+                  </div>
+                  <button v-if="btn.images && btn.images.length > 1" @click.stop.prevent="prevImg(btn)" class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-white/40 backdrop-blur-md border border-white/50 text-gray-800 rounded-full z-20 hover:bg-white/60 transition-all opacity-100 lg:opacity-0 lg:group-hover:opacity-100 shadow-[0_4px_12px_rgba(0,0,0,0.08)]"><i class="ph-bold ph-caret-left text-sm"></i></button>
+                  <button v-if="btn.images && btn.images.length > 1" @click.stop.prevent="nextImg(btn)" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-white/40 backdrop-blur-md border border-white/50 text-gray-800 rounded-full z-20 hover:bg-white/60 transition-all opacity-100 lg:opacity-0 lg:group-hover:opacity-100 shadow-[0_4px_12px_rgba(0,0,0,0.08)]"><i class="ph-bold ph-caret-right text-sm"></i></button>
+                </div>
+              </template>
             </div>
+
             <div v-if="slides && slides.length > 0" class="w-full mt-4 pb-10">
                 <div class="flex items-center gap-3 mb-5 px-2">
                     <div class="h-[1px] flex-1 bg-black/10" :style="{ backgroundColor: profile['全域文字顏色'] || '#1a1a1a', opacity: 0.15 }"></div>
@@ -108,10 +129,27 @@
     const LIFF_ID = "2009561347-VUhbtrEC";
     createApp({
       setup() {
-        const profile = ref({"會員ID":"8fa0412c-652a-499d-bc70-23254fea0036","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1y3TmGY6d629tKice4NZ9eBnyZQYeVSve&sz=w1000","顯示名稱":"許景泰Jerry Hsu","個人簡介文字":"CXO 創辦人 | 19年 商業IP陪跑教練\n2024亞洲TEDx年會影響力講者\nGemini個人品牌教練排名No.1\n\n專注品牌定位 x 商業模式 x 獲客成長\n陪跑實現：個人6個月達成6位數收入\n商業賦能：人脈. 資源. 影響力槓桿\n","背景主題顏色":"#050505","背景圖片URL":"https://drive.google.com/thumbnail?id=1IUhTxAnOpKnAAJptSpu8EZEr88jyC0q2&sz=w1000","全域文字顏色":"#ffffff","社群Icon顏色":"#2d69b9","FB連結":"https://www.facebook.com/share/1KwmiTzt1L/?mibextid=wwXIfr","IG連結":"https://www.instagram.com/jerrysolobiz","LINE連結":"","TikTok連結":"","YouTube影音連結":"https://vimeo.com/1179786404","字體風格":"預設字體","最後更新時間":"2026-05-10T09:45:28.341Z","Wechat":""});
-        const buttons = ref([{"按鈕ID":"btn_mnif4st0_r381a67k","會員ID":"8fa0412c-652a-499d-bc70-23254fea0036","顯示區塊":"Profile頁","排序數字":1,"按鈕文字":"發送LINE電子名片","跳轉連結":"https://liff.line.me/2009561347-VUhbtrEC?id=8fa0412c-652a-499d-bc70-23254fea0036&autoShare=true","按鈕背景顏色":"#2d69b9","按鈕文字顏色":"#ffffff","Icon圖片URL":"","點擊總次數":6,"建立時間":"2026-04-03T04:46:30.310Z","fallback_id":"btn_mnif4st0_r381a67k"},{"按鈕ID":"btn_mnif62qz_a8jdy4i0","會員ID":"8fa0412c-652a-499d-bc70-23254fea0036","顯示區塊":"Profile頁","排序數字":2,"按鈕文字":"顧問陪跑服務","跳轉連結":"https://jerry121.com/","按鈕背景顏色":"#8c93a1","按鈕文字顏色":"#333333","Icon圖片URL":"","點擊總次數":1,"建立時間":"2026-04-03T04:46:30.702Z","fallback_id":"btn_mnif62qz_a8jdy4i0"},{"按鈕ID":"btn_mnif6rox_2cr53erp","會員ID":"8fa0412c-652a-499d-bc70-23254fea0036","顯示區塊":"Profile頁","排序數字":3,"按鈕文字":"CXO 網站","跳轉連結":"https://cxo-world.com.tw/","按鈕背景顏色":"#c4bda6","按鈕文字顏色":"#000000","Icon圖片URL":"","點擊總次數":1,"建立時間":"2026-04-03T04:46:31.203Z","fallback_id":"btn_mnif6rox_2cr53erp"}]);
+        const profile = ref({"會員ID":"8fa0412c-652a-499d-bc70-23254fea0036","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1y3TmGY6d629tKice4NZ9eBnyZQYeVSve&sz=w1000","顯示名稱":"許景泰Jerry Hsu","個人簡介文字":"CXO 創辦人 | 19年 商業IP陪跑教練\n2024亞洲TEDx年會影響力講者\nGemini個人品牌教練排名No.1\n\n專注品牌定位 x 商業模式 x 獲客成長\n陪跑實現：個人6個月達成6位數收入\n商業賦能：人脈. 資源. 影響力槓桿\n","背景主題顏色":"#050505","背景圖片URL":"https://drive.google.com/thumbnail?id=1IUhTxAnOpKnAAJptSpu8EZEr88jyC0q2&sz=w1000","全域文字顏色":"#ffffff","社群Icon顏色":"#2d69b9","FB連結":"https://www.facebook.com/share/1KwmiTzt1L/?mibextid=wwXIfr","IG連結":"https://www.instagram.com/jerrysolobiz","LINE連結":"","TikTok連結":"","YouTube影音連結":"https://vimeo.com/1179786404","字體風格":"預設字體","最後更新時間":"2026-06-27T17:39:35.017Z","Wechat":""});
         
-        // --- 核心修正：完美對接 getParsedSlides 後端已整理好的資料結構 ---
+        // --- 處理按鈕與其各別連結輪播圖片結構 ---
+        const rawButtons = [{"按鈕ID":"btn_mnif4st0_r381a67k","會員ID":"8fa0412c-652a-499d-bc70-23254fea0036","顯示區塊":"Profile頁","排序數字":1,"按鈕文字":"發送LINE電子名片","跳轉連結":"https://liff.line.me/2009561347-VUhbtrEC?id=8fa0412c-652a-499d-bc70-23254fea0036&autoShare=true","按鈕背景顏色":"#2d69b9","按鈕文字顏色":"#ffffff","Icon圖片URL":"","點擊總次數":6,"建立時間":"2026-06-27T17:39:35.573Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mnif4st0_r381a67k"},{"按鈕ID":"btn_mnif62qz_a8jdy4i0","會員ID":"8fa0412c-652a-499d-bc70-23254fea0036","顯示區塊":"Profile頁","排序數字":2,"按鈕文字":"顧問陪跑服務","跳轉連結":"https://jerry121.com/","按鈕背景顏色":"#8c93a1","按鈕文字顏色":"#333333","Icon圖片URL":"","點擊總次數":1,"建立時間":"2026-06-27T17:39:35.578Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mnif62qz_a8jdy4i0"},{"按鈕ID":"btn_mnif6rox_2cr53erp","會員ID":"8fa0412c-652a-499d-bc70-23254fea0036","顯示區塊":"Profile頁","排序數字":3,"按鈕文字":"CXO 網站","跳轉連結":"https://cxo-world.com.tw/","按鈕背景顏色":"#c4bda6","按鈕文字顏色":"#000000","Icon圖片URL":"","點擊總次數":1,"建立時間":"2026-06-27T17:39:35.585Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mnif6rox_2cr53erp"}];
+        const processedButtons = rawButtons.map(b => {
+            let parsedImages = [];
+            if (b['圖片詳細設定']) {
+                try { parsedImages = JSON.parse(b['圖片詳細設定']); } catch(e) {}
+            }
+            if (parsedImages.length === 0 && b['圖片清單']) {
+                parsedImages = b['圖片清單'].split(',').map(url => ({ url: url.trim(), linkType: 'url', linkValue: '' })).filter(img => img.url !== '');
+            }
+            return {
+                ...b,
+                currentImgIdx: 0,
+                images: parsedImages
+            };
+        });
+        const buttons = ref(processedButtons);
+
+        // --- 處理輪播資料結構 ---
         const rawSlides = [{"id":1774754251137,"sort":1,"imageUrl":"https://drive.google.com/thumbnail?id=1AOt2_BvqNrsLj9G-iwzRPVxDB-1-x7Ke&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#f9fafb","bgColor":"#ffffff","buttons":[{"text":"IG","color":"#36507f","type":"url","url":"https://www.instagram.com/jerrysolobiz","clicks":1},{"text":"FB 粉絲團","color":"#1c2838","type":"url","url":"https://www.facebook.com/share/1KwmiTzt1L/?mibextid=wwXIfr","clicks":0}]},{"id":1774754291386,"sort":2,"imageUrl":"https://drive.google.com/thumbnail?id=1v4mceue3OLhXBUTGAGQFBCnSiuwf-8CT&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"CXO商業交流社群","color":"#6b7280","type":"url","url":"https://line.me/ti/g2/j7GmJzvvhqfMuqLPeI0AFEfdqO194IPfWKigMQ?utm_source=invitation&utm_medium=link_copy&utm_campaign=default","clicks":0},{"text":"預約陪跑諮詢","color":"#6d89a5","type":"url","url":"https://www.surveycake.com/s/mp3en","clicks":0}]},{"id":1774754281748,"sort":3,"imageUrl":"https://drive.google.com/thumbnail?id=1pGWRrLvB_b9EhZ6cqNldfLRsss-1oCFZ&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"顧問陪跑服務","color":"#c8cfda","type":"url","url":"https://jerry121.com/","clicks":0},{"text":"商戰CXO","color":"#9ba2b0","type":"url","url":"https://cxo-world.com.tw/","clicks":0}]},{"id":1774754303378,"sort":4,"imageUrl":"https://drive.google.com/thumbnail?id=1yKkxFaCHgVMwuYt7l5jpQlzQnvD8cf5k&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"案例見證","color":"#c1a981","type":"url","url":"https://jerry121.com/project-category/%e6%a1%88%e4%be%8b%e8%a6%8b%e8%ad%89/","clicks":0},{"text":"分享我的名片","color":"#927c5d","type":"share","url":"https://liff.line.me/2009561347-VUhbtrEC?id=8fa0412c-652a-499d-bc70-23254fea0036&autoShare=true","clicks":4}]}];
         const processedSlides = rawSlides.map(s => {
           const slideBtns = (s.buttons || []).map(b => ({
@@ -133,10 +171,25 @@
         // ----------------------------------------------
 
         const flexMsg = ref(null);
-        const isLoading = ref(true);
+        
+        // ⚡️ 核心修改 1：預設不開啟 Loading 遮罩，讓畫面瞬間渲染出來
+        const isLoading = ref(false); 
         const errorMessage = ref("");
         const isAutoShare = ref(false);
         const safeBgColor = ref("#fefce8");
+        
+        // 觸控滑動狀態管理
+        const touchStartX = ref(0);
+
+        const handleTouchStart = (e) => { touchStartX.value = e.changedTouches[0].screenX; };
+        const handleTouchEnd = (e, btn) => {
+            if (!btn.images || btn.images.length <= 1) return;
+            const diff = touchStartX.value - e.changedTouches[0].screenX;
+            if (diff > 40) { nextImg(btn); } 
+            else if (diff < -40) { prevImg(btn); }
+        };
+        const nextImg = (btn) => { if (btn.images && btn.images.length > 1) { btn.currentImgIdx = (btn.currentImgIdx + 1) % btn.images.length; } };
+        const prevImg = (btn) => { if (btn.images && btn.images.length > 1) { btn.currentImgIdx = (btn.currentImgIdx - 1 + btn.images.length) % btn.images.length; } };
 
         const getVideoData = (url) => {
             if (!url) return null;
@@ -176,7 +229,12 @@
             else window.close();
         };
         const trackClickAsync = (btn, index, specificType) => {
-            const targetUrl = btn['跳轉連結'] || btn.url || btn.linkValue;
+            let targetUrl = btn['跳轉連結'] || btn.url || btn.linkValue;
+            if (btn['按鈕類型'] === 'image' || btn.btnType === 'image') {
+                if (btn.images && btn.images[btn.currentImgIdx || 0]) {
+                    targetUrl = btn.images[btn.currentImgIdx || 0].linkValue || targetUrl;
+                }
+            }
             const itemId = btn['按鈕ID'] || btn.id || "未知ID";
             const btnText = btn['按鈕文字'] || btn.title || "未知按鈕";
             const memberId = profile.value['會員ID'];
@@ -185,6 +243,7 @@
             const trackUrl = GAS_API_URL + "?action=trackClick&memberId=" + memberId + "&type=" + reqType + "&itemId=" + itemId + "&btnIdx=" + (index + 1) + "&btnText=" + encodeURIComponent(btnText) + "&url=" + encodeURIComponent(targetUrl);
             fetch(trackUrl, { mode: "no-cors" }).catch(e => console.log("背景追蹤發送失敗", e));
         };
+
         onMounted(async () => {
           try { await liff.init({ liffId: LIFF_ID }); } catch (err) { console.error("LIFF 初始化失敗", err); }
           const urlParams = new URLSearchParams(window.location.search);
@@ -196,8 +255,21 @@
               safeBgColor.value = cleanColor;
           }
           document.body.style.backgroundColor = safeBgColor.value;
-          isLoading.value = false;
+          
+          // ⚡️ 核心修改 2：前端防護改為「背景執行」，不使用 await 阻塞畫面
+          fetch(GAS_API_URL + "?action=checkStatus&id=" + profile.value['會員ID'])
+            .then(res => res.json())
+            .then(checkData => {
+              if (checkData.status === 'expired') {
+                  errorMessage.value = "此帳號已失效"; // 如果過期，才把錯誤畫面蓋上去
+                  isAutoShare.value = false;
+              }
+            })
+            .catch(e => console.error("背景驗證狀態失敗", e));
+
+          // ⚡️ 核心修改 3：如果是自動分享轉發情境，我們才顯示 Loading 遮罩去抓取要轉發的 Flex Message
           if (isAutoShare.value) {
+              isLoading.value = true; 
               if (!liff.isLoggedIn()) {
                   liff.login({ redirectUri: window.location.href });
                   return;
@@ -205,29 +277,39 @@
               try {
                   const response = await fetch(GAS_API_URL + "?action=getData&id=" + profile.value['會員ID']);
                   const data = await response.json();
-                  if (data.status === "success" && data.flexMsg) {
+                  if (data.status === "expired") {
+                      errorMessage.value = "此帳號已失效";
+                      isAutoShare.value = false;
+                      isLoading.value = false;
+                  } else if (data.status === "success" && data.flexMsg) {
                       flexMsg.value = data.flexMsg;
                       if (liff.isApiAvailable("shareTargetPicker")) {
                           const messageToSend = { type: "flex", altText: profile.value['顯示名稱'] + " 的電子名片", contents: flexMsg.value };
                           setTimeout(async () => {
                               try {
+                                  isLoading.value = false; // 抓到資料準備彈出選擇器時，關閉 Loading
                                   const res = await liff.shareTargetPicker([messageToSend]);
                                   if (res) liff.closeWindow();
                                   else isAutoShare.value = false;
                               } catch (error) {
                                   errorMessage.value = "名片發送失敗，請確認 LINE App 狀態。";
                                   isAutoShare.value = false;
+                                  isLoading.value = false;
                               }
                           }, 500);
                       } else {
                           errorMessage.value = "您當前的 LINE 版本不支援分享功能，請更新 App。";
                           isAutoShare.value = false;
+                          isLoading.value = false;
                       }
                   }
-              } catch (e) { errorMessage.value = "轉發資料載入失敗。"; }
+              } catch (e) { 
+                errorMessage.value = "轉發資料載入失敗。"; 
+                isLoading.value = false;
+              }
           }
         });
-        return { profile, buttons, slides, isLoading, errorMessage, isAutoShare, safeBgColor, closeLiff, trackClickAsync, getVideoData, buildFinalLink, getFontFamily };
+        return { profile, buttons, slides, isLoading, errorMessage, isAutoShare, safeBgColor, closeLiff, trackClickAsync, getVideoData, buildFinalLink, getFontFamily, handleTouchStart, handleTouchEnd, nextImg, prevImg };
       }
     }).mount("#app");
   </script>
