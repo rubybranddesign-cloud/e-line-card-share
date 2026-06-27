@@ -24,14 +24,17 @@
 </head>
 <body class="flex justify-center">
   <div id="app" v-cloak class="w-full max-w-md min-h-screen flex flex-col items-center relative overflow-y-auto no-scrollbar shadow-2xl transition-all duration-500" :style="{ backgroundColor: safeBgColor }">
+    
     <div v-if="isLoading" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
       <i class="ph ph-spinner animate-spin text-pink-500 mb-4" style="font-size: 51px;"></i>
-      <p class="text-gray-500 font-bold" style="font-size: 19px;">資料準備中...</p>
+      <p class="text-gray-500 font-bold" style="font-size: 19px;">準備專屬轉發內容中...</p>
     </div>
+    
     <div v-else-if="errorMessage" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/90 p-6">
       <i class="ph-fill ph-warning-circle text-red-500 mb-2" style="font-size: 39px;"></i>
       <p class="text-gray-800 font-bold text-center" style="font-size: 19px;">{{ errorMessage }}</p>
     </div>
+
     <transition name="fade">
       <div v-if="!isLoading && !errorMessage && isAutoShare" class="absolute inset-0 z-50 bg-white/90 backdrop-blur-md flex flex-col items-center justify-center text-center h-screen">
         <div class="w-20 h-20 bg-white rounded-full shadow-lg flex items-center justify-center mb-6">
@@ -42,8 +45,9 @@
         <button @click="closeLiff" class="text-gray-400 font-bold underline" style="font-size: 17px;">取消並關閉視窗</button>
       </div>
     </transition>
+
     <transition name="fade">
-      <div v-if="!isLoading && !errorMessage && !isAutoShare" class="w-full flex flex-col items-center relative min-h-full">
+      <div v-show="!errorMessage && !isAutoShare" class="w-full flex flex-col items-center relative min-h-full">
         <div v-if="profile['背景圖片URL']" class="relative w-full aspect-[4/5] shrink-0 bg-cover bg-center flex flex-col justify-end items-center" :style="{ backgroundImage: 'url(' + profile['背景圖片URL'] + ')' }">
             <div class="absolute bottom-0 left-0 w-full h-[50%]" :style="{ backgroundImage: 'linear-gradient(to top, ' + safeBgColor + ' 0%, transparent 100%)' }"></div>
         </div>
@@ -125,16 +129,15 @@
     const LIFF_ID = "2009561347-VUhbtrEC";
     createApp({
       setup() {
-        const profile = ref({"會員ID":"05ebbe12-42bc-4eb6-a149-2b23dc704c7c","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1Yx4aFkqr9II1r4ws1NRCh12eyh1JqGIS&sz=w1000","顯示名稱":"Zoey吳惇恩","個人簡介文字":"商業視覺定位 × 高端形象顧問\n\n60+ 企業主與品牌主形象企劃\n300+ 藝人・作者・名人造型服務\n80+ 政治人物形象服務\n13年 妝髮整體造型經驗\n11年 服裝設計背景\n\n品牌經歷\n醫療院所/企業形象企劃｜\n勤業眾信・中國醫藥大學新竹附設醫院 \n大型典禮與藝文活動｜\n金曲獎指定妝髮造型團隊\n國際美妝品牌合作｜\nSHU UEMURA・GUERLAIN・LANEIGE・PHILIPS\n商業活動與媒體造型｜\n商業周刊‧VOGUE‧中天電視台‧東森電視台","背景主題顏色":"#e5e7eb","背景圖片URL":"https://drive.google.com/thumbnail?id=1Yx4aFkqr9II1r4ws1NRCh12eyh1JqGIS&sz=w1000","全域文字顏色":"#1a1a1a","社群Icon顏色":"#000000","FB連結":"","IG連結":"","LINE連結":"","TikTok連結":"","YouTube影音連結":"","字體風格":"預設字體","最後更新時間":"2026-06-25T17:05:24.926Z","Wechat":""});
+        const profile = ref({"會員ID":"05ebbe12-42bc-4eb6-a149-2b23dc704c7c","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1Yx4aFkqr9II1r4ws1NRCh12eyh1JqGIS&sz=w1000","顯示名稱":"Zoey吳惇恩","個人簡介文字":"商業視覺定位 × 高端形象顧問\n\n60+ 企業主與品牌主形象企劃\n300+ 藝人・作者・名人造型服務\n80+ 政治人物形象服務\n13年 妝髮整體造型經驗\n11年 服裝設計背景\n\n品牌經歷\n醫療院所/企業形象企劃｜\n勤業眾信・中國醫藥大學新竹附設醫院 \n大型典禮與藝文活動｜\n金曲獎指定妝髮造型團隊\n國際美妝品牌合作｜\nSHU UEMURA・GUERLAIN・LANEIGE・PHILIPS\n商業活動與媒體造型｜\n商業周刊‧VOGUE‧中天電視台‧東森電視台","背景主題顏色":"#e5e7eb","背景圖片URL":"https://drive.google.com/thumbnail?id=1Yx4aFkqr9II1r4ws1NRCh12eyh1JqGIS&sz=w1000","全域文字顏色":"#1a1a1a","社群Icon顏色":"#000000","FB連結":"","IG連結":"","LINE連結":"","TikTok連結":"","YouTube影音連結":"","字體風格":"預設字體","最後更新時間":"2026-06-27T17:38:55.537Z","Wechat":""});
         
         // --- 處理按鈕與其各別連結輪播圖片結構 ---
-        const rawButtons = [{"按鈕ID":"btn_mozm0rvb_cd6yun8k","會員ID":"05ebbe12-42bc-4eb6-a149-2b23dc704c7c","顯示區塊":"Profile頁","排序數字":1,"按鈕文字":"發送我的電子名片","跳轉連結":"https://liff.line.me/2009561347-VUhbtrEC?id=05ebbe12-42bc-4eb6-a149-2b23dc704c7c&autoShare=true","按鈕背景顏色":"#aab5bb","按鈕文字顏色":"#ffffff","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-06-25T17:05:25.254Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mozm0rvb_cd6yun8k"}];
+        const rawButtons = [{"按鈕ID":"btn_mozm0rvb_cd6yun8k","會員ID":"05ebbe12-42bc-4eb6-a149-2b23dc704c7c","顯示區塊":"Profile頁","排序數字":1,"按鈕文字":"發送我的電子名片","跳轉連結":"https://liff.line.me/2009561347-VUhbtrEC?id=05ebbe12-42bc-4eb6-a149-2b23dc704c7c&autoShare=true","按鈕背景顏色":"#aab5bb","按鈕文字顏色":"#ffffff","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-06-27T17:38:56.625Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mozm0rvb_cd6yun8k"}];
         const processedButtons = rawButtons.map(b => {
             let parsedImages = [];
             if (b['圖片詳細設定']) {
                 try { parsedImages = JSON.parse(b['圖片詳細設定']); } catch(e) {}
             }
-            // 兼容舊版：如果只有圖片清單，幫它生出預設的 URL 格式
             if (parsedImages.length === 0 && b['圖片清單']) {
                 parsedImages = b['圖片清單'].split(',').map(url => ({ url: url.trim(), linkType: 'url', linkValue: '' })).filter(img => img.url !== '');
             }
@@ -146,7 +149,7 @@
         });
         const buttons = ref(processedButtons);
 
-        // --- 核心修正：完美對接 getParsedSlides 後端已整理好的資料結構 ---
+        // --- 處理輪播資料結構 ---
         const rawSlides = [{"id":"sld_mozlqqfx_682jrr8q","sort":1,"imageUrl":"https://drive.google.com/thumbnail?id=1o6kjdXDazuOcnWqmVwvPJX6jRGTPJWd1&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"分享我的電子名片","color":"#8ba5b2","type":"share","url":"https://liff.line.me/2009561347-VUhbtrEC?id=05ebbe12-42bc-4eb6-a149-2b23dc704c7c&autoShare=true","clicks":0}]},{"id":"sld_mozlqquv_xn7dlk3h","sort":2,"imageUrl":"https://drive.google.com/thumbnail?id=1BG8gzvRVU9lCpoAB6ZWzaxaLGayRx4Ft&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"官方LINE@預約","color":"#d1d1d1","type":"url","url":"https://lin.ee/fAImeSm","clicks":0}]},{"id":"sld_mozlqre1_28zd81lg","sort":3,"imageUrl":"https://drive.google.com/thumbnail?id=1wcXdT48SGkOL7bogpkJ0cMZDkGTqHnid&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"看作品IG","color":"#000000","type":"url","url":"https://www.instagram.com/321_a_voir?igsh=bWVuYzg1M29rNjA1&utm_source=qr","clicks":0}]},{"id":"sld_mozlqr64_rbtuhreq","sort":4,"imageUrl":"https://drive.google.com/thumbnail?id=1s1wnjL-HnPVpFOlImj5AgPveYUDMQ1q-&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"漂唇霧眉服務 IG","color":"#d1d1d1","type":"url","url":"https://www.instagram.com/z_2.0beauty?igsh=MWRhbnY2Zndxd3FrOA%3D%3D&utm_source=qr","clicks":0}]}];
         const processedSlides = rawSlides.map(s => {
           const slideBtns = (s.buttons || []).map(b => ({
@@ -168,7 +171,9 @@
         // ----------------------------------------------
 
         const flexMsg = ref(null);
-        const isLoading = ref(true);
+        
+        // ⚡️ 核心修改 1：預設不開啟 Loading 遮罩，讓畫面瞬間渲染出來
+        const isLoading = ref(false); 
         const errorMessage = ref("");
         const isAutoShare = ref(false);
         const safeBgColor = ref("#fefce8");
@@ -176,31 +181,15 @@
         // 觸控滑動狀態管理
         const touchStartX = ref(0);
 
-        const handleTouchStart = (e) => {
-            touchStartX.value = e.changedTouches[0].screenX;
-        };
-
+        const handleTouchStart = (e) => { touchStartX.value = e.changedTouches[0].screenX; };
         const handleTouchEnd = (e, btn) => {
             if (!btn.images || btn.images.length <= 1) return;
             const diff = touchStartX.value - e.changedTouches[0].screenX;
-            if (diff > 40) { // 向左滑 -> 下一張
-                nextImg(btn);
-            } else if (diff < -40) { // 向右滑 -> 上一張
-                prevImg(btn);
-            }
+            if (diff > 40) { nextImg(btn); } 
+            else if (diff < -40) { prevImg(btn); }
         };
-
-        const nextImg = (btn) => {
-            if (btn.images && btn.images.length > 1) {
-                btn.currentImgIdx = (btn.currentImgIdx + 1) % btn.images.length;
-            }
-        };
-
-        const prevImg = (btn) => {
-            if (btn.images && btn.images.length > 1) {
-                btn.currentImgIdx = (btn.currentImgIdx - 1 + btn.images.length) % btn.images.length;
-            }
-        };
+        const nextImg = (btn) => { if (btn.images && btn.images.length > 1) { btn.currentImgIdx = (btn.currentImgIdx + 1) % btn.images.length; } };
+        const prevImg = (btn) => { if (btn.images && btn.images.length > 1) { btn.currentImgIdx = (btn.currentImgIdx - 1 + btn.images.length) % btn.images.length; } };
 
         const getVideoData = (url) => {
             if (!url) return null;
@@ -254,6 +243,7 @@
             const trackUrl = GAS_API_URL + "?action=trackClick&memberId=" + memberId + "&type=" + reqType + "&itemId=" + itemId + "&btnIdx=" + (index + 1) + "&btnText=" + encodeURIComponent(btnText) + "&url=" + encodeURIComponent(targetUrl);
             fetch(trackUrl, { mode: "no-cors" }).catch(e => console.log("背景追蹤發送失敗", e));
         };
+
         onMounted(async () => {
           try { await liff.init({ liffId: LIFF_ID }); } catch (err) { console.error("LIFF 初始化失敗", err); }
           const urlParams = new URLSearchParams(window.location.search);
@@ -266,22 +256,20 @@
           }
           document.body.style.backgroundColor = safeBgColor.value;
           
-          // 前端防護：掛載階段自動檢驗是否帳號失效
-          try {
-              const checkRes = await fetch(GAS_API_URL + "?action=checkStatus&id=" + profile.value['會員ID']);
-              const checkData = await checkRes.json();
+          // ⚡️ 核心修改 2：前端防護改為「背景執行」，不使用 await 阻塞畫面
+          fetch(GAS_API_URL + "?action=checkStatus&id=" + profile.value['會員ID'])
+            .then(res => res.json())
+            .then(checkData => {
               if (checkData.status === 'expired') {
-                  errorMessage.value = "此帳號已失效";
-                  isLoading.value = false;
+                  errorMessage.value = "此帳號已失效"; // 如果過期，才把錯誤畫面蓋上去
                   isAutoShare.value = false;
-                  return;
               }
-          } catch(e) {
-              console.error(e);
-          }
+            })
+            .catch(e => console.error("背景驗證狀態失敗", e));
 
-          isLoading.value = false;
+          // ⚡️ 核心修改 3：如果是自動分享轉發情境，我們才顯示 Loading 遮罩去抓取要轉發的 Flex Message
           if (isAutoShare.value) {
+              isLoading.value = true; 
               if (!liff.isLoggedIn()) {
                   liff.login({ redirectUri: window.location.href });
                   return;
@@ -292,26 +280,33 @@
                   if (data.status === "expired") {
                       errorMessage.value = "此帳號已失效";
                       isAutoShare.value = false;
+                      isLoading.value = false;
                   } else if (data.status === "success" && data.flexMsg) {
                       flexMsg.value = data.flexMsg;
                       if (liff.isApiAvailable("shareTargetPicker")) {
                           const messageToSend = { type: "flex", altText: profile.value['顯示名稱'] + " 的電子名片", contents: flexMsg.value };
                           setTimeout(async () => {
                               try {
+                                  isLoading.value = false; // 抓到資料準備彈出選擇器時，關閉 Loading
                                   const res = await liff.shareTargetPicker([messageToSend]);
                                   if (res) liff.closeWindow();
                                   else isAutoShare.value = false;
                               } catch (error) {
                                   errorMessage.value = "名片發送失敗，請確認 LINE App 狀態。";
                                   isAutoShare.value = false;
+                                  isLoading.value = false;
                               }
                           }, 500);
                       } else {
                           errorMessage.value = "您當前的 LINE 版本不支援分享功能，請更新 App。";
                           isAutoShare.value = false;
+                          isLoading.value = false;
                       }
                   }
-              } catch (e) { errorMessage.value = "轉發資料載入失敗。"; }
+              } catch (e) { 
+                errorMessage.value = "轉發資料載入失敗。"; 
+                isLoading.value = false;
+              }
           }
         });
         return { profile, buttons, slides, isLoading, errorMessage, isAutoShare, safeBgColor, closeLiff, trackClickAsync, getVideoData, buildFinalLink, getFontFamily, handleTouchStart, handleTouchEnd, nextImg, prevImg };
