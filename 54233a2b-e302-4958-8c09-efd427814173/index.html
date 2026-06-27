@@ -24,14 +24,17 @@
 </head>
 <body class="flex justify-center">
   <div id="app" v-cloak class="w-full max-w-md min-h-screen flex flex-col items-center relative overflow-y-auto no-scrollbar shadow-2xl transition-all duration-500" :style="{ backgroundColor: safeBgColor }">
+    
     <div v-if="isLoading" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
       <i class="ph ph-spinner animate-spin text-pink-500 mb-4" style="font-size: 51px;"></i>
-      <p class="text-gray-500 font-bold" style="font-size: 19px;">資料準備中...</p>
+      <p class="text-gray-500 font-bold" style="font-size: 19px;">準備專屬轉發內容中...</p>
     </div>
+    
     <div v-else-if="errorMessage" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/90 p-6">
       <i class="ph-fill ph-warning-circle text-red-500 mb-2" style="font-size: 39px;"></i>
       <p class="text-gray-800 font-bold text-center" style="font-size: 19px;">{{ errorMessage }}</p>
     </div>
+
     <transition name="fade">
       <div v-if="!isLoading && !errorMessage && isAutoShare" class="absolute inset-0 z-50 bg-white/90 backdrop-blur-md flex flex-col items-center justify-center text-center h-screen">
         <div class="w-20 h-20 bg-white rounded-full shadow-lg flex items-center justify-center mb-6">
@@ -42,8 +45,9 @@
         <button @click="closeLiff" class="text-gray-400 font-bold underline" style="font-size: 17px;">取消並關閉視窗</button>
       </div>
     </transition>
+
     <transition name="fade">
-      <div v-if="!isLoading && !errorMessage && !isAutoShare" class="w-full flex flex-col items-center relative min-h-full">
+      <div v-show="!errorMessage && !isAutoShare" class="w-full flex flex-col items-center relative min-h-full">
         <div v-if="profile['背景圖片URL']" class="relative w-full aspect-[4/5] shrink-0 bg-cover bg-center flex flex-col justify-end items-center" :style="{ backgroundImage: 'url(' + profile['背景圖片URL'] + ')' }">
             <div class="absolute bottom-0 left-0 w-full h-[50%]" :style="{ backgroundImage: 'linear-gradient(to top, ' + safeBgColor + ' 0%, transparent 100%)' }"></div>
         </div>
@@ -54,15 +58,13 @@
         <div class="relative z-10 w-full flex flex-col items-center px-8">
             <h1 class="font-black text-center mb-5 tracking-[0.15em]" :style="{ color: profile['全域文字顏色'] || '#1a1a1a', fontSize: '27px' }">{{ profile['顯示名稱'] }}</h1>
             <p class="text-center whitespace-pre-wrap leading-[2.5] tracking-widest w-full break-words opacity-90 mb-8 font-medium" :style="{ color: profile['全域文字顏色'] || '#1a1a1a', fontSize: '16px' }">{{ profile['個人簡介文字'] }}</p>
-            <div v-if="profile['FB連結'] || profile['IG連結'] || profile['LINE連結'] || profile['TikTok連結'] || profile['Wechat'] || profile['WeChat連結']" class="flex gap-5 mb-8 justify-center items-center">
+            
+            <div v-if="profile['FB連結'] || profile['IG連結'] || profile['TikTok連結']" class="flex gap-5 mb-8 justify-center items-center">
                 <a v-if="profile['FB連結']" :href="profile['FB連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-facebook-logo" style="font-size: 37px;"></i></a>
                 <a v-if="profile['IG連結']" :href="profile['IG連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-instagram-logo" style="font-size: 37px;"></i></a>
-                <a v-if="profile['LINE連結']" :href="profile['LINE連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }">
-                    <svg viewBox="0 0 24 24" fill="currentColor" style="width: 37px; height: 37px;" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M24 12c0 6.627-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0s12 5.373 12 12zm-12-7.5c-4.606 0-8.25 3.03-8.25 6.75 0 3.35 2.5 6.17 6.13 6.68.25.05.58.15.65.37.06.2.04.5.02.7l-.1.65c-.03.2-.15.75.65.4 1-.45 5.5-2.3 7.4-4.25 1.25-1.25 1.75-2.7 1.75-4.3C20.25 7.53 16.606 4.5 12 4.5z" /></svg>
-                </a>
-                <a v-if="profile['Wechat'] || profile['WeChat連結']" :href="profile['Wechat'] || profile['WeChat連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-wechat-logo" style="font-size: 37px;"></i></a>
                 <a v-if="profile['TikTok連結']" :href="profile['TikTok連結']" target="_blank" class="hover:opacity-70 transition flex items-center justify-center" :style="{ color: profile['社群Icon顏色'] || '#000000' }"><i class="ph-fill ph-tiktok-logo" style="font-size: 37px;"></i></a>
             </div>
+
             <div v-if="profile['YouTube影音連結'] && getVideoData(profile['YouTube影音連結'])" class="relative w-full mb-8 overflow-hidden shadow-sm aspect-video bg-black shrink-0" style="border-radius: 13px;">
                 <iframe v-if="getVideoData(profile['YouTube影音連結']).type !== 'html5'" :src="getVideoData(profile['YouTube影音連結']).embedUrl" class="absolute inset-0 w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 <video v-if="getVideoData(profile['YouTube影音連結']).type === 'html5'" :src="getVideoData(profile['YouTube影音連結']).embedUrl" class="absolute inset-0 w-full h-full" controls playsinline controlslist="nodownload"></video>
@@ -127,16 +129,15 @@
     const LIFF_ID = "2009561347-VUhbtrEC";
     createApp({
       setup() {
-        const profile = ref({"會員ID":"54233a2b-e302-4958-8c09-efd427814173","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1LVVKDcnIsNO-UJyap5eMTCT_1mpoEdRc&sz=w1000","顯示名稱":"李 家 蓁","個人簡介文字":"潘朵拉美學院負責人\n艾莉莎美學文創 負責人\n中華國際美學教育發展協會理事長","背景主題顏色":"#e5e7eb","背景圖片URL":"https://drive.google.com/thumbnail?id=1qoVhL85v3r5l8HdxJm0M1796d3yVk_Ze&sz=w1000","全域文字顏色":"#1a1a1a","社群Icon顏色":"#000000","FB連結":"","IG連結":"","LINE連結":"","TikTok連結":"","YouTube影音連結":"","字體風格":"預設字體","最後更新時間":"2026-05-24T14:32:39.600Z","Wechat":""});
+        const profile = ref({"會員ID":"54233a2b-e302-4958-8c09-efd427814173","大頭貼圖片URL":"https://drive.google.com/thumbnail?id=1LVVKDcnIsNO-UJyap5eMTCT_1mpoEdRc&sz=w1000","顯示名稱":"李 家 蓁","個人簡介文字":"潘朵拉美學院負責人\n艾莉莎美學文創 負責人\n中華國際美學教育發展協會理事長","背景主題顏色":"#e5e7eb","背景圖片URL":"https://drive.google.com/thumbnail?id=1qoVhL85v3r5l8HdxJm0M1796d3yVk_Ze&sz=w1000","全域文字顏色":"#1a1a1a","社群Icon顏色":"#000000","FB連結":"","IG連結":"","LINE連結":"","TikTok連結":"","YouTube影音連結":"","字體風格":"預設字體","最後更新時間":"2026-06-27T17:44:05.718Z","Wechat":""});
         
         // --- 處理按鈕與其各別連結輪播圖片結構 ---
-        const rawButtons = [{"按鈕ID":"btn_mpjvintp_moes4j5q","會員ID":"54233a2b-e302-4958-8c09-efd427814173","顯示區塊":"Profile頁","排序數字":1,"按鈕文字":"潘朵拉 官方LINE","跳轉連結":"https://line.me/R/ti/p/@ysp7928m","按鈕背景顏色":"#604a63","按鈕文字顏色":"#ffffff","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-05-24T14:32:39.904Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mpjvintp_moes4j5q"},{"按鈕ID":"btn_mpjvkc84_ikcwzvl4","會員ID":"54233a2b-e302-4958-8c09-efd427814173","顯示區塊":"Profile頁","排序數字":2,"按鈕文字":"轉發電子名片","跳轉連結":"https://liff.line.me/2009561347-VUhbtrEC?id=54233a2b-e302-4958-8c09-efd427814173&autoShare=true","按鈕背景顏色":"#7c6280","按鈕文字顏色":"#ffffff","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-05-24T14:32:39.907Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mpjvkc84_ikcwzvl4"}];
+        const rawButtons = [{"按鈕ID":"btn_mpjvintp_moes4j5q","會員ID":"54233a2b-e302-4958-8c09-efd427814173","顯示區塊":"Profile頁","排序數字":1,"按鈕文字":"潘朵拉 官方LINE","跳轉連結":"https://line.me/R/ti/p/@ysp7928m","按鈕背景顏色":"#604a63","按鈕文字顏色":"#ffffff","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-06-27T17:44:06.135Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mpjvintp_moes4j5q"},{"按鈕ID":"btn_mpjvkc84_ikcwzvl4","會員ID":"54233a2b-e302-4958-8c09-efd427814173","顯示區塊":"Profile頁","排序數字":2,"按鈕文字":"轉發電子名片","跳轉連結":"https://liff.line.me/2009561347-VUhbtrEC?id=54233a2b-e302-4958-8c09-efd427814173&autoShare=true","按鈕背景顏色":"#7c6280","按鈕文字顏色":"#ffffff","Icon圖片URL":"","點擊總次數":0,"建立時間":"2026-06-27T17:44:06.137Z","按鈕類型":"button","圖片清單":"","圖片詳細設定":"[]","fallback_id":"btn_mpjvkc84_ikcwzvl4"}];
         const processedButtons = rawButtons.map(b => {
             let parsedImages = [];
             if (b['圖片詳細設定']) {
                 try { parsedImages = JSON.parse(b['圖片詳細設定']); } catch(e) {}
             }
-            // 兼容舊版：如果只有圖片清單，幫它生出預設的 URL 格式
             if (parsedImages.length === 0 && b['圖片清單']) {
                 parsedImages = b['圖片清單'].split(',').map(url => ({ url: url.trim(), linkType: 'url', linkValue: '' })).filter(img => img.url !== '');
             }
@@ -148,7 +149,7 @@
         });
         const buttons = ref(processedButtons);
 
-        // --- 核心修正：完美對接 getParsedSlides 後端已整理好的資料結構 ---
+        // --- 處理輪播資料結構 ---
         const rawSlides = [{"id":"sld_mpjuzfxu_aroo0dga","sort":1,"imageUrl":"https://drive.google.com/thumbnail?id=1gyV3JlHGOpQfMKVLRWFeoTWJizgXxrwF&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"潘朵拉 官方LINE","color":"#453249","type":"url","url":"https://line.me/R/ti/p/@ysp7928m","clicks":0},{"text":"分享我的名片","color":"#604a63","type":"share","url":"https://liff.line.me/2009561347-VUhbtrEC?id=54233a2b-e302-4958-8c09-efd427814173&autoShare=true","clicks":0}]},{"id":"sld_mpjuzgay_u0sae9rw","sort":2,"imageUrl":"https://drive.google.com/thumbnail?id=1dcOxGQgIntWE9owoXzXL4jcFoMSG2HkU&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"潘朵拉 台中大雅店 IG","color":"#604a63","type":"url","url":"https://www.instagram.com/pandoranail106?igsh=MWVsc3drZ3ozMzRtcg==","clicks":0},{"text":"大雅店地址","color":"#453249","type":"url","url":"https://maps.app.goo.gl/vhopt3H7P1wULhf16?g_st=ic","clicks":0}]},{"id":"sld_mpjuzgmu_mien6ao1","sort":3,"imageUrl":"https://drive.google.com/thumbnail?id=16uLS0964vDzMXJWV_XA6DxdwzDXC5hGJ&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"潘朵拉 台東店 FB","color":"#604a63","type":"url","url":"https://www.facebook.com/no1.1658/?locale=zh_TW","clicks":0},{"text":"台東店地址","color":"#453249","type":"url","url":"https://www.google.com/maps/dir/24.1743156,120.7134442/22.74932,121.14284/@23.1968443,119.3697431,8z/data=!3m1!4b1!4m4!4m3!1m1!4e1!1m0?entry=ttu&g_ep=EgoyMDI1MDcxNi4wIKXMDSoASAFQAw%3D%3D","clicks":0}]},{"id":"sld_mpjuzgs9_t8vsfalu","sort":4,"imageUrl":"https://drive.google.com/thumbnail?id=160n7hN8qrZiEZ01cwc1JxsoKQgNEjtUF&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"講師訓練班","color":"#7c6280","type":"url","url":"https://www.facebook.com/share/p/1BhVjAhyAt/","clicks":0},{"text":"艾莉莎 美學文創","color":"#453249","type":"url","url":"https://www.facebook.com/kuki1688/?_rdr","clicks":0}]},{"id":"sld_mpjv46cq_yx2gcjck","sort":5,"imageUrl":"https://drive.google.com/thumbnail?id=1mrJtYvWjdKX0ypgnX3sno8XF9DxJ_hhm&sz=w1000","buttonFont":"預設字體","buttonTextColor":"#ffffff","bgColor":"#ffffff","buttons":[{"text":"指甲嚴重變形矯正案例","color":"#b19cba","type":"url","url":"https://www.facebook.com/share/p/16zbANDQmH/","clicks":0},{"text":"甲溝炎案例","color":"#b19cba","type":"url","url":"https://www.instagram.com/p/DJbczqCSbDU/?igsh=cTcwZWZ2N2E1a3A=","clicks":0}]}];
         const processedSlides = rawSlides.map(s => {
           const slideBtns = (s.buttons || []).map(b => ({
@@ -170,7 +171,9 @@
         // ----------------------------------------------
 
         const flexMsg = ref(null);
-        const isLoading = ref(true);
+        
+        // ⚡️ 核心修改 1：預設不開啟 Loading 遮罩，讓畫面瞬間渲染出來
+        const isLoading = ref(false); 
         const errorMessage = ref("");
         const isAutoShare = ref(false);
         const safeBgColor = ref("#fefce8");
@@ -178,31 +181,15 @@
         // 觸控滑動狀態管理
         const touchStartX = ref(0);
 
-        const handleTouchStart = (e) => {
-            touchStartX.value = e.changedTouches[0].screenX;
-        };
-
+        const handleTouchStart = (e) => { touchStartX.value = e.changedTouches[0].screenX; };
         const handleTouchEnd = (e, btn) => {
             if (!btn.images || btn.images.length <= 1) return;
             const diff = touchStartX.value - e.changedTouches[0].screenX;
-            if (diff > 40) { // 向左滑 -> 下一張
-                nextImg(btn);
-            } else if (diff < -40) { // 向右滑 -> 上一張
-                prevImg(btn);
-            }
+            if (diff > 40) { nextImg(btn); } 
+            else if (diff < -40) { prevImg(btn); }
         };
-
-        const nextImg = (btn) => {
-            if (btn.images && btn.images.length > 1) {
-                btn.currentImgIdx = (btn.currentImgIdx + 1) % btn.images.length;
-            }
-        };
-
-        const prevImg = (btn) => {
-            if (btn.images && btn.images.length > 1) {
-                btn.currentImgIdx = (btn.currentImgIdx - 1 + btn.images.length) % btn.images.length;
-            }
-        };
+        const nextImg = (btn) => { if (btn.images && btn.images.length > 1) { btn.currentImgIdx = (btn.currentImgIdx + 1) % btn.images.length; } };
+        const prevImg = (btn) => { if (btn.images && btn.images.length > 1) { btn.currentImgIdx = (btn.currentImgIdx - 1 + btn.images.length) % btn.images.length; } };
 
         const getVideoData = (url) => {
             if (!url) return null;
@@ -256,6 +243,7 @@
             const trackUrl = GAS_API_URL + "?action=trackClick&memberId=" + memberId + "&type=" + reqType + "&itemId=" + itemId + "&btnIdx=" + (index + 1) + "&btnText=" + encodeURIComponent(btnText) + "&url=" + encodeURIComponent(targetUrl);
             fetch(trackUrl, { mode: "no-cors" }).catch(e => console.log("背景追蹤發送失敗", e));
         };
+
         onMounted(async () => {
           try { await liff.init({ liffId: LIFF_ID }); } catch (err) { console.error("LIFF 初始化失敗", err); }
           const urlParams = new URLSearchParams(window.location.search);
@@ -268,22 +256,20 @@
           }
           document.body.style.backgroundColor = safeBgColor.value;
           
-          // 前端防護：掛載階段自動檢驗是否帳號失效
-          try {
-              const checkRes = await fetch(GAS_API_URL + "?action=checkStatus&id=" + profile.value['會員ID']);
-              const checkData = await checkRes.json();
+          // ⚡️ 核心修改 2：前端防護改為「背景執行」，不使用 await 阻塞畫面
+          fetch(GAS_API_URL + "?action=checkStatus&id=" + profile.value['會員ID'])
+            .then(res => res.json())
+            .then(checkData => {
               if (checkData.status === 'expired') {
-                  errorMessage.value = "此帳號已失效";
-                  isLoading.value = false;
+                  errorMessage.value = "此帳號已失效"; // 如果過期，才把錯誤畫面蓋上去
                   isAutoShare.value = false;
-                  return;
               }
-          } catch(e) {
-              console.error(e);
-          }
+            })
+            .catch(e => console.error("背景驗證狀態失敗", e));
 
-          isLoading.value = false;
+          // ⚡️ 核心修改 3：如果是自動分享轉發情境，我們才顯示 Loading 遮罩去抓取要轉發的 Flex Message
           if (isAutoShare.value) {
+              isLoading.value = true; 
               if (!liff.isLoggedIn()) {
                   liff.login({ redirectUri: window.location.href });
                   return;
@@ -294,26 +280,33 @@
                   if (data.status === "expired") {
                       errorMessage.value = "此帳號已失效";
                       isAutoShare.value = false;
+                      isLoading.value = false;
                   } else if (data.status === "success" && data.flexMsg) {
                       flexMsg.value = data.flexMsg;
                       if (liff.isApiAvailable("shareTargetPicker")) {
                           const messageToSend = { type: "flex", altText: profile.value['顯示名稱'] + " 的電子名片", contents: flexMsg.value };
                           setTimeout(async () => {
                               try {
+                                  isLoading.value = false; // 抓到資料準備彈出選擇器時，關閉 Loading
                                   const res = await liff.shareTargetPicker([messageToSend]);
                                   if (res) liff.closeWindow();
                                   else isAutoShare.value = false;
                               } catch (error) {
                                   errorMessage.value = "名片發送失敗，請確認 LINE App 狀態。";
                                   isAutoShare.value = false;
+                                  isLoading.value = false;
                               }
                           }, 500);
                       } else {
                           errorMessage.value = "您當前的 LINE 版本不支援分享功能，請更新 App。";
                           isAutoShare.value = false;
+                          isLoading.value = false;
                       }
                   }
-              } catch (e) { errorMessage.value = "轉發資料載入失敗。"; }
+              } catch (e) { 
+                errorMessage.value = "轉發資料載入失敗。"; 
+                isLoading.value = false;
+              }
           }
         });
         return { profile, buttons, slides, isLoading, errorMessage, isAutoShare, safeBgColor, closeLiff, trackClickAsync, getVideoData, buildFinalLink, getFontFamily, handleTouchStart, handleTouchEnd, nextImg, prevImg };
