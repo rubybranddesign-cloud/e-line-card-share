@@ -14,7 +14,7 @@
         -webkit-tap-highlight-color: transparent; 
         transition: background-color 0.3s ease; 
     }
-    .fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
+    .fade-enter-active, .fade-leave-active { transition: opacity 0.5s ease; }
     .fade-enter-from, .fade-leave-to { opacity: 0; }
     [v-cloak] { display: none !important; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -114,6 +114,7 @@
         const errorMessage = ref('');
         const isAutoShare = ref(false); 
         
+        // 🔥 定義安全的底色變數
         const safeBgColor = ref('#fefce8'); 
         
         const getYoutubeEmbedUrl = (url) => {
@@ -163,9 +164,22 @@
         };
 
         onMounted(async () => {
-          const urlParams = new URLSearchParams(window.location.search);
-          const memberId = urlParams.get('id');
-          isAutoShare.value = urlParams.get('autoShare') === 'true';
+          try {
+            await liff.init({ liffId: LIFF_ID });
+          } catch (err) {
+            console.error("LIFF 初始化失敗", err);
+          }
+
+          // 🚀 核心修復：破解 LINE 的 liff.state 參數封裝陷阱
+          let searchParams = new URLSearchParams(window.location.search);
+          if (searchParams.has('liff.state')) {
+              let stateStr = searchParams.get('liff.state');
+              // 確保開頭有問號，讓 URLSearchParams 能正確解析
+              searchParams = new URLSearchParams(stateStr.startsWith('?') ? stateStr : '?' + stateStr);
+          }
+
+          const memberId = searchParams.get('id');
+          isAutoShare.value = searchParams.get('autoShare') === 'true';
 
           if (!memberId) {
             errorMessage.value = '網址錯誤：缺少專屬會員 ID';
@@ -174,11 +188,9 @@
           }
 
           try {
-            // 🔥 極速優化核心：將 LIFF 初始化與 GAS 請求「並行處理」，節省排隊時間
-            const liffInitPromise = liff.init({ liffId: LIFF_ID }).catch(err => console.error("LIFF 初始化失敗", err));
-            const fetchPromise = fetch(`${GAS_API_URL}?action=getData&id=${memberId}`).then(res => res.json());
-
-            const [_, data] = await Promise.all([liffInitPromise, fetchPromise]);
+            // 🔥 極速優化：直接請求資料
+            const response = await fetch(`${GAS_API_URL}?action=getData&id=${memberId}`);
+            const data = await response.json();
 
             if (data.status === 'success') {
               profile.value = data.profile;
@@ -187,6 +199,7 @@
               flexMsg.value = data.flexMsg;
               document.title = isAutoShare.value ? '發送名片中...' : `${data.profile['顯示名稱']} 的電子名片`;
 
+              // 🔥 色碼防呆處理
               let rawColor = profile.value['背景主題顏色'];
               let cleanColor = rawColor ? String(rawColor).trim() : '';
               if (cleanColor !== '') {
@@ -197,6 +210,7 @@
               }
               document.body.style.backgroundColor = safeBgColor.value;
 
+              // 🚀 執行分享邏輯
               if (isAutoShare.value && flexMsg.value) {
                   if (!liff.isLoggedIn()) {
                       liff.login({ redirectUri: window.location.href });
@@ -210,7 +224,7 @@
                           contents: flexMsg.value
                       };
 
-                      // 🔥 拔除 setTimeout 刻意延遲，拿到資料的瞬間立刻呼叫好友列表！
+                      // 極速喚起分享列表
                       try {
                           isLoading.value = false; // 瞬間解除轉圈圈
                           const res = await liff.shareTargetPicker([messageToSend]);
