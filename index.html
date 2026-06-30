@@ -24,9 +24,7 @@
 <body class="flex justify-center">
   <div id="app" v-cloak class="w-full max-w-md min-h-screen flex flex-col items-center relative overflow-y-auto no-scrollbar shadow-2xl transition-all duration-500" :style="{ backgroundColor: safeBgColor }">
     
-    <div v-if="isLoading" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
-      <i class="ph ph-spinner animate-spin text-pink-500 mb-4" style="font-size: 51px;"></i>
-      <p class="text-gray-500 font-bold" style="font-size: 19px;">資料準備中...</p>
+    <div v-if="isLoading" class="absolute inset-0 z-50 flex flex-col items-center justify-center transition-opacity duration-300" :style="{ backgroundColor: safeBgColor }">
     </div>
 
     <div v-else-if="errorMessage" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/90 p-6">
@@ -35,13 +33,7 @@
     </div>
 
     <transition name="fade">
-      <div v-if="!isLoading && !errorMessage && isAutoShare" class="absolute inset-0 z-50 bg-white/90 backdrop-blur-md flex flex-col items-center justify-center text-center h-screen">
-        <div class="w-20 h-20 bg-white rounded-full shadow-lg flex items-center justify-center mb-6">
-           <i class="ph-fill ph-paper-plane-tilt text-[#06C755] animate-pulse" style="font-size: 39px;"></i>
-        </div>
-        <h2 class="font-black text-gray-900 mb-2" style="font-size: 23px;">正在開啟好友列表</h2>
-        <p class="text-gray-500 font-bold mb-8" style="font-size: 17px;">請在彈出的視窗中選擇要發送的對象</p>
-        <button @click="closeLiff" class="text-gray-400 font-bold underline" style="font-size: 17px;">取消並關閉視窗</button>
+      <div v-if="!isLoading && !errorMessage && isAutoShare" class="absolute inset-0 z-50 flex flex-col items-center justify-center transition-opacity duration-300" :style="{ backgroundColor: safeBgColor }">
       </div>
     </transition>
 
@@ -114,7 +106,7 @@
         const errorMessage = ref('');
         const isAutoShare = ref(false); 
         
-        const safeBgColor = ref('#fefce8'); 
+        const safeBgColor = ref('#ffffff'); // 預設白底，確保乾淨
         
         const getYoutubeEmbedUrl = (url) => {
             if (!url) return null;
@@ -174,7 +166,7 @@
           }
 
           try {
-            // 🔥 極速優化核心：將 LIFF 初始化與 GAS 請求「並行處理」，節省排隊時間
+            // 與後端通訊依然並行處理以節省時間
             const liffInitPromise = liff.init({ liffId: LIFF_ID }).catch(err => console.error("LIFF 初始化失敗", err));
             const fetchPromise = fetch(`${GAS_API_URL}?action=getData&id=${memberId}`).then(res => res.json());
 
@@ -185,7 +177,6 @@
               profile.value['會員ID'] = memberId; 
               buttons.value = data.buttons;
               flexMsg.value = data.flexMsg;
-              document.title = isAutoShare.value ? '發送名片中...' : `${data.profile['顯示名稱']} 的電子名片`;
 
               let rawColor = profile.value['背景主題顏色'];
               let cleanColor = rawColor ? String(rawColor).trim() : '';
@@ -210,9 +201,9 @@
                           contents: flexMsg.value
                       };
 
-                      // 🔥 拔除 setTimeout 刻意延遲，拿到資料的瞬間立刻呼叫好友列表！
                       try {
-                          isLoading.value = false; // 瞬間解除轉圈圈
+                          isLoading.value = false; 
+                          // 零延遲，直接喚起好友列表
                           const res = await liff.shareTargetPicker([messageToSend]);
                           if (res) {
                               liff.closeWindow();
