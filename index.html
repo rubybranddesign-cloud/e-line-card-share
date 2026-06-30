@@ -14,7 +14,7 @@
         -webkit-tap-highlight-color: transparent; 
         transition: background-color 0.3s ease; 
     }
-    .fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
+    .fade-enter-active, .fade-leave-active { transition: opacity 0.5s ease; }
     .fade-enter-from, .fade-leave-to { opacity: 0; }
     [v-cloak] { display: none !important; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -113,7 +113,6 @@
         const isLoading = ref(true);
         const errorMessage = ref('');
         const isAutoShare = ref(false); 
-        
         const safeBgColor = ref('#fefce8'); 
         
         const getYoutubeEmbedUrl = (url) => {
@@ -154,8 +153,13 @@
             const itemId = btn['按鈕ID'] || btn[Object.keys(btn)[0]]; 
             const btnText = btn['按鈕文字'] || '未知按鈕';
             const urlParams = new URLSearchParams(window.location.search);
-            const memberId = urlParams.get('id');
-            
+            // 防呆：如果是在一般頁面點擊，這裡也確保解開 liff.state 避免報錯
+            let memberId = urlParams.get('id');
+            if (!memberId && urlParams.has('liff.state')) {
+                let stateStr = urlParams.get('liff.state');
+                let parsedState = new URLSearchParams(stateStr.startsWith('?') ? stateStr : '?' + stateStr);
+                memberId = parsedState.get('id');
+            }
             if (!memberId || !targetUrl) return;
 
             const trackUrl = `${GAS_API_URL}?action=trackClick&memberId=${memberId}&type=button&itemId=${itemId}&btnIdx=${index + 1}&btnText=${encodeURIComponent(btnText)}&url=${encodeURIComponent(targetUrl)}`;
@@ -163,9 +167,15 @@
         };
 
         onMounted(async () => {
-          const urlParams = new URLSearchParams(window.location.search);
-          const memberId = urlParams.get('id');
-          isAutoShare.value = urlParams.get('autoShare') === 'true';
+          // 🚀 第一步：提早手動拆解 liff.state 包裹，救出被藏起來的 ID
+          let searchParams = new URLSearchParams(window.location.search);
+          if (searchParams.has('liff.state')) {
+              let stateStr = searchParams.get('liff.state');
+              searchParams = new URLSearchParams(stateStr.startsWith('?') ? stateStr : '?' + stateStr);
+          }
+
+          const memberId = searchParams.get('id');
+          isAutoShare.value = searchParams.get('autoShare') === 'true';
 
           if (!memberId) {
             errorMessage.value = '網址錯誤：缺少專屬會員 ID';
@@ -174,7 +184,7 @@
           }
 
           try {
-            // 🔥 極速優化核心：將 LIFF 初始化與 GAS 請求「並行處理」，節省排隊時間
+            // 🚀 第二步：拿到 ID 後，讓 LIFF 初始化與 GAS 請求「並行光速起跑」
             const liffInitPromise = liff.init({ liffId: LIFF_ID }).catch(err => console.error("LIFF 初始化失敗", err));
             const fetchPromise = fetch(`${GAS_API_URL}?action=getData&id=${memberId}`).then(res => res.json());
 
@@ -197,6 +207,7 @@
               }
               document.body.style.backgroundColor = safeBgColor.value;
 
+              // 🚀 第三步：資料一到位，瞬間解除轉圈圈，彈出分享列表！
               if (isAutoShare.value && flexMsg.value) {
                   if (!liff.isLoggedIn()) {
                       liff.login({ redirectUri: window.location.href });
@@ -210,9 +221,8 @@
                           contents: flexMsg.value
                       };
 
-                      // 🔥 拔除 setTimeout 刻意延遲，拿到資料的瞬間立刻呼叫好友列表！
                       try {
-                          isLoading.value = false; // 瞬間解除轉圈圈
+                          isLoading.value = false; // 拿到資料，瞬間關閉轉圈動畫
                           const res = await liff.shareTargetPicker([messageToSend]);
                           if (res) {
                               liff.closeWindow();
