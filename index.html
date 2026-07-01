@@ -24,7 +24,8 @@
 <body class="flex justify-center">
   <div id="app" v-cloak class="w-full max-w-md min-h-screen flex flex-col items-center relative overflow-y-auto no-scrollbar shadow-2xl transition-all duration-500" :style="{ backgroundColor: safeBgColor }">
     
-    <div v-if="isLoading" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
+    <!-- 一般瀏覽模式的讀取圈圈（轉發模式下不顯示，避免重複轉圈） -->
+    <div v-if="isLoading && !isAutoShare" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
       <i class="ph ph-spinner animate-spin text-pink-500 mb-4" style="font-size: 51px;"></i>
       <p class="text-gray-500 font-bold" style="font-size: 19px;">資料準備中...</p>
     </div>
@@ -34,8 +35,9 @@
       <p class="text-gray-800 font-bold text-center" style="font-size: 19px;">{{ errorMessage }}</p>
     </div>
 
+    <!-- 轉發過渡畫面：只要是轉發模式，一進入網頁直接秒顯此畫面 -->
     <transition name="fade">
-      <div v-if="!isLoading && !errorMessage && isAutoShare" class="absolute inset-0 z-50 bg-white/90 backdrop-blur-md flex flex-col items-center justify-center text-center h-screen">
+      <div v-if="!errorMessage && isAutoShare" class="absolute inset-0 z-50 bg-white/90 backdrop-blur-md flex flex-col items-center justify-center text-center h-screen">
         <div class="w-20 h-20 bg-white rounded-full shadow-lg flex items-center justify-center mb-6">
            <i class="ph-fill ph-paper-plane-tilt text-[#06C755] animate-pulse" style="font-size: 39px;"></i>
         </div>
@@ -153,7 +155,6 @@
             const itemId = btn['按鈕ID'] || btn[Object.keys(btn)[0]]; 
             const btnText = btn['按鈕文字'] || '未知按鈕';
             const urlParams = new URLSearchParams(window.location.search);
-            // 防呆：如果是在一般頁面點擊，這裡也確保解開 liff.state 避免報錯
             let memberId = urlParams.get('id');
             if (!memberId && urlParams.has('liff.state')) {
                 let stateStr = urlParams.get('liff.state');
@@ -167,7 +168,6 @@
         };
 
         onMounted(async () => {
-          // 🚀 第一步：提早手動拆解 liff.state 包裹，救出被藏起來的 ID
           let searchParams = new URLSearchParams(window.location.search);
           if (searchParams.has('liff.state')) {
               let stateStr = searchParams.get('liff.state');
@@ -183,9 +183,46 @@
             return;
           }
 
+          // 並行初始化 LIFF
+          const liffInitPromise = liff.init({ liffId: LIFF_ID }).catch(err => console.error("LIFF 初始化失敗", err));
+
+          // 🚀 快取優先機制：如果是轉發模式且本端有暫存，直接在毫秒內喚起分享視窗
+          if (isAutoShare.value) {
+              const cachedData = localStorage.getItem('e_card_cache_' + memberId);
+              if (cachedData) {
+                  try {
+                      const parsed = JSON.parse(cachedData);
+                      if (parsed && parsed.flexMsg) {
+                          profile.value = parsed.profile;
+                          flexMsg.value = parsed.flexMsg;
+                          
+                          await liffInitPromise;
+                          if (!liff.isLoggedIn()) {
+                              liff.login({ redirectUri: window.location.href });
+                              return;
+                          }
+                          
+                          if (liff.isApiAvailable('shareTargetPicker')) {
+                              isLoading.value = false;
+                              const res = await liff.shareTargetPicker([{
+                                  type: "flex",
+                                  altText: `${profile.value['顯示名稱'] || '專屬'} 的電子名片`,
+                                  contents: flexMsg.value
+                              }]);
+                              if (res) {
+                                  liff.closeWindow();
+                                  return; // 快取轉發成功，提早結束，不需等待 GAS 載入
+                              }
+                          }
+                      }
+                  } catch (e) {
+                      console.warn("暫存讀取與分享失敗，改由網路重新下載資料", e);
+                  }
+              }
+          }
+
           try {
-            // 🚀 第二步：拿到 ID 後，讓 LIFF 初始化與 GAS 請求「並行光速起跑」
-            const liffInitPromise = liff.init({ liffId: LIFF_ID }).catch(err => console.error("LIFF 初始化失敗", err));
+            // 背景非同步向 GAS 伺服器載入最新資料
             const fetchPromise = fetch(`${GAS_API_URL}?action=getData&id=${memberId}`).then(res => res.json());
 
             const [_, data] = await Promise.all([liffInitPromise, fetchPromise]);
@@ -207,7 +244,17 @@
               }
               document.body.style.backgroundColor = safeBgColor.value;
 
-              // 🚀 第三步：資料一到位，瞬間解除轉圈圈，彈出分享列表！
+              // 將最新資料寫入快取，以備下次可以進行秒開轉發
+              try {
+                  localStorage.setItem('e_card_cache_' + memberId, JSON.stringify({
+                      profile: data.profile,
+                      flexMsg: data.flexMsg
+                  }));
+              } catch (e) {
+                  console.warn("快取寫入失敗", e);
+              }
+
+              // 如果本端沒有快取，則此處為首次分享之 GAS 後備載入點
               if (isAutoShare.value && flexMsg.value) {
                   if (!liff.isLoggedIn()) {
                       liff.login({ redirectUri: window.location.href });
@@ -222,7 +269,7 @@
                       };
 
                       try {
-                          isLoading.value = false; // 拿到資料，瞬間關閉轉圈動畫
+                          isLoading.value = false; 
                           const res = await liff.shareTargetPicker([messageToSend]);
                           if (res) {
                               liff.closeWindow();
