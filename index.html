@@ -209,15 +209,19 @@
           // 並行初始化 LIFF
           const liffInitPromise = liff.init({ liffId: LIFF_ID }).catch(err => console.error("LIFF 初始化失敗", err));
 
-          // 🚀 快取優先機制
+          // 🚀 快取優先機制（加入快取資料的清洗攔截）
           if (isAutoShare.value) {
               const cachedData = localStorage.getItem('e_card_cache_' + memberId);
               if (cachedData) {
                   try {
                       const parsed = JSON.parse(cachedData);
                       if (parsed && parsed.flexMsg) {
+                          // 🚨 這裡就是解決關鍵：強制清洗從本機快取讀出來的舊資料
+                          parsed.profile['大頭貼圖片URL'] = fixImageUrl(parsed.profile['大頭貼圖片URL']);
+                          parsed.profile['背景圖片URL'] = fixImageUrl(parsed.profile['背景圖片URL']);
+                          parsed.flexMsg = fixFlexMsgImages(parsed.flexMsg);
+
                           profile.value = parsed.profile;
-                          // 直接使用已經修復過的快取訊息
                           flexMsg.value = parsed.flexMsg;
                           
                           await liffInitPromise;
@@ -252,6 +256,15 @@
             const [_, data] = await Promise.all([liffInitPromise, fetchPromise]);
 
             if (data.status === 'success') {
+              const customUrl = data.profile['個人頁個性化網址'];
+              const targetPathName = customUrl ? customUrl : memberId;
+
+              // 🚨 防護網：強制跳轉 (如果網址列沒有正確的個性化路徑，立刻換網址，且不干擾 autoShare)
+              if (!isAutoShare.value && !window.location.pathname.includes('/' + targetPathName + '/')) {
+                  window.location.replace('https://rubybranddesign-cloud.github.io/e-line-card-share/' + targetPathName + '/');
+                  return; // 終止後續渲染
+              }
+
               // 🚨 在資料指派前，強制替換圖片網址！
               data.profile['大頭貼圖片URL'] = fixImageUrl(data.profile['大頭貼圖片URL']);
               data.profile['背景圖片URL'] = fixImageUrl(data.profile['背景圖片URL']);
