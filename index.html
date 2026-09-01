@@ -127,25 +127,25 @@
             return url;
         };
 
-        // 🚨 Flex 訊息物件圖片修復器 (加入快取破解機制)
+        // 🚨 Flex 訊息物件圖片修復器 (加入終極快取破解機制)
         const fixFlexMsgImages = (flexObj) => {
             if (!flexObj) return flexObj;
             try {
                 let jsonStr = JSON.stringify(flexObj);
-                // 使用正則表達式安全替換 JSON 字串中的 thumbnail 網址
                 jsonStr = jsonStr.replace(/https:\/\/drive\.google\.com\/thumbnail\?id=([a-zA-Z0-9_-]+)(?:&sz=w1000)?/g, 'https://drive.google.com/uc?export=view&id=$1');
                 
                 let parsed = JSON.parse(jsonStr);
                 
-                // 🔥 動態加入當下時間戳記，確保每次「發送名片」都是全新網址
-                const freshTimestamp = new Date().getTime();
+                // 🔥 每次發送都產生全新亂數
+                const uniqueId = new Date().getTime().toString() + "_" + Math.floor(Math.random() * 10000).toString();
+                
                 if (parsed && parsed.contents) {
                     parsed.contents.forEach(bubble => {
                         if (bubble.hero && bubble.hero.url) {
-                            // 先清掉可能殘留的舊時間戳記，避免網址越來越長
-                            let cleanUrl = bubble.hero.url.split('&nocache=')[0].split('?nocache=')[0];
-                            // 重新附上最新的時間戳記
-                            bubble.hero.url = cleanUrl + (cleanUrl.includes('?') ? '&' : '?') + 'nocache=' + freshTimestamp;
+                            // 先清掉可能殘留的舊 fresh 參數
+                            let cleanUrl = bubble.hero.url.split('&fresh=')[0].split('?fresh=')[0];
+                            // 加上全新的 fresh 參數
+                            bubble.hero.url = cleanUrl + (cleanUrl.includes('?') ? '&' : '?') + 'fresh=' + uniqueId;
                         }
                     });
                 }
