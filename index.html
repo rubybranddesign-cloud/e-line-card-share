@@ -127,15 +127,16 @@
             return url;
         };
 
-        // 🚨 Flex 訊息物件圖片修復器 (擁抱 LINE 極速快取版)
+        //// 🚨 Flex 訊息物件圖片修復器 (極速秒開版)
         const fixFlexMsgImages = (flexObj) => {
             if (!flexObj) return flexObj;
             try {
                 let jsonStr = JSON.stringify(flexObj);
-                // 僅做最穩定的網址替換，將不穩定的 thumbnail 強制轉為安全的 uc 網址
-                jsonStr = jsonStr.replace(/https:\/\/drive\.google\.com\/thumbnail\?id=([a-zA-Z0-9_-]+)(?:&sz=w1000)?/g, 'https://drive.google.com/uc?export=view&id=$1');
                 
-                // 🔥 直接回傳，不再加入隨機時間戳記，讓 LINE 伺服器幫我們把圖存起來，轉傳即刻顯示！
+                // 🔥 終極正則表達式：不管試算表裡的網址長怎樣，全部攔截並轉換為極速直連 + 靜態版本號 (v=ruby01)
+                // 這樣可以立刻拯救女友手機的空白狀況，並且保證之後大家轉傳都是瞬間秒開！
+                jsonStr = jsonStr.replace(/https:\/\/drive\.google\.com\/(?:file\/d\/|uc\?export=view(?:&|\\u0026)id=|thumbnail\?id=)([a-zA-Z0-9_-]{25,})[^"]*/g, 'https://drive.google.com/thumbnail?id=$1&sz=w1080&v=ruby01');
+                
                 return JSON.parse(jsonStr);
             } catch (e) {
                 console.error("圖片修復器發生錯誤", e);
