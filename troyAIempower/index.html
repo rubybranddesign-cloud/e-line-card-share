@@ -1,12 +1,235 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-TW">
 <head>
-  <meta charset="utf-8">
-  <title>網址已升級，跳轉中...</title>
-  <meta http-equiv="refresh" content="0; url=https://tuituicard.github.io/share/troyAIempower/">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>特洛伊AI賦能師 - 專屬電子名片</title>
+  <meta name="description" content="專屬電子名片">
+  <meta property="og:title" content="特洛伊AI賦能師 - 專屬電子名片">
+  <meta property="og:description" content="專屬電子名片">
+  <meta property="og:image" content="https://drive.google.com/thumbnail?id=1nBXWqTaGBSsCsIgSQ-phGYZgecUVF4FR&sz=w1000">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="https://drive.google.com/uc?export=view&id=1BQfcrTIFiSpntNeQbsjr_T2oUYgGeGRx" type="image/jpeg">
+  <link rel="apple-touch-icon" href="https://drive.google.com/uc?export=view&id=1BQfcrTIFiSpntNeQbsjr_T2oUYgGeGRx">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@400;700;900&family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: "Inter", "Noto Sans TC", sans-serif; -webkit-tap-highlight-color: transparent; margin: 0; background-color: #1f2937; }
+    [v-cloak] { display: none !important; }
+  </style>
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script>
+    const decodedSearch = decodeURIComponent(window.location.search);
+    const isAutoShare = decodedSearch.includes("autoShare=true");
+    if (!isAutoShare) {
+      document.write('<script src="https://cdn.tailwindcss.com"><\/script>');
+      document.write('<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"><\/script>');
+      document.write('<script src="https://unpkg.com/vue@3/dist/vue.global.js"><\/script>');
+    }
+  </script>
 </head>
-<body style="display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif; color:#666;">
-  系統網址已升級，安全連線中，準備前往專屬名片...
-  <script>window.location.replace("https://tuituicard.github.io/share/troyAIempower/");</script>
+<body class="flex justify-center min-h-screen" style="background-color: #1f2937; color: #ffffff;">
+  <div id="app" v-cloak class="w-full max-w-md min-h-screen flex flex-col items-center px-6 pt-12 pb-16">
+    <!-- 大頭貼與姓名副標 -->
+    <img :src="profile['大頭貼圖片URL'] || 'https://via.placeholder.com/150'" @error="$event.target.src='https://via.placeholder.com/150'" class="w-[100px] h-[100px] rounded-full object-cover border-[3px] border-white shadow-md mb-4">
+    <h1 class="text-2xl font-black tracking-widest text-center" :style="{ color: textColor, fontFamily: getFontFamily(profile['主標題字體']) }">{{ profile['顯示名稱'] }}</h1>
+    <p v-if="cfg.subtitle" class="text-sm font-medium tracking-wider mt-1.5 opacity-85 text-center" :style="{ color: textColor, fontFamily: getFontFamily(profile['敘述文字體']) }">{{ cfg.subtitle }}</p>
+
+    <!-- 服務項目膠囊標籤 -->
+    <div v-if="tagList.length > 0" class="w-full mt-7">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="h-[1px] flex-1 bg-current opacity-20"></div>
+        <span class="text-xs font-bold tracking-widest opacity-85" style="color: #ffffff;">服務項目</span>
+        <div class="h-[1px] flex-1 bg-current opacity-20"></div>
+      </div>
+      <div class="flex flex-wrap justify-center gap-2">
+        <span v-for="(tag, idx) in tagList" :key="idx" class="px-3.5 py-1.5 rounded-full text-xs font-medium bg-white/85 backdrop-blur-sm shadow-sm text-gray-800">{{ tag }}</span>
+      </div>
+    </div>
+
+    <!-- 白色聯絡卡片 -->
+    <div v-if="cfg.contactPhone || cfg.contactEmail || cfg.contactLine" class="w-full bg-white rounded-3xl p-5 shadow-sm mt-7 text-gray-800">
+      <div class="grid grid-cols-3 gap-2.5 mb-3">
+        <a v-if="cfg.contactPhone" :href="'tel:' + cfg.contactPhone" class="bg-gray-100 hover:bg-gray-200 transition rounded-2xl py-3 flex flex-col items-center justify-center gap-1.5 text-xs font-bold text-gray-700"><i class="ph ph-phone text-xl"></i><span>撥電話</span></a>
+        <div v-else class="bg-gray-50 rounded-2xl py-3 flex flex-col items-center justify-center gap-1.5 text-xs font-bold text-gray-300"><i class="ph ph-phone text-xl"></i><span>撥電話</span></div>
+        <a v-if="cfg.contactLine" :href="buildLineAddUrl(cfg.contactLine)" target="_blank" class="bg-gray-100 hover:bg-gray-200 transition rounded-2xl py-3 flex flex-col items-center justify-center gap-1.5 text-xs font-bold text-gray-700"><i class="ph ph-chat-circle text-xl"></i><span>加 LINE</span></a>
+        <div v-else class="bg-gray-50 rounded-2xl py-3 flex flex-col items-center justify-center gap-1.5 text-xs font-bold text-gray-300"><i class="ph ph-chat-circle text-xl"></i><span>加 LINE</span></div>
+        <a v-if="cfg.contactEmail" :href="'mailto:' + cfg.contactEmail" class="bg-gray-100 hover:bg-gray-200 transition rounded-2xl py-3 flex flex-col items-center justify-center gap-1.5 text-xs font-bold text-gray-700"><i class="ph ph-envelope-simple text-xl"></i><span>寄 Email</span></a>
+        <div v-else class="bg-gray-50 rounded-2xl py-3 flex flex-col items-center justify-center gap-1.5 text-xs font-bold text-gray-300"><i class="ph ph-envelope-simple text-xl"></i><span>寄 Email</span></div>
+      </div>
+      <button @click="downloadVCard" class="w-full py-3 rounded-xl text-white font-bold text-sm flex items-center justify-center gap-2 shadow-sm hover:opacity-90 transition" style="background-color: #fefce8;">
+        <i class="ph ph-user-plus text-lg"></i> 存到手機聯絡人
+      </button>
+      <div class="mt-4 pt-3 border-t border-gray-100 space-y-2 text-xs">
+        <div v-if="cfg.contactPhone" class="flex items-center"><span class="w-14 font-bold shrink-0" style="color: #fefce8;">手機</span><span class="text-gray-700 font-medium">{{ cfg.contactPhone }}</span></div>
+        <div v-if="cfg.contactEmail" class="flex items-center"><span class="w-14 font-bold shrink-0" style="color: #fefce8;">Email</span><span class="text-gray-700 font-medium break-all">{{ cfg.contactEmail }}</span></div>
+        <div v-if="cfg.contactLine" class="flex items-center"><span class="w-14 font-bold shrink-0" style="color: #fefce8;">LINE</span><span class="text-gray-700 font-medium">{{ cfg.contactLine }}</span></div>
+      </div>
+    </div>
+
+    <!-- 關於我們 -->
+    <div v-if="cfg.aboutUs" class="w-full mt-7">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="text-xs font-bold tracking-widest shrink-0 opacity-85" style="color: #ffffff;">關於我們</span>
+        <div class="h-[1px] flex-1 bg-current opacity-20"></div>
+      </div>
+      <p class="text-sm leading-relaxed whitespace-pre-wrap opacity-90" :style="{ color: textColor, fontFamily: getFontFamily(profile['敘述文字體']) }">{{ cfg.aboutUs }}</p>
+    </div>
+
+    <!-- 可以找我的事 -->
+    <div v-if="serviceRows.length > 0" class="w-full mt-7">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="text-xs font-bold tracking-widest shrink-0 opacity-85" style="color: #ffffff;">可以找我的事</span>
+        <div class="h-[1px] flex-1 bg-current opacity-20"></div>
+      </div>
+      <div class="space-y-2.5">
+        <template v-for="(item, idx) in serviceRows" :key="idx">
+          <a v-if="item.url" :href="buildServiceUrl(item.url)" target="_blank" class="w-full bg-white rounded-full px-5 py-3 flex justify-between items-center shadow-sm hover:opacity-90 active:scale-[0.99] transition cursor-pointer" style="text-decoration: none;">
+            <span class="text-sm font-bold" style="color: #fefce8;">{{ item.name }}</span>
+            <span class="text-sm font-bold" style="color: #fefce8;">{{ item.price }}</span>
+          </a>
+          <div v-else class="w-full bg-white rounded-full px-5 py-3 flex justify-between items-center shadow-sm">
+            <span class="text-sm font-bold" style="color: #fefce8;">{{ item.name }}</span>
+            <span class="text-sm font-bold" style="color: #fefce8;">{{ item.price }}</span>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- LINK 連結 (沿用主頁按鈕管理) -->
+    <div v-if="buttons.length > 0" class="w-full mt-7">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="text-xs font-bold tracking-widest shrink-0 opacity-85" style="color: #ffffff;">LINK 連結</span>
+        <div class="h-[1px] flex-1 bg-current opacity-20"></div>
+      </div>
+      <div class="space-y-3">
+        <template v-for="(btn, index) in buttons" :key="index">
+          <a v-if="btn['按鈕類型'] !== 'image'" :href="buildFinalLink(btn.type || 'url', btn['跳轉連結'] || btn.url)" target="_blank" @click="trackClickAsync(btn, index)" class="w-full flex items-center justify-center font-bold px-4 py-3.5 rounded-xl shadow-sm hover:opacity-90 transition text-sm tracking-wider" :style="{ backgroundColor: btn['按鈕背景顏色'] || '#fefce8', color: btn['按鈕文字顏色'] || '#ffffff', fontFamily: getFontFamily(btn['按鈕字體'] || btn.font) }">
+            {{ btn['按鈕文字'] || btn.title }}
+          </a>
+        </template>
+      </div>
+    </div>
+
+    <!-- 公司資訊 -->
+    <div v-if="cfg.companyName || cfg.companyAddress || cfg.companyPhone" class="w-full mt-7">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="text-xs font-bold tracking-widest shrink-0 opacity-85" style="color: #ffffff;">公司資訊</span>
+        <div class="h-[1px] flex-1 bg-current opacity-20"></div>
+      </div>
+      <div class="w-full bg-white rounded-3xl p-5 shadow-sm text-gray-800">
+        <h3 v-if="cfg.companyName" class="text-base font-black text-gray-900 mb-1">{{ cfg.companyName }}</h3>
+        <p v-if="cfg.companyAddress" class="text-xs text-gray-500 mb-4">{{ cfg.companyAddress }}</p>
+        <div class="grid grid-cols-2 gap-2.5">
+          <a v-if="cfg.companyAddress" :href="'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(cfg.companyAddress)" target="_blank" class="py-2.5 rounded-xl text-white text-xs font-bold flex items-center justify-center gap-1.5 hover:opacity-90 transition" style="background-color: #fefce8;"><i class="ph ph-navigation-arrow"></i> 導航</a>
+          <a v-if="cfg.companyPhone" :href="'tel:' + cfg.companyPhone" class="py-2.5 rounded-xl text-white text-xs font-bold flex items-center justify-center gap-1.5 hover:opacity-90 transition" style="background-color: #fefce8;"><i class="ph ph-phone"></i> 公司電話</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 分享這張名片 -->
+    <button @click="shareCardNative" type="button" class="mt-8 inline-block text-xs font-bold tracking-widest underline underline-offset-4 hover:opacity-70 transition opacity-85 bg-transparent border-0 cursor-pointer" style="color: #ffffff;">{{ shareCopied ? '已複製名片訊息！' : '分享這張名片' }}</button>
+    <p class="mt-6 text-xs font-medium tracking-wider opacity-60 text-center" style="color: #ffffff;">
+      <a href="https://lin.ee/WKcncUr" target="_blank" class="hover:opacity-100 transition-all duration-300" style="color: inherit; text-decoration: none;">
+        Powered by Ruby.Brand.Design
+      </a>
+    </p>
+  </div>
+
+  <script>
+    const LIFF_ID = "2009561347-VUhbtrEC";
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwKN7tVF5tnRIIHDGyQ3KElB_BNstGbrWOikDG69EVB-pflciYpVCyVjLStZxpUMQvs/exec";
+    function decodeBase64Safe(s) { try { return JSON.parse(decodeURIComponent(escape(atob(s)))); } catch(e) { return null; } }
+    const RAW_P = "eyLmnIPlk6FJRCI6ImI2MzA4MTY0LTY0NGItNGI3NC04N2NmLTRiZDQyM2FkY2I0NyIsIuWkp+mgreiyvOWclueJh1VSTCI6Imh0dHBzOi8vZHJpdmUuZ29vZ2xlLmNvbS90aHVtYm5haWw/aWQ9MW5CWFdxVGFHQlNzQ3NJZ1NRLXBoR1laZ2VjVVZGNEZSJnN6PXcxMDAwIiwi6aGv56S65ZCN56ixIjoi54m55rSb5LyKQUnos6bog73luKsiLCLlgIvkurrnsKHku4vmloflrZciOiJcbuWJteeri+OAjEdST1dUSFjvvZzlvq7kvIFBSeWtuOmZouOAjVxu44CM5Lqk5aSn6Zu75qmf55Wi5qWt44CNXG7jgIw15qyh5Ym15qWtIHgg6ZaL6YGONeWutuiMtumjsuW6l+OAjVxu44CMNuW5tOaQrOWutualreS6jOS7o+i9ieWei+OAjVxu44CMNuW5tOalreWLmeWVhuWLmee2k+mpl+OAjVxu44CM5L2/55SoQUnnt6jnorzotoXpgY4xMDAwMOWwj+aZguOAjVxu44CMNDAr5aC0QUnlr6bmiLDlt6XkvZzlnYrjgI1cblxu6LaF5oeC44CM5qCh6ZW35YW85pKe6ZCY44CN55qE54Sh5Y+v5aWI5L2VXG7otoXmh4LjgIzllYbli5noqp7oqIDjgI3nmoTmhJ/mgKfnkIblt6XohaZcblxu6YGL55So44CM5pyJ44COIOWJtealrUFJ5a+m5oiwIOOAj+W3peS9nOWdiuOAjVxu6LOm6IO944CM5b6u5Z6L5Ym15qWt6ICFIFZpYmUgQ29kaW5nIOOAjeaKgOiDvVxu6Ieq6KO944CMIOOAjiDlrojkvY/lhYnpmbAg44CP5pW45L2N57O757WxL+WIhui6q+OAjVxuXG7nnIHkuIvjgIwxMDDokKwr44CN55qE5aSW5YyF57O757Wx6ZaL55m86LK7XG7muJvlsJHjgIw25YCL5pyIK+OAjeeahOmWi+eZvOa6nemAmuaIkOacrFxu44CM6LSW5ZueIDHlubQxMjAw5bCP5pmCKyDjgI3nmoTlr7bosrTlhYnpmbBcblxu6K6T57O757Wx54K65L2g5pWI5Yue77yM6K6T5Ym15qWt5LiN5YaN6YGO5YueXG7kvb/nlJ/mtLvlt6XkvZzlubPooaHvvIzorpPnlJ/mhI/mjIHkuYvku6XmgYYiLCLog4zmma/kuLvpoYzpoY/oibIiOiIjMWYyOTM3Iiwi6IOM5pmv5ZyW54mHVVJMIjoiaHR0cHM6Ly9kcml2ZS5nb29nbGUuY29tL3RodW1ibmFpbD9pZD0xMFN1aTFyeWFZQWl2cjZOX1pranlJMUlQQ3B1YnQzVU8mc3o9dzEwMDAiLCLlhajln5/mloflrZfpoY/oibIiOiIjZmZmZmZmIiwi56S+576kSWNvbumhj+iJsiI6IiNmZWZjZTgiLCJGQumAo+e1kCI6Imh0dHBzOi8vd3d3LmZhY2Vib29rLmNvbS9wcm9maWxlLnBocD9pZD02MTU4ODg4NzU2NTQ1OSIsIklH6YCj57WQIjoiaHR0cHM6Ly93d3cuaW5zdGFncmFtLmNvbS90cm95Lmdyb3d0aHguYWkvP2hsPXpoLXR3IiwiTElORemAo+e1kCI6IiIsIlRpa1Rva+mAo+e1kCI6IiIsIue9rumgguaSreaUvueahOW9semfs+mAo+e1kCI6Imh0dHBzOi8veW91dHUuYmUvVGt3WDc1TFVUSEE/c2k9VVZSNld6djZ0cWRoc203SSIsIuWtl+mrlOmiqOagvCI6IntcInRlbXBsYXRlVHlwZVwiOlwibWluaW1hbFwiLFwic3VidGl0bGVcIjpcIlwiLFwic2VydmljZVRhZ3NcIjpcIlwiLFwiY29udGFjdFBob25lXCI6XCJcIixcImNvbnRhY3RFbWFpbFwiOlwiXCIsXCJjb250YWN0TGluZVwiOlwiXCIsXCJhYm91dFVzXCI6XCJcIixcInNlcnZpY2VzTGlzdFwiOlwiXCIsXCJjb21wYW55TmFtZVwiOlwiXCIsXCJjb21wYW55QWRkcmVzc1wiOlwiXCIsXCJjb21wYW55UGhvbmVcIjpcIlwifSIsIuacgOW+jOabtOaWsOaZgumWkyI6IjIwMjYtMTEtMjRUMTU6MTk6MjAuNjQ5WiIsIuWAi+S6uumggeWAi+aAp+WMlue2suWdgCI6InRyb3lBSWVtcG93ZXIiLCJUaHJlYWRz6YCj57WQIjoiIiwiV2hhdHNBcHDpgKPntZAiOiIiLCJMaW5rZWRJbumAo+e1kCI6IiIsIlBvZGNhc3TpgKPntZAiOiJodHRwczovL3d3dy55b3V0dWJlLmNvbS9wbGF5bGlzdD9saXN0PVBMdnFGZ3JnaGtwRjViaXlpTW4zdmpncFdQSnlWZ2pFSUgiLCJXZUNoYXTpgKPntZAiOiIiLCJZb3VUdWJl6aC76YGT6YCj57WQ77yI57Wm56S+576kIEljb24g5bCI55So77yM5Lul5YWN6Lef5Y6f5pys55qE5b2x6Z+z5bWM5YWl6KGd56qB77yJIjoiaHR0cHM6Ly93d3cueW91dHViZS5jb20vcGxheWxpc3Q/bGlzdD1QTHZxRmdyZ2hrcEY3aU0xUFZKX0lxNDZZSXR2cXdYOVZWIiwi5Li75qiZ6aGM5a2X6auUIjoi6aCQ6Kit5a2X6auUIiwi5pWY6L+w5paH5a2X6auUIjoi6aCQ6Kit5a2X6auUIiwiWW91VHViZeW9semfs+mAo+e1kCI6Imh0dHBzOi8veW91dHUuYmUvVGt3WDc1TFVUSEE/c2k9VVZSNld6djZ0cWRoc203SSIsInl0VXJsIjoiaHR0cHM6Ly95b3V0dS5iZS9Ua3dYNzVMVVRIQT9zaT1VVlI2V3p2NnRxZGhzbTdJIiwi5qW157Ch54mI6Kit5a6aIjoie1widGVtcGxhdGVUeXBlXCI6XCJtaW5pbWFsXCIsXCJzdWJ0aXRsZVwiOlwiXCIsXCJzZXJ2aWNlVGFnc1wiOlwiXCIsXCJjb250YWN0UGhvbmVcIjpcIlwiLFwiY29udGFjdEVtYWlsXCI6XCJcIixcImNvbnRhY3RMaW5lXCI6XCJcIixcImFib3V0VXNcIjpcIlwiLFwic2VydmljZXNMaXN0XCI6XCJcIixcImNvbXBhbnlOYW1lXCI6XCJcIixcImNvbXBhbnlBZGRyZXNzXCI6XCJcIixcImNvbXBhbnlQaG9uZVwiOlwiXCJ9In0=", RAW_B = "W3si5oyJ6YiVSUQiOiJidG5fbW85a3R3Y2VfY3F2anNtNmIiLCLmnIPlk6FJRCI6ImI2MzA4MTY0LTY0NGItNGI3NC04N2NmLTRiZDQyM2FkY2I0NyIsIumhr+ekuuWNgOWhiiI6IlByb2ZpbGXpoIEiLCLmjpLluo/mlbjlrZciOjEsIuaMiemIleaWh+WtlyI6Iu+8i+WumOaWuUxJTkUgLSDogYrogYrlibXmpa1BSeWvpuaIsCAiLCLot7PovYnpgKPntZAiOiJodHRwczovL2xpbmUubWUvdGkvcC9+JTQwNTExdWNweXoiLCLmjInpiJXog4zmma/poY/oibIiOiIjZmVmY2U4Iiwi5oyJ6YiV5paH5a2X6aGP6ImyIjoiIzBjNGE2ZSIsIkljb27lnJbniYdVUkwiOiIiLCLpu57mk4rnuL3mrKHmlbgiOjIsIuW7uueri+aZgumWkyI6IjIwMjYtMTEtMjRUMTU6MTk6MjEuMTc2WiIsIuaMiemIlemhnuWeiyI6ImJ1dHRvbiIsIuWclueJh+a4heWWriI6IiIsIuWclueJh+ips+e0sOioreWumiI6IltdIiwi5oyJ6YiV5a2X6auUIjoi6aCQ6Kit5a2X6auUIiwiZmFsbGJhY2tfaWQiOiJidG5fbW85a3R3Y2VfY3F2anNtNmIifSx7IuaMiemIlUlEIjoiYnRuX21ycm1ubmR4X3dtaWVxeTZuIiwi5pyD5ZOhSUQiOiJiNjMwODE2NC02NDRiLTRiNzQtODdjZi00YmQ0MjNhZGNiNDciLCLpoa/npLrljYDloYoiOiJQcm9maWxl6aCBIiwi5o6S5bqP5pW45a2XIjoyLCLmjInpiJXmloflrZciOiLloLHlkI3oqrLnqIsiLCLot7PovYnpgKPntZAiOiJodHRwczovL2J2c2hvcHNlbWluYXIubXkuY2FudmEuc2l0ZS9iaXpncm93dGh4YWkiLCLmjInpiJXog4zmma/poY/oibIiOiIjZmRlMDQ3Iiwi5oyJ6YiV5paH5a2X6aGP6ImyIjoiIzBjNGE2ZSIsIkljb27lnJbniYdVUkwiOiIiLCLpu57mk4rnuL3mrKHmlbgiOjAsIuW7uueri+aZgumWkyI6IjIwMjYtMTEtMjRUMTU6MTk6MjEuMTg0WiIsIuaMiemIlemhnuWeiyI6ImltYWdlIiwi5ZyW54mH5riF5ZauIjoiaHR0cHM6Ly9kcml2ZS5nb29nbGUuY29tL3RodW1ibmFpbD9pZD0xNjEwazVPS0dRdVNJdlZEQTkzQWZOd2hNa0RqU1AyYnkmc3o9dzEwMDAsaHR0cHM6Ly9kcml2ZS5nb29nbGUuY29tL3RodW1ibmFpbD9pZD0xX2lVT0JrWFp2NWd1azhBV0pGZGtQYU9oYXdMSDJpbi0mc3o9dzEwMDAiLCLlnJbniYfoqbPntLDoqK3lrpoiOiJbe1widXJsXCI6XCJodHRwczovL2RyaXZlLmdvb2dsZS5jb20vdGh1bWJuYWlsP2lkPTE2MTBrNU9LR1F1U0l2VkRBOTNBZk53aE1rRGpTUDJieSZzej13MTAwMFwiLFwibGlua1R5cGVcIjpcInVybFwiLFwibGlua1ZhbHVlXCI6XCJodHRwczovL2J2c2hvcHNlbWluYXIubXkuY2FudmEuc2l0ZS9iaXpncm93dGh4YWlcIn0se1widXJsXCI6XCJodHRwczovL2RyaXZlLmdvb2dsZS5jb20vdGh1bWJuYWlsP2lkPTFfaVVPQmtYWnY1Z3VrOEFXSkZka1BhT2hhd0xIMmluLSZzej13MTAwMFwiLFwibGlua1R5cGVcIjpcInVybFwiLFwibGlua1ZhbHVlXCI6XCJodHRwczovL2J2c2hvcHNlbWluYXIubXkuY2FudmEuc2l0ZS9iaXpncm93dGh4YWktMlwifV0iLCLmjInpiJXlrZfpq5QiOiLpoJDoqK3lrZfpq5QiLCJmYWxsYmFja19pZCI6ImJ0bl9tcnJtbm5keF93bWllcXk2biJ9LHsi5oyJ6YiVSUQiOiJidG5fbW5pcmUxdnhfcWlnNTZ1d20iLCLmnIPlk6FJRCI6ImI2MzA4MTY0LTY0NGItNGI3NC04N2NmLTRiZDQyM2FkY2I0NyIsIumhr+ekuuWNgOWhiiI6IlByb2ZpbGXpoIEiLCLmjpLluo/mlbjlrZciOjMsIuaMiemIleaWh+WtlyI6IkdST1dUSFjvvZzlvq7kvIFBSSDlrbjpmaIiLCLot7PovYnpgKPntZAiOiJodHRwczovL2J2c2hvcHNlbWluYXIubXkuY2FudmEuc2l0ZS9ncm93dGh4d29ya3Nob3AiLCLmjInpiJXog4zmma/poY/oibIiOiIjZmRlMDQ3Iiwi5oyJ6YiV5paH5a2X6aGP6ImyIjoiIzBjNGE2ZSIsIkljb27lnJbniYdVUkwiOiIiLCLpu57mk4rnuL3mrKHmlbgiOjI0LCLlu7rnq4vmmYLplpMiOiIyMDI2LTExLTI0VDE1OjE5OjIxLjIxNFoiLCLmjInpiJXpoZ7lnosiOiJidXR0b24iLCLlnJbniYfmuIXllq4iOiIiLCLlnJbniYfoqbPntLDoqK3lrpoiOiJbXSIsIuaMiemIleWtl+mrlCI6IumgkOioreWtl+mrlCIsImZhbGxiYWNrX2lkIjoiYnRuX21uaXJlMXZ4X3FpZzU2dXdtIn0seyLmjInpiJVJRCI6ImJ0bl9tbnpvMDdzZl91NjB1ZG16ZSIsIuacg+WToUlEIjoiYjYzMDgxNjQtNjQ0Yi00Yjc0LTg3Y2YtNGJkNDIzYWRjYjQ3Iiwi6aGv56S65Y2A5aGKIjoiUHJvZmlsZemggSIsIuaOkuW6j+aVuOWtlyI6NCwi5oyJ6YiV5paH5a2XIjoiR1JPV1RIWO+9nEFJ6Kqy56iLIOWlveiplSIsIui3s+i9iemAo+e1kCI6Imh0dHBzOi8vcHNlLmlzLzljdnFyeCIsIuaMiemIleiDjOaZr+mhj+iJsiI6IiNmZGUwNDciLCLmjInpiJXmloflrZfpoY/oibIiOiIjMGM0YTZlIiwiSWNvbuWclueJh1VSTCI6IiIsIum7nuaTiue4veasoeaVuCI6Mywi5bu656uL5pmC6ZaTIjoiMjAyNi0xMS0yNFQxNToxOToyMS4yMjJaIiwi5oyJ6YiV6aGe5Z6LIjoiYnV0dG9uIiwi5ZyW54mH5riF5ZauIjoiIiwi5ZyW54mH6Kmz57Sw6Kit5a6aIjoiW10iLCLmjInpiJXlrZfpq5QiOiLpoJDoqK3lrZfpq5QiLCJmYWxsYmFja19pZCI6ImJ0bl9tbnpvMDdzZl91NjB1ZG16ZSJ9LHsi5oyJ6YiVSUQiOjE3NzQ5NzM2MzIwMjksIuacg+WToUlEIjoiYjYzMDgxNjQtNjQ0Yi00Yjc0LTg3Y2YtNGJkNDIzYWRjYjQ3Iiwi6aGv56S65Y2A5aGKIjoiUHJvZmlsZemggSIsIuaOkuW6j+aVuOWtlyI6NSwi5oyJ6YiV5paH5a2XIjoi54m55rSb5LyKQUnos6bog73luKvvvZzlr6bmiLDpg6jokL3moLwiLCLot7PovYnpgKPntZAiOiJodHRwczovL3ZvY3VzLmNjL3NhbG9uL2Jpemdyb3d0aHhhaSIsIuaMiemIleiDjOaZr+mhj+iJsiI6IiNmZWZjZTgiLCLmjInpiJXmloflrZfpoY/oibIiOiIjMGM0YTZlIiwiSWNvbuWclueJh1VSTCI6MSwi6bue5pOK57i95qyh5pW4IjoxMiwi5bu656uL5pmC6ZaTIjoiMjAyNi0xMS0yNFQxNToxOToyMS4yMjlaIiwi5oyJ6YiV6aGe5Z6LIjoiYnV0dG9uIiwi5ZyW54mH5riF5ZauIjoiIiwi5ZyW54mH6Kmz57Sw6Kit5a6aIjoiW10iLCLmjInpiJXlrZfpq5QiOiLpoJDoqK3lrZfpq5QiLCJmYWxsYmFja19pZCI6MTc3NDk3MzYzMjAyOX0seyLmjInpiJVJRCI6ImJ0bl9tbndwZ3p2bV85cHZsaXhiaSIsIuacg+WToUlEIjoiYjYzMDgxNjQtNjQ0Yi00Yjc0LTg3Y2YtNGJkNDIzYWRjYjQ3Iiwi6aGv56S65Y2A5aGKIjoiUHJvZmlsZemggSIsIuaOkuW6j+aVuOWtlyI6Niwi5oyJ6YiV5paH5a2XIjoi54m55rSb5LyKQUnos6bog73luKvvvZxQb2RjYXN0Iiwi6Lez6L2J6YCj57WQIjoiaHR0cHM6Ly93d3cueW91dHViZS5jb20vcGxheWxpc3Q/bGlzdD1QTHZxRmdyZ2hrcEY1Yml5aU1uM3ZqZ3BXUEp5VmdqRUlIIiwi5oyJ6YiV6IOM5pmv6aGP6ImyIjoiI2ZlZmNlOCIsIuaMiemIleaWh+Wtl+mhj+iJsiI6IiMwYzRhNmUiLCJJY29u5ZyW54mHVVJMIjoiIiwi6bue5pOK57i95qyh5pW4Ijo0LCLlu7rnq4vmmYLplpMiOiIyMDI2LTExLTI0VDE1OjE5OjIxLjIzOFoiLCLmjInpiJXpoZ7lnosiOiJidXR0b24iLCLlnJbniYfmuIXllq4iOiIiLCLlnJbniYfoqbPntLDoqK3lrpoiOiJbXSIsIuaMiemIleWtl+mrlCI6IumgkOioreWtl+mrlCIsImZhbGxiYWNrX2lkIjoiYnRuX21ud3BnenZtXzlwdmxpeGJpIn0seyLmjInpiJVJRCI6ImJ0bl9tbmV1a2k3eF9tNGJ1cXM0ciIsIuacg+WToUlEIjoiYjYzMDgxNjQtNjQ0Yi00Yjc0LTg3Y2YtNGJkNDIzYWRjYjQ3Iiwi6aGv56S65Y2A5aGKIjoiUHJvZmlsZemggSIsIuaOkuW6j+aVuOWtlyI6Nywi5oyJ6YiV5paH5a2XIjoi5aCx5ZCNQUnos6bog73nt5rkuIroqqrmmI7mnIMiLCLot7PovYnpgKPntZAiOiJodHRwczovL2Zvcm1zLmdsZS9McVVjaUVyRzdQeHhQWVZtOCIsIuaMiemIleiDjOaZr+mhj+iJsiI6IiNmZGUwNDciLCLmjInpiJXmloflrZfpoY/oibIiOiIjMGM0YTZlIiwiSWNvbuWclueJh1VSTCI6IiIsIum7nuaTiue4veasoeaVuCI6Niwi5bu656uL5pmC6ZaTIjoiMjAyNi0xMS0yNFQxNToxOToyMS4yNDZaIiwi5oyJ6YiV6aGe5Z6LIjoiYnV0dG9uIiwi5ZyW54mH5riF5ZauIjoiIiwi5ZyW54mH6Kmz57Sw6Kit5a6aIjoiW10iLCLmjInpiJXlrZfpq5QiOiLpoJDoqK3lrZfpq5QiLCJmYWxsYmFja19pZCI6ImJ0bl9tbmV1a2k3eF9tNGJ1cXM0ciJ9XQ==", RAW_C = "eyJ0ZW1wbGF0ZVR5cGUiOiJtaW5pbWFsIiwic3VidGl0bGUiOiIiLCJzZXJ2aWNlVGFncyI6IiIsImNvbnRhY3RQaG9uZSI6IiIsImNvbnRhY3RFbWFpbCI6IiIsImNvbnRhY3RMaW5lIjoiIiwiYWJvdXRVcyI6IiIsInNlcnZpY2VzTGlzdCI6IiIsImNvbXBhbnlOYW1lIjoiIiwiY29tcGFueUFkZHJlc3MiOiIiLCJjb21wYW55UGhvbmUiOiIifQ==", RAW_F = "eyJ0eXBlIjoiY2Fyb3VzZWwiLCJjb250ZW50cyI6W3sidHlwZSI6ImJ1YmJsZSIsInNpemUiOiJtZWdhIiwiaGVybyI6eyJ0eXBlIjoiaW1hZ2UiLCJ1cmwiOiJodHRwczovL2RyaXZlLmdvb2dsZS5jb20vdGh1bWJuYWlsP2lkPTFDTmFDOTNQVzVLTmFORENCUk15N3MycjJWZTFiLS0xcyZzej13MTAwMCIsInNpemUiOiJmdWxsIiwiYXNwZWN0UmF0aW8iOiIxMDgwOjE2ODAiLCJhc3BlY3RNb2RlIjoiY292ZXIifSwiYm9keSI6eyJ0eXBlIjoiYm94IiwibGF5b3V0IjoidmVydGljYWwiLCJwYWRkaW5nVG9wIjoiMTNweCIsInBhZGRpbmdCb3R0b20iOiIxMnB4IiwicGFkZGluZ1N0YXJ0IjoiOHB4IiwicGFkZGluZ0VuZCI6IjhweCIsImJhY2tncm91bmRDb2xvciI6IiNlZmY2ZmYiLCJjb250ZW50cyI6W3sidHlwZSI6ImJ1dHRvbiIsInN0eWxlIjoicHJpbWFyeSIsImNvbG9yIjoiIzVmMzk3NyIsImhlaWdodCI6InNtIiwibWFyZ2luIjoibm9uZSIsImFjdGlvbiI6eyJ0eXBlIjoidXJpIiwibGFiZWwiOiLoqo3orZgg54m55rSb5LyKIEFJ6LOm6IO95birIiwidXJpIjoiaHR0cHM6Ly9ydWJ5YnJhbmRkZXNpZ24tY2xvdWQuZ2l0aHViLmlvL2UtbGluZS1jYXJkLXNoYXJlL2I2MzA4MTY0LTY0NGItNGI3NC04N2NmLTRiZDQyM2FkY2I0Ny8ifX0seyJ0eXBlIjoiYnV0dG9uIiwic3R5bGUiOiJwcmltYXJ5IiwiY29sb3IiOiIjMDM2OWExIiwiaGVpZ2h0Ijoic20iLCJtYXJnaW4iOiJzbSIsImFjdGlvbiI6eyJ0eXBlIjoidXJpIiwibGFiZWwiOiLliIbkuqvpm7vlrZDlkI3niYciLCJ1cmkiOiJodHRwczovL2xpZmYubGluZS5tZS8yMDA5NTYxMzQ3LVZVaGJ0ckVDP2lkPWI2MzA4MTY0LTY0NGItNGI3NC04N2NmLTRiZDQyM2FkY2I0NyZhdXRvU2hhcmU9dHJ1ZSJ9fV19fSx7InR5cGUiOiJidWJibGUiLCJzaXplIjoibWVnYSIsImhlcm8iOnsidHlwZSI6ImltYWdlIiwidXJsIjoiaHR0cHM6Ly9kcml2ZS5nb29nbGUuY29tL3RodW1ibmFpbD9pZD0xQlBuR1JlTUtkM3FHQjJObkpSNHNRYUo4YWdrQVRDZkUmc3o9dzEwMDAiLCJzaXplIjoiZnVsbCIsImFzcGVjdFJhdGlvIjoiMTA4MDoxNjgwIiwiYXNwZWN0TW9kZSI6ImNvdmVyIn0sImJvZHkiOnsidHlwZSI6ImJveCIsImxheW91dCI6InZlcnRpY2FsIiwicGFkZGluZ1RvcCI6IjEzcHgiLCJwYWRkaW5nQm90dG9tIjoiMTJweCIsInBhZGRpbmdTdGFydCI6IjhweCIsInBhZGRpbmdFbmQiOiI4cHgiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZmZmZmZmIiwiY29udGVudHMiOlt7InR5cGUiOiJidXR0b24iLCJzdHlsZSI6InByaW1hcnkiLCJjb2xvciI6IiMwMzY5YTEiLCJoZWlnaHQiOiJzbSIsIm1hcmdpbiI6Im5vbmUiLCJhY3Rpb24iOnsidHlwZSI6InVyaSIsImxhYmVsIjoi5aCx5ZCNIEFJIOaZuuiDveWuouacjeePrSIsInVyaSI6Imh0dHBzOi8vYnZzaG9wc2VtaW5hci5teS5jYW52YS5zaXRlL2Jpemdyb3d0aHhhaSJ9fSx7InR5cGUiOiJidXR0b24iLCJzdHlsZSI6InByaW1hcnkiLCJjb2xvciI6IiMwNTI3M2QiLCJoZWlnaHQiOiJzbSIsIm1hcmdpbiI6InNtIiwiYWN0aW9uIjp7InR5cGUiOiJ1cmkiLCJsYWJlbCI6IuWgseWQjSBBSSDlrqLoo73ljJbns7vntbHnj60iLCJ1cmkiOiJodHRwczovL2J2c2hvcHNlbWluYXIubXkuY2FudmEuc2l0ZS9iaXpncm93dGh4YWktMiJ9fV19fSx7InR5cGUiOiJidWJibGUiLCJzaXplIjoibWVnYSIsImhlcm8iOnsidHlwZSI6ImltYWdlIiwidXJsIjoiaHR0cHM6Ly9kcml2ZS5nb29nbGUuY29tL3RodW1ibmFpbD9pZD0xZDM0LUJ4bldfVks1ajc1bHVCVWswczhobW5GNW1PV2Emc3o9dzEwMDAiLCJzaXplIjoiZnVsbCIsImFzcGVjdFJhdGlvIjoiMTA4MDoxNjgwIiwiYXNwZWN0TW9kZSI6ImNvdmVyIn0sImJvZHkiOnsidHlwZSI6ImJveCIsImxheW91dCI6InZlcnRpY2FsIiwicGFkZGluZ1RvcCI6IjEzcHgiLCJwYWRkaW5nQm90dG9tIjoiMTJweCIsInBhZGRpbmdTdGFydCI6IjhweCIsInBhZGRpbmdFbmQiOiI4cHgiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZmZmZmZmIiwiY29udGVudHMiOlt7InR5cGUiOiJidXR0b24iLCJzdHlsZSI6InByaW1hcnkiLCJjb2xvciI6IiMwNjFkMzAiLCJoZWlnaHQiOiJzbSIsIm1hcmdpbiI6Im5vbmUiLCJhY3Rpb24iOnsidHlwZSI6InVyaSIsImxhYmVsIjoi5oiR55qE5L2c5ZOBIC0g6Zu75a2Q5ZCN54mH57O757WxIiwidXJpIjoiaHR0cHM6Ly9ydWJ5YnJhbmRkZXNpZ24tY2xvdWQuZ2l0aHViLmlvL2UtbGluZS1jYXJkLWJhY2tlci8ifX0seyJ0eXBlIjoiYnV0dG9uIiwic3R5bGUiOiJwcmltYXJ5IiwiY29sb3IiOiIjMGY2MzllIiwiaGVpZ2h0Ijoic20iLCJtYXJnaW4iOiJzbSIsImFjdGlvbiI6eyJ0eXBlIjoidXJpIiwibGFiZWwiOiLlrbjlk6HkvZzlk4EgLSDpjKbokbPppIrnlJ/ppKgiLCJ1cmkiOiJodHRwczovL2xpbmUubWUvdGkvcC9+JTQwamlud2VpMSJ9fV19fSx7InR5cGUiOiJidWJibGUiLCJzaXplIjoibWVnYSIsImhlcm8iOnsidHlwZSI6ImltYWdlIiwidXJsIjoiaHR0cHM6Ly9kcml2ZS5nb29nbGUuY29tL3RodW1ibmFpbD9pZD0xcS1HVnpZU0RyMHZJaU4wUkhfZmVZbGNtZk9qYUZsS3omc3o9dzEwMDAiLCJzaXplIjoiZnVsbCIsImFzcGVjdFJhdGlvIjoiMTA4MDoxNjgwIiwiYXNwZWN0TW9kZSI6ImNvdmVyIn0sImJvZHkiOnsidHlwZSI6ImJveCIsImxheW91dCI6InZlcnRpY2FsIiwicGFkZGluZ1RvcCI6IjEzcHgiLCJwYWRkaW5nQm90dG9tIjoiMTJweCIsInBhZGRpbmdTdGFydCI6IjhweCIsInBhZGRpbmdFbmQiOiI4cHgiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZWZmNmZmIiwiY29udGVudHMiOlt7InR5cGUiOiJidXR0b24iLCJzdHlsZSI6InByaW1hcnkiLCJjb2xvciI6IiMwMzY5YTEiLCJoZWlnaHQiOiJzbSIsIm1hcmdpbiI6Im5vbmUiLCJhY3Rpb24iOnsidHlwZSI6InVyaSIsImxhYmVsIjoi77yLRkIg6L+96Lmk5a+m5oiwIiwidXJpIjoiaHR0cHM6Ly93d3cuZmFjZWJvb2suY29tL3Byb2ZpbGUucGhwP2lkPTYxNTg4ODg3NTY1NDU5In19LHsidHlwZSI6ImJ1dHRvbiIsInN0eWxlIjoicHJpbWFyeSIsImNvbG9yIjoiIzBiMTczZCIsImhlaWdodCI6InNtIiwibWFyZ2luIjoic20iLCJhY3Rpb24iOnsidHlwZSI6InVyaSIsImxhYmVsIjoi6YOo6JC95qC8IOWvpuaIsOethuiomCIsInVyaSI6Imh0dHBzOi8vdm9jdXMuY2Mvc2Fsb24vYml6Z3Jvd3RoeGFpL3Jvb20vYml6Z3Jvd3RoeGFpIn19XX19LHsidHlwZSI6ImJ1YmJsZSIsInNpemUiOiJtZWdhIiwiaGVybyI6eyJ0eXBlIjoiaW1hZ2UiLCJ1cmwiOiJodHRwczovL2RyaXZlLmdvb2dsZS5jb20vdGh1bWJuYWlsP2lkPTFTcTlxSVR0Wk5Pci1sd1lfUHdYWjVOMXlPMlU1ZWRZRSZzej13MTAwMCIsInNpemUiOiJmdWxsIiwiYXNwZWN0UmF0aW8iOiIxMDgwOjE2ODAiLCJhc3BlY3RNb2RlIjoiY292ZXIifSwiYm9keSI6eyJ0eXBlIjoiYm94IiwibGF5b3V0IjoidmVydGljYWwiLCJwYWRkaW5nVG9wIjoiMTNweCIsInBhZGRpbmdCb3R0b20iOiIxMnB4IiwicGFkZGluZ1N0YXJ0IjoiOHB4IiwicGFkZGluZ0VuZCI6IjhweCIsImJhY2tncm91bmRDb2xvciI6IiNlZmY2ZmYiLCJjb250ZW50cyI6W3sidHlwZSI6ImJ1dHRvbiIsInN0eWxlIjoicHJpbWFyeSIsImNvbG9yIjoiIzBiMTczZCIsImhlaWdodCI6InNtIiwibWFyZ2luIjoibm9uZSIsImFjdGlvbiI6eyJ0eXBlIjoidXJpIiwibGFiZWwiOiJHb29nbGXlpb3oqZUiLCJ1cmkiOiJodHRwczovL2cucGFnZS9yL0NSVkhpdUZwX3N2aUVBRS9yZXZpZXcifX0seyJ0eXBlIjoiYnV0dG9uIiwic3R5bGUiOiJwcmltYXJ5IiwiY29sb3IiOiIjMDM2OWExIiwiaGVpZ2h0Ijoic20iLCJtYXJnaW4iOiJzbSIsImFjdGlvbiI6eyJ0eXBlIjoidXJpIiwibGFiZWwiOiLlrbjlk6Hlj6PnopHopovorYkiLCJ1cmkiOiJodHRwczovL3lvdXR1YmUuY29tL3BsYXlsaXN0P2xpc3Q9UEx2cUZncmdoa3BGN2lNMVBWSl9JcTQ2WUl0dnF3WDlWViZzaT02cVl1OEN5bUFnSlRBTnM2In19XX19LHsidHlwZSI6ImJ1YmJsZSIsInNpemUiOiJtZWdhIiwiaGVybyI6eyJ0eXBlIjoiaW1hZ2UiLCJ1cmwiOiJodHRwczovL2RyaXZlLmdvb2dsZS5jb20vdGh1bWJuYWlsP2lkPTF1Q3hvbW1rRFFiM0FRRG9TSGlIMk80ZXBNOXRRSnpCWSZzej13MTAwMCIsInNpemUiOiJmdWxsIiwiYXNwZWN0UmF0aW8iOiIxMDgwOjE2ODAiLCJhc3BlY3RNb2RlIjoiY292ZXIifSwiYm9keSI6eyJ0eXBlIjoiYm94IiwibGF5b3V0IjoidmVydGljYWwiLCJwYWRkaW5nVG9wIjoiMTNweCIsInBhZGRpbmdCb3R0b20iOiIxMnB4IiwicGFkZGluZ1N0YXJ0IjoiOHB4IiwicGFkZGluZ0VuZCI6IjhweCIsImJhY2tncm91bmRDb2xvciI6IiNlZmY2ZmYiLCJjb250ZW50cyI6W3sidHlwZSI6ImJ1dHRvbiIsInN0eWxlIjoicHJpbWFyeSIsImNvbG9yIjoiIzBiMTczZCIsImhlaWdodCI6InNtIiwibWFyZ2luIjoibm9uZSIsImFjdGlvbiI6eyJ0eXBlIjoidXJpIiwibGFiZWwiOiLvvItMSU5FIOWBmuirruipoiIsInVyaSI6Imh0dHBzOi8vbGluZS5tZS90aS9wL34lNDA1MTF1Y3B5eiJ9fSx7InR5cGUiOiJidXR0b24iLCJzdHlsZSI6InByaW1hcnkiLCJjb2xvciI6IiMwMzY5YTEiLCJoZWlnaHQiOiJzbSIsIm1hcmdpbiI6InNtIiwiYWN0aW9uIjp7InR5cGUiOiJ1cmkiLCJsYWJlbCI6IkFJLVNFTyDnibnmtJvkvIpBSeizpuiDveW4qyIsInVyaSI6Imh0dHBzOi8vcHNlLmlzLzljdzNhMiJ9fV19fV19";
+
+    if (isAutoShare) {
+      let flexMsg = decodeBase64Safe(RAW_F);
+      liff.init({ liffId: LIFF_ID }).then(() => {
+        if (!liff.isLoggedIn()) { liff.login({ redirectUri: window.location.href }); return; }
+        if (flexMsg && flexMsg.type === 'carousel') {
+          liff.shareTargetPicker([{ type: "flex", altText: "特洛伊AI賦能師 的專屬電子名片", contents: flexMsg }]).then(() => liff.closeWindow()).catch(() => liff.closeWindow());
+        } else { liff.closeWindow(); }
+      }).catch(() => liff.closeWindow());
+    } else {
+      const { createApp, ref, computed } = Vue;
+      createApp({
+        setup() {
+          const profile = ref(decodeBase64Safe(RAW_P) || {});
+          const buttons = ref(decodeBase64Safe(RAW_B) || []);
+          const cfg = ref(decodeBase64Safe(RAW_C) || {});
+          const tagList = computed(() => String(cfg.value.serviceTags || '').split(/[,，\n]+/).map(t => t.trim()).filter(Boolean));
+          const serviceRows = computed(() => String(cfg.value.servicesList || '').split('\n').map(line => {
+            const parts = line.split(/[|｜]/);
+            return parts[0] && parts[0].trim() ? { name: parts[0].trim(), price: (parts[1] || '').trim(), url: (parts[2] || '').trim() } : null;
+          }).filter(Boolean));
+          const buildServiceUrl = (u) => {
+            const v = String(u || '').trim();
+            if (!v) return '#';
+            return (v.startsWith('http://') || v.startsWith('https://') || v.startsWith('tel:') || v.startsWith('mailto:')) ? v : 'https://' + v;
+          };
+          const getFontFamily = (f) => ({ "預設字體": "sans-serif", "黑體": "\"Noto Sans TC\", sans-serif", "明體": "\"Noto Serif TC\", serif", "圓體": "\"Zen Maru Gothic\", sans-serif" }[f] || "sans-serif");
+          const buildLineAddUrl = (val) => {
+            const v = String(val || "").trim();
+            if (!v) return "#";
+            if (v.startsWith("http")) return v;
+            if (v.startsWith("@")) return "https://line.me/R/ti/p/" + encodeURIComponent(v);
+            return "https://line.me/ti/p/~" + encodeURIComponent(v);
+          };
+          const buildFinalLink = (type, value) => {
+            if (!value) return "#";
+            if (type === "tel") return value.startsWith("tel:") ? value : "tel:" + value;
+            if (type === "email") return value.startsWith("mailto:") ? value : "mailto:" + value;
+            if (type === "line" || type === "line_personal") return buildLineAddUrl(value);
+            if (!value.startsWith("http") && !value.startsWith("mailto:") && !value.startsWith("tel:")) return "https://" + value;
+            return value;
+          };
+          const trackClickAsync = (btn, index) => {
+            const targetUrl = btn['跳轉連結'] || btn.url;
+            const memberId = profile.value['會員ID'];
+            if (!memberId || !targetUrl) return;
+            fetch(GAS_API_URL + "?action=trackClick&memberId=" + memberId + "&type=button&itemId=" + (btn['按鈕ID'] || btn.id || '') + "&btnIdx=" + (index + 1) + "&btnText=" + encodeURIComponent(btn['按鈕文字'] || btn.title || '') + "&url=" + encodeURIComponent(targetUrl), { mode: "no-cors" }).catch(()=>{});
+          };
+          const downloadVCard = () => {
+            const vcard = ["BEGIN:VCARD", "VERSION:3.0", "FN:" + (profile.value['顯示名稱'] || ''), cfg.value.companyName ? "ORG:" + cfg.value.companyName : "", cfg.value.subtitle ? "TITLE:" + cfg.value.subtitle : "", cfg.value.contactPhone ? "TEL;TYPE=CELL:" + cfg.value.contactPhone : "", cfg.value.contactEmail ? "EMAIL:" + cfg.value.contactEmail : "", "END:VCARD"].filter(Boolean).join("\n");
+            const blob = new Blob([vcard], { type: "text/vcard;charset=utf-8;" });
+            const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = (profile.value['顯示名稱'] || 'card') + ".vcf"; a.click();
+          };
+          const shareCopied = ref(false);
+          const shareCardNative = () => {
+            const name = profile.value['顯示名稱'] || "我";
+            const customPath = profile.value['個人頁個性化網址'] || profile.value['會員ID'];
+            const cardUrl = customPath ? ("https://rubybranddesign-cloud.github.io/e-line-card-share/" + customPath + "/") : window.location.href;
+            const introText = "哈囉！這是「" + name + "」的電子名片，請點擊連結查看：";
+            const fullText = introText + "\n" + cardUrl;
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(fullText).catch(() => {});
+            }
+
+            if (navigator.share) {
+              navigator.share({
+                title: name + " - 專屬電子名片",
+                text: introText,
+                url: cardUrl
+              }).catch(() => {});
+            } else {
+              try {
+                const ta = document.createElement('textarea');
+                ta.value = fullText;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+              } catch (e) {}
+              shareCopied.value = true;
+              setTimeout(() => { shareCopied.value = false; }, 2000);
+            }
+          };
+          return { profile, buttons, cfg, tagList, serviceRows, buildServiceUrl, getFontFamily, buildLineAddUrl, buildFinalLink, trackClickAsync, downloadVCard, shareCopied, shareCardNative };
+        }
+      }).mount("#app");
+    }
+  </script>
 </body>
 </html>
