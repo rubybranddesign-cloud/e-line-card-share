@@ -103,7 +103,7 @@
   <script>
     const { createApp, ref, onMounted } = Vue;
 
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzvRtYWqMtRbl1p2qzvfnhz-es1X9TqvHHt2tqz4ZR2FDhstbmG8SjYEO8I-25JQal03g/exec";
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwKN7tVF5tnRIIHDGyQ3KElB_BNstGbrWOikDG69EVB-pflciYpVCyVjLStZxpUMQvs/exec";
     const LIFF_ID = "2009561347-VUhbtrEC";
 
     createApp({
@@ -243,8 +243,10 @@
                               }]);
                               if (res) {
                                   liff.closeWindow();
-                                  return; // 快取轉發成功，提早結束，不需等待 GAS 載入
+                              } else {
+                                  isAutoShare.value = false;
                               }
+                              return;
                           }
                       }
                   } catch (e) {
@@ -332,6 +334,10 @@
                       isAutoShare.value = false;
                       isLoading.value = false;
                   }
+              } else if (isAutoShare.value && !flexMsg.value) {
+                  errorMessage.value = '尚未建立 LINE 輪播卡片，請先至後台「LINE輪播」新增卡片並儲存。';
+                  isAutoShare.value = false;
+                  isLoading.value = false;
               } else {
                   isLoading.value = false;
               }
